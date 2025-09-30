@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState } from 'react';
 import QRCode from 'react-qr-code';
 import { useWalletStore } from '@/store/walletStore';
 import { CryptoService, type DerivedAccount } from '@/services/crypto.service';
+import { Dashboard as WalletDashboard } from '@/components/Dashboard';
 
 type ViewState = 'landing' | 'create' | 'import' | 'dashboard';
 
@@ -109,39 +110,7 @@ export default function Home() {
     );
   }
 
-  function Dashboard() {
-    const current = selected || accounts[0] || null;
-    return (
-      <div className="space-y-6">
-        <div className="flex items-center justify-between">
-          <h2 className="text-xl font-semibold">Your Wallet</h2>
-          <button onClick={() => setView('landing')} className="text-sm text-gray-500 underline">Reset</button>
-        </div>
-        <div className="grid grid-cols-1 gap-3">
-          {accounts.map((a) => (
-            <button key={a.id} onClick={() => selectAccount(a.id)} className={`text-left border rounded-lg p-3 ${selectedAccountId === a.id ? 'border-indigo-500 bg-indigo-50' : ''}`}>
-              <div className="text-sm text-gray-500">{a.name} · {a.chain}</div>
-              <div className="font-mono text-sm">{short(a.address)}</div>
-            </button>
-          ))}
-        </div>
-        {current && (
-          <div className="bg-gray-50 border rounded-lg p-4">
-            <div className="text-sm text-gray-600 mb-2">Receive {current.chain}</div>
-            <div className="bg-white inline-block p-3 rounded-md"><QRCode value={current.address} size={140} /></div>
-            <div className="mt-3 flex items-center justify-between">
-              <div className="font-mono text-sm break-all">{current.address}</div>
-              <button onClick={() => navigator.clipboard.writeText(current.address)} className="ml-3 text-sm px-3 py-1 rounded bg-gray-900 text-white">Copy</button>
-            </div>
-          </div>
-        )}
-        <div className="grid grid-cols-2 gap-3">
-          <button disabled className="w-full bg-gray-200 text-gray-500 rounded-lg py-3 font-medium">Send (soon)</button>
-          <button className="w-full border rounded-lg py-3 font-medium" onClick={() => setView('create')}>Add account</button>
-        </div>
-      </div>
-    );
-  }
+  const Dashboard = WalletDashboard;
 
   return (
     <main className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-500 to-purple-600 p-4">
