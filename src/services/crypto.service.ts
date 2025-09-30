@@ -182,7 +182,7 @@ export class CryptoService {
     const decrypted = await crypto.subtle.decrypt(
       { name: 'AES-GCM', iv },
       cryptoKey,
-      ciphertext
+      ciphertext.buffer
     );
 
     const decoder = new TextDecoder();
