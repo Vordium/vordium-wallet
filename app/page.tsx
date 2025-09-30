@@ -2,8 +2,8 @@
 
 import { useEffect, useMemo, useState } from 'react';
 import QRCode from 'react-qr-code';
-import { useWalletStore } from '@/src/store/walletStore';
-import { CryptoService, type DerivedAccount } from '@/src/services/crypto.service';
+import { useWalletStore } from '@/store/walletStore';
+import { CryptoService, type DerivedAccount } from '@/services/crypto.service';
 
 type ViewState = 'landing' | 'create' | 'import' | 'dashboard';
 
