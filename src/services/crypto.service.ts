@@ -179,10 +179,13 @@ export class CryptoService {
       ['decrypt']
     );
 
+    const ivBuffer = this.uint8ToArrayBuffer(iv);
+    const dataBuffer = this.uint8ToArrayBuffer(ciphertext);
+
     const decrypted = await crypto.subtle.decrypt(
-      { name: 'AES-GCM', iv },
+      { name: 'AES-GCM', iv: ivBuffer },
       cryptoKey,
-      ciphertext.buffer
+      dataBuffer
     );
 
     const decoder = new TextDecoder();
@@ -221,6 +224,12 @@ export class CryptoService {
     return Array.from(bytes)
       .map((b) => b.toString(16).padStart(2, '0'))
       .join('');
+  }
+
+  private static uint8ToArrayBuffer(bytes: Uint8Array): ArrayBuffer {
+    const ab = new ArrayBuffer(bytes.byteLength);
+    new Uint8Array(ab).set(bytes);
+    return ab;
   }
 
   static isValidEVMAddress(address: string): boolean {
