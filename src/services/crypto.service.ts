@@ -72,7 +72,8 @@ export class CryptoService {
     const privateKeyHex = '0x' + this.bytesToHex(privateKey);
     const wallet = new ethers.Wallet(privateKeyHex);
     
-    const publicKey = ethers.computePublicKey(privateKeyHex, false);
+    const signingKey = new ethers.SigningKey(privateKeyHex);
+    const publicKey = signingKey.publicKey;
     return {
       address: wallet.address,
       privateKey: wallet.privateKey,
