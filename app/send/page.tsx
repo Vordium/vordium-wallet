@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/Button';
-import { isValidAddress } from '@/src/utils/safety.utils';
+import { isValidAddress } from '@/utils/safety.utils';
 import { useWalletStore } from '@/store/walletStore';
 
 export default function SendPage() {
