@@ -3,7 +3,7 @@ import * as bip39 from 'bip39';
 import { HDKey } from '@scure/bip32';
 import { ethers } from 'ethers';
 import TronWeb from 'tronweb';
-import * as argon2 from 'argon2-browser';
+// Using WebCrypto PBKDF2 instead of argon2-browser to avoid WASM in Next.js build
 
 // Derivation paths
 const EVM_PATH = "m/44'/60'/0'/0"; // EIP-44 standard
@@ -115,34 +115,34 @@ export class CryptoService {
 
   static async encrypt(data: string, password: string): Promise<EncryptedVault> {
     const salt = crypto.getRandomValues(new Uint8Array(32));
-    
-    const result = await argon2.hash({
-      pass: password,
-      salt: salt,
-      type: argon2.ArgonType.Argon2id,
-      time: 3,
-      mem: 65536,
-      hashLen: 32,
-      parallelism: 1
-    });
-
-    const key = result.hash;
     const iv = crypto.getRandomValues(new Uint8Array(12));
-    
-    const cryptoKey = await crypto.subtle.importKey(
+
+    const passwordKey = await crypto.subtle.importKey(
       'raw',
-      key,
-      { name: 'AES-GCM' },
+      new TextEncoder().encode(password),
+      { name: 'PBKDF2' },
+      false,
+      ['deriveKey']
+    );
+
+    const iterations = 150000;
+    const aesKey = await crypto.subtle.deriveKey(
+      {
+        name: 'PBKDF2',
+        salt,
+        iterations,
+        hash: 'SHA-256',
+      },
+      passwordKey,
+      { name: 'AES-GCM', length: 256 },
       false,
       ['encrypt']
     );
 
-    const encoder = new TextEncoder();
-    const dataBuffer = encoder.encode(data);
-    
+    const dataBuffer = new TextEncoder().encode(data);
     const ciphertext = await crypto.subtle.encrypt(
       { name: 'AES-GCM', iv },
-      cryptoKey,
+      aesKey,
       dataBuffer
     );
 
@@ -150,7 +150,7 @@ export class CryptoService {
       ciphertext: this.uint8ToBase64(new Uint8Array(ciphertext)),
       iv: this.uint8ToBase64(iv),
       salt: this.uint8ToBase64(salt),
-      iterations: 3
+      iterations
     };
   }
 
@@ -159,22 +159,23 @@ export class CryptoService {
     const iv = this.base64ToUint8(vault.iv);
     const ciphertext = this.base64ToUint8(vault.ciphertext);
 
-    const result = await argon2.hash({
-      pass: password,
-      salt: salt,
-      type: argon2.ArgonType.Argon2id,
-      time: vault.iterations,
-      mem: 65536,
-      hashLen: 32,
-      parallelism: 1
-    });
-
-    const key = result.hash;
-
-    const cryptoKey = await crypto.subtle.importKey(
+    const passwordKey = await crypto.subtle.importKey(
       'raw',
-      key,
-      { name: 'AES-GCM' },
+      new TextEncoder().encode(password),
+      { name: 'PBKDF2' },
+      false,
+      ['deriveKey']
+    );
+
+    const aesKey = await crypto.subtle.deriveKey(
+      {
+        name: 'PBKDF2',
+        salt,
+        iterations: vault.iterations,
+        hash: 'SHA-256',
+      },
+      passwordKey,
+      { name: 'AES-GCM', length: 256 },
       false,
       ['decrypt']
     );
@@ -184,7 +185,7 @@ export class CryptoService {
 
     const decrypted = await crypto.subtle.decrypt(
       { name: 'AES-GCM', iv: ivBuffer },
-      cryptoKey,
+      aesKey,
       dataBuffer
     );
 
