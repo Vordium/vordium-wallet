@@ -37,12 +37,13 @@ export class CryptoService {
     return bip39.validateMnemonic(mnemonic);
   }
 
-  static async mnemonicToSeed(mnemonic: string, passphrase?: string): Promise<Buffer> {
-    return bip39.mnemonicToSeed(mnemonic, passphrase);
+  static async mnemonicToSeed(mnemonic: string, passphrase?: string): Promise<Uint8Array> {
+    const seed = await bip39.mnemonicToSeed(mnemonic, passphrase);
+    return new Uint8Array(seed);
   }
 
   static async deriveAccount(
-    seed: Buffer,
+    seed: Uint8Array,
     chainType: ChainType,
     index: number
   ): Promise<DerivedAccount> {
@@ -64,11 +65,12 @@ export class CryptoService {
   }
 
   private static deriveEVMAccount(
-    privateKey: Buffer,
+    privateKey: Uint8Array,
     derivationPath: string,
     index: number
   ): DerivedAccount {
-    const wallet = new ethers.Wallet(privateKey);
+    const privateKeyHex = '0x' + this.bytesToHex(privateKey);
+    const wallet = new ethers.Wallet(privateKeyHex);
     
     return {
       address: wallet.address,
@@ -81,11 +83,11 @@ export class CryptoService {
   }
 
   private static deriveTronAccount(
-    privateKey: Buffer,
+    privateKey: Uint8Array,
     derivationPath: string,
     index: number
   ): DerivedAccount {
-    const privateKeyHex = privateKey.toString('hex');
+    const privateKeyHex = this.bytesToHex(privateKey);
     const address = TronWeb.address.fromPrivateKey(privateKeyHex);
     
     return {
@@ -100,12 +102,12 @@ export class CryptoService {
 
   static importPrivateKey(privateKey: string, chainType: ChainType): DerivedAccount {
     const cleanKey = privateKey.startsWith('0x') ? privateKey.slice(2) : privateKey;
-    const keyBuffer = Buffer.from(cleanKey, 'hex');
+    const keyBytes = this.hexToBytes(cleanKey);
 
     if (chainType === 'EVM') {
-      return this.deriveEVMAccount(keyBuffer, 'imported', 0);
+      return this.deriveEVMAccount(keyBytes, 'imported', 0);
     } else {
-      return this.deriveTronAccount(keyBuffer, 'imported', 0);
+      return this.deriveTronAccount(keyBytes, 'imported', 0);
     }
   }
 
@@ -143,17 +145,17 @@ export class CryptoService {
     );
 
     return {
-      ciphertext: this.bufferToBase64(new Uint8Array(ciphertext)),
-      iv: this.bufferToBase64(iv),
-      salt: this.bufferToBase64(salt),
+      ciphertext: this.uint8ToBase64(new Uint8Array(ciphertext)),
+      iv: this.uint8ToBase64(iv),
+      salt: this.uint8ToBase64(salt),
       iterations: 3
     };
   }
 
   static async decrypt(vault: EncryptedVault, password: string): Promise<string> {
-    const salt = this.base64ToBuffer(vault.salt);
-    const iv = this.base64ToBuffer(vault.iv);
-    const ciphertext = this.base64ToBuffer(vault.ciphertext);
+    const salt = this.base64ToUint8(vault.salt);
+    const iv = this.base64ToUint8(vault.iv);
+    const ciphertext = this.base64ToUint8(vault.ciphertext);
 
     const result = await argon2.hash({
       pass: password,
@@ -185,12 +187,38 @@ export class CryptoService {
     return decoder.decode(decrypted);
   }
 
-  private static bufferToBase64(buffer: Uint8Array): string {
-    return Buffer.from(buffer).toString('base64');
+  private static uint8ToBase64(bytes: Uint8Array): string {
+    let binary = '';
+    const chunkSize = 0x8000;
+    for (let i = 0; i < bytes.length; i += chunkSize) {
+      const chunk = bytes.subarray(i, i + chunkSize);
+      binary += String.fromCharCode.apply(null, Array.from(chunk));
+    }
+    return btoa(binary);
   }
 
-  private static base64ToBuffer(base64: string): Uint8Array {
-    return new Uint8Array(Buffer.from(base64, 'base64'));
+  private static base64ToUint8(base64: string): Uint8Array {
+    const binary = atob(base64);
+    const bytes = new Uint8Array(binary.length);
+    for (let i = 0; i < binary.length; i++) {
+      bytes[i] = binary.charCodeAt(i);
+    }
+    return bytes;
+  }
+
+  private static hexToBytes(hex: string): Uint8Array {
+    const len = hex.length;
+    const out = new Uint8Array(len / 2);
+    for (let i = 0; i < len; i += 2) {
+      out[i / 2] = parseInt(hex.substr(i, 2), 16);
+    }
+    return out;
+  }
+
+  private static bytesToHex(bytes: Uint8Array): string {
+    return Array.from(bytes)
+      .map((b) => b.toString(16).padStart(2, '0'))
+      .join('');
   }
 
   static isValidEVMAddress(address: string): boolean {
