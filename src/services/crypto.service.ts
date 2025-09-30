@@ -129,7 +129,7 @@ export class CryptoService {
     const aesKey = await crypto.subtle.deriveKey(
       {
         name: 'PBKDF2',
-        salt,
+        salt: this.uint8ToArrayBuffer(salt),
         iterations,
         hash: 'SHA-256',
       },
@@ -170,7 +170,7 @@ export class CryptoService {
     const aesKey = await crypto.subtle.deriveKey(
       {
         name: 'PBKDF2',
-        salt,
+        salt: this.uint8ToArrayBuffer(salt),
         iterations: vault.iterations,
         hash: 'SHA-256',
       },
