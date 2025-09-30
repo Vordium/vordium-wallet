@@ -1,4 +1,5 @@
 // src/services/tron.service.ts
+ 'use client';
 import TronWeb from 'tronweb';
 
 export interface TronNetwork {
@@ -21,6 +22,9 @@ export class TronService {
 
   constructor(network: TronNetwork = TRON_NETWORKS.mainnet) {
     this.network = network;
+    if (typeof window === 'undefined') {
+      throw new Error('TronService must be used in the browser only');
+    }
     this.tronWeb = new TronWeb({
       fullHost: network.fullHost,
       headers: { 'TRON-PRO-API-KEY': process.env.NEXT_PUBLIC_TRONGRID_API_KEY }

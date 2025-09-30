@@ -1,4 +1,5 @@
 // src/services/evm.service.ts
+ 'use client';
 import { ethers } from 'ethers';
 
 const ERC20_ABI = [
@@ -40,6 +41,9 @@ export class EVMService {
 
   constructor(network: EVMNetwork = EVM_NETWORKS.ethereum) {
     this.network = network;
+    if (!network.rpcUrl) {
+      throw new Error('EVM RPC URL missing. Set NEXT_PUBLIC_ETHEREUM_RPC or corresponding RPC.');
+    }
     this.provider = new ethers.JsonRpcProvider(network.rpcUrl);
   }
 

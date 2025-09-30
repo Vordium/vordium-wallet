@@ -72,10 +72,11 @@ export class CryptoService {
     const privateKeyHex = '0x' + this.bytesToHex(privateKey);
     const wallet = new ethers.Wallet(privateKeyHex);
     
+    const publicKey = ethers.computePublicKey(privateKeyHex, false);
     return {
       address: wallet.address,
       privateKey: wallet.privateKey,
-      publicKey: wallet.publicKey,
+      publicKey,
       derivationPath,
       index,
       chainType: 'EVM'
