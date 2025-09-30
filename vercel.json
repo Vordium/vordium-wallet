@@ -1,0 +1,39 @@
+{
+  "version": 2,
+  "buildCommand": "npm run build",
+  "devCommand": "npm run dev",
+  "installCommand": "npm install",
+  "framework": "nextjs",
+  "env": {
+    "NEXT_PUBLIC_ETHEREUM_RPC": "@ethereum_rpc",
+    "NEXT_PUBLIC_POLYGON_RPC": "@polygon_rpc",
+    "NEXT_PUBLIC_BSC_RPC": "@bsc_rpc",
+    "NEXT_PUBLIC_ARBITRUM_RPC": "@arbitrum_rpc",
+    "NEXT_PUBLIC_TRON_API": "@tron_api",
+    "NEXT_PUBLIC_TRONGRID_API_KEY": "@trongrid_api_key",
+    "NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID": "@walletconnect_project_id"
+  },
+  "headers": [
+    {
+      "source": "/(.*)",
+      "headers": [
+        {
+          "key": "X-Content-Type-Options",
+          "value": "nosniff"
+        },
+        {
+          "key": "X-Frame-Options",
+          "value": "DENY"
+        },
+        {
+          "key": "X-XSS-Protection",
+          "value": "1; mode=block"
+        },
+        {
+          "key": "Referrer-Policy",
+          "value": "strict-origin-when-cross-origin"
+        }
+      ]
+    }
+  ]
+}
