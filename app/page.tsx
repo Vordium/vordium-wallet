@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useMemo, useState } from 'react';
+import { useRouter } from 'next/navigation';
 import QRCode from 'react-qr-code';
 import { useWalletStore } from '@/store/walletStore';
 import { CryptoService, type DerivedAccount } from '@/services/crypto.service';
@@ -63,6 +64,7 @@ export default function Home() {
   }
 
   function Landing() {
+    const router = useRouter();
     return (
       <div className="space-y-6">
         <div className="text-center">
@@ -70,8 +72,8 @@ export default function Home() {
           <p className="text-gray-600 mt-1">Non-custodial, multi-chain wallet</p>
         </div>
         <div className="grid grid-cols-1 gap-3">
-          <button onClick={() => setView('create')} className="w-full bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg py-3 font-medium">Create new wallet</button>
-          <button onClick={() => setView('import')} className="w-full bg-gray-900 hover:bg-gray-800 text-white rounded-lg py-3 font-medium">Import with recovery phrase</button>
+          <button onClick={() => router.push('/create')} className="w-full bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg py-3 font-medium">Create new wallet</button>
+          <button onClick={() => router.push('/import')} className="w-full bg-gray-900 hover:bg-gray-800 text-white rounded-lg py-3 font-medium">Import with recovery phrase</button>
         </div>
       </div>
     );
