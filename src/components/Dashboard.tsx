@@ -3,6 +3,9 @@
 import React, { useMemo, useState } from 'react';
 import { BalanceCard } from './BalanceCard';
 import { Button } from './ui/Button';
+import { TokenCard } from './TokenCard';
+import { ReceiveCard } from './ReceiveCard';
+import Link from 'next/link';
 import { useWalletStore } from '@/store/walletStore';
 
 export function Dashboard() {
@@ -35,9 +38,21 @@ export function Dashboard() {
         </div>
       </div>
 
-      <div className="grid grid-cols-2 gap-3">
-        <Button disabled>Send (soon)</Button>
-        <Button variant="secondary">Receive</Button>
+      {selected && (
+        <ReceiveCard address={selected.address} network={selected.chain} />
+      )}
+
+      <div className="bg-white border rounded-2xl p-4">
+        <div className="text-sm text-gray-500 mb-3">Tokens</div>
+        <div className="space-y-2">
+          <TokenCard symbol="ETH" name="Ethereum" balance="0.00" value="$0.00" change="+0.0%" />
+          <TokenCard symbol="TRX" name="TRON" balance="0.00" value="$0.00" change="+0.0%" />
+        </div>
+      </div>
+
+      <div className="grid grid-cols-2 gap-3 pb-16 md:pb-0">
+        <Link href="/send"><Button>Send</Button></Link>
+        <Link href="/receive"><Button variant="secondary">Receive</Button></Link>
       </div>
     </div>
   );
