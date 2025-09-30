@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://vordium-wallet.vercel.app/sitemap.xml
