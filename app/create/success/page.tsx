@@ -43,7 +43,7 @@ export default function CreateSuccess() {
         {/* Success Message */}
         <div className="space-y-2">
           <h1 className="text-3xl font-bold text-gray-900">Wallet Created Successfully! 🎉</h1>
-          <p className="text-gray-600">You're ready to explore Web3</p>
+          <p className="text-gray-600">You&apos;re ready to explore Web3</p>
         </div>
 
         {/* Wallet Info Card */}

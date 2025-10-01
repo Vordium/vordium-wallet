@@ -57,7 +57,7 @@ Keep this backup safe and secure!`;
   }
 
   function handleSkip() {
-    if (confirm('⚠️ Skipping verification is risky. You won\'t be able to prove you saved your phrase. Are you sure?')) {
+    if (confirm('⚠️ Skipping verification is risky. You won&apos;t be able to prove you saved your phrase. Are you sure?')) {
       sessionStorage.setItem('verification_skipped', 'true');
       router.push('/create/complete');
     }

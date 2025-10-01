@@ -101,7 +101,7 @@ export default function UnlockPage() {
         {/* Reset Warning */}
         <div className="text-center">
           <p className="text-xs text-gray-500">
-            Forgot password? You'll need your recovery phrase to restore your wallet.
+            Forgot password? You&apos;ll need your recovery phrase to restore your wallet.
           </p>
         </div>
       </div>
