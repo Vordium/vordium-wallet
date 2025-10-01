@@ -61,14 +61,37 @@ export interface WalletState {
 
 export const useWalletStore = create<WalletState>()(
   persist(
-    (set, get) => ({
-      // Legacy state
-      accounts: [],
-      selectedAccountId: null,
-      
-      // Multi-wallet state
-      wallets: [],
-      currentWalletId: null,
+    (set, get) => {
+      // Load wallets from localStorage on initialization
+      const loadWallets = () => {
+        try {
+          const stored = localStorage.getItem('vordium-wallets');
+          return stored ? JSON.parse(stored) : [];
+        } catch {
+          return [];
+        }
+      };
+
+      const loadCurrentWallet = () => {
+        try {
+          return localStorage.getItem('vordium-current-wallet');
+        } catch {
+          return null;
+        }
+      };
+
+      const initialWallets = loadWallets();
+      const initialCurrentWallet = loadCurrentWallet();
+      const currentWallet = initialWallets.find(w => w.id === initialCurrentWallet);
+
+      return {
+        // Legacy state
+        accounts: currentWallet?.accounts || [],
+        selectedAccountId: currentWallet?.accounts[0]?.id || null,
+        
+        // Multi-wallet state
+        wallets: initialWallets,
+        currentWalletId: initialCurrentWallet,
       
       // Legacy actions (maintain backwards compatibility)
       addAccount: (account) =>
@@ -105,6 +128,8 @@ export const useWalletStore = create<WalletState>()(
       addWallet: (wallet) =>
         set((state) => {
           const newWallets = [...state.wallets, wallet];
+          // Persist to localStorage for cross-session persistence
+          localStorage.setItem('vordium-wallets', JSON.stringify(newWallets));
           return {
             wallets: newWallets,
             currentWalletId: wallet.id,
@@ -119,6 +144,9 @@ export const useWalletStore = create<WalletState>()(
           const newCurrent = filtered[0]?.id || null;
           const newAccounts = filtered[0]?.accounts || [];
           
+          // Persist to localStorage
+          localStorage.setItem('vordium-wallets', JSON.stringify(filtered));
+          
           return {
             wallets: filtered,
             currentWalletId: newCurrent,
@@ -131,6 +159,9 @@ export const useWalletStore = create<WalletState>()(
         set((state) => {
           const wallet = state.wallets.find(w => w.id === id);
           if (!wallet) return state;
+          
+          // Persist current wallet selection
+          localStorage.setItem('vordium-current-wallet', id);
           
           return {
             currentWalletId: id,

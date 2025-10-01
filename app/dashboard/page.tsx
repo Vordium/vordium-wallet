@@ -4,12 +4,24 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useWalletStore } from '@/store/walletStore';
 import QRCode from 'react-qr-code';
-import { RefreshCw } from 'lucide-react';
 import Link from 'next/link';
 import { AddTokenModal } from '@/components/AddTokenModal';
 import { WalletSwitcherModal } from '@/components/WalletSwitcherModal';
+import { BottomNavigation } from '@/components/BottomNavigation';
 import { BalanceService, type TokenBalance } from '@/services/balance.service';
 import { getTrustWalletLogo, NATIVE_LOGOS } from '@/lib/tokenLogos';
+import { 
+  SettingsIcon, 
+  BellIcon, 
+  SendIcon, 
+  ReceiveIcon, 
+  BuyIcon, 
+  SwapIcon, 
+  SearchIcon, 
+  PlusIcon, 
+  MoreIcon, 
+  RefreshIcon 
+} from '@/components/icons/GrayIcons';
 
 export default function DashboardPage() {
   const router = useRouter();
@@ -76,38 +88,38 @@ export default function DashboardPage() {
   const isPositive = parseFloat(change24h.percent) >= 0;
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-gray-900 text-white pb-20">
       {/* Top Bar */}
-      <div className="flex items-center justify-between p-4 border-b border-gray-200">
+      <div className="flex items-center justify-between p-4 border-b border-gray-700">
         <button
           onClick={() => setShowWalletModal(true)}
-          className="flex items-center gap-2 px-4 py-2 bg-gray-100 rounded-full hover:bg-gray-200 transition"
+          className="flex items-center gap-2 px-4 py-2 bg-gray-800 rounded-full hover:bg-gray-700 transition"
         >
-          <div className="w-8 h-8 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white font-bold">
+          <div className="w-8 h-8 rounded-full bg-gradient-to-br from-gray-600 to-gray-800 flex items-center justify-center text-white font-bold">
             {(localStorage.getItem('vordium_wallet_name') || 'M')[0]}
           </div>
-          <span className="font-semibold text-gray-900">{localStorage.getItem('vordium_wallet_name') || 'My Wallet'}</span>
-          <span className="text-gray-500">▼</span>
+          <span className="font-semibold text-white">{localStorage.getItem('vordium_wallet_name') || 'My Wallet'}</span>
+          <span className="text-gray-400">▼</span>
         </button>
         <div className="flex gap-2">
           <button
             onClick={() => router.push('/settings')}
-            className="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center text-gray-700 hover:bg-gray-200 transition"
+            className="w-10 h-10 rounded-full bg-gray-800 flex items-center justify-center text-gray-400 hover:bg-gray-700 transition"
           >
-            ⚙️
+            <SettingsIcon className="w-5 h-5" />
           </button>
-          <button className="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center text-gray-700 hover:bg-gray-200 transition">
-            🔔
+          <button className="w-10 h-10 rounded-full bg-gray-800 flex items-center justify-center text-gray-400 hover:bg-gray-700 transition">
+            <BellIcon className="w-5 h-5" />
           </button>
         </div>
       </div>
 
       {/* Total Balance */}
       <div className="text-center py-8 px-4">
-        <div className="text-5xl font-bold mb-2">
+        <div className="text-5xl font-bold mb-2 text-white">
           ${loading ? '...' : totalBalance}
         </div>
-        <div className={`text-lg font-semibold ${isPositive ? 'text-green-600' : 'text-red-600'}`}>
+        <div className={`text-lg ${isPositive ? 'text-green-400' : 'text-red-400'}`}>
           {isPositive ? '+' : ''}${change24h.value} ({change24h.percent}%)
         </div>
       </div>
@@ -117,33 +129,33 @@ export default function DashboardPage() {
         <div className="grid grid-cols-4 gap-3">
           <button
             onClick={() => router.push('/send')}
-            className="flex flex-col items-center gap-2 py-4 bg-blue-600 rounded-2xl hover:bg-blue-700 active:scale-95 transition"
+            className="flex flex-col items-center gap-2 py-4 bg-gray-800 rounded-2xl hover:bg-gray-700 active:scale-95 transition border border-gray-600"
           >
-            <span className="text-2xl">📤</span>
-            <span className="text-sm font-semibold text-white">Send</span>
+            <SendIcon className="w-6 h-6 text-gray-300" />
+            <span className="text-sm font-semibold text-gray-300">Send</span>
           </button>
           
           <button
             onClick={() => router.push('/receive')}
-            className="flex flex-col items-center gap-2 py-4 bg-green-600 rounded-2xl hover:bg-green-700 active:scale-95 transition"
+            className="flex flex-col items-center gap-2 py-4 bg-gray-800 rounded-2xl hover:bg-gray-700 active:scale-95 transition border border-gray-600"
           >
-            <span className="text-2xl">📥</span>
-            <span className="text-sm font-semibold text-white">Receive</span>
+            <ReceiveIcon className="w-6 h-6 text-gray-300" />
+            <span className="text-sm font-semibold text-gray-300">Receive</span>
           </button>
           
           <button
             disabled
-            className="flex flex-col items-center gap-2 py-4 bg-gray-200 rounded-2xl cursor-not-allowed"
+            className="flex flex-col items-center gap-2 py-4 bg-gray-800 rounded-2xl cursor-not-allowed border border-gray-700 opacity-50"
           >
-            <span className="text-2xl opacity-50">💳</span>
+            <BuyIcon className="w-6 h-6 text-gray-500" />
             <span className="text-sm font-semibold text-gray-500">Buy</span>
           </button>
           
           <button
             disabled
-            className="flex flex-col items-center gap-2 py-4 bg-gray-200 rounded-2xl cursor-not-allowed"
+            className="flex flex-col items-center gap-2 py-4 bg-gray-800 rounded-2xl cursor-not-allowed border border-gray-700 opacity-50"
           >
-            <span className="text-2xl opacity-50">🔄</span>
+            <SwapIcon className="w-6 h-6 text-gray-500" />
             <span className="text-sm font-semibold text-gray-500">Swap</span>
           </button>
         </div>
@@ -198,9 +210,10 @@ export default function DashboardPage() {
         {/* Add Token */}
         <button
           onClick={() => setShowAddToken(true)}
-          className="w-full mt-4 py-4 border-2 border-dashed border-gray-300 rounded-2xl text-blue-600 font-semibold hover:bg-blue-50 transition"
+          className="w-full mt-4 py-4 border-2 border-dashed border-gray-600 rounded-2xl text-gray-400 font-semibold hover:bg-gray-800 hover:text-gray-300 transition flex items-center justify-center gap-2"
         >
-          + Add Token
+          <PlusIcon className="w-5 h-5" />
+          Add Token
         </button>
       </div>
 
@@ -216,6 +229,9 @@ export default function DashboardPage() {
           onClose={() => setShowAddToken(false)}
         />
       )}
+
+      {/* Bottom Navigation */}
+      <BottomNavigation />
     </div>
   );
 }

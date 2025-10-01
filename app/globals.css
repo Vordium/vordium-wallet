@@ -2,39 +2,63 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Force all inputs to have visible text */
+/* DARK THEME - Clean gray and black backgrounds */
+:root {
+  --bg-primary: #1a1a1a;      /* Dark black */
+  --bg-secondary: #2d2d2d;    /* Dark gray */
+  --bg-tertiary: #404040;     /* Medium gray */
+  --text-primary: #ffffff;    /* White text */
+  --text-secondary: #b3b3b3;  /* Light gray text */
+  --text-muted: #808080;      /* Muted gray text */
+  --border: #404040;          /* Gray borders */
+  --accent: #6b7280;          /* Gray accent */
+}
+
+/* Global dark theme */
+body {
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+}
+
+/* Force all inputs to have visible text on dark theme */
 input[type="text"],
 input[type="password"],
 input[type="email"],
 textarea,
 select {
-  color: #111827 !important; /* gray-900 - always dark text */
-  background-color: #ffffff !important; /* white background */
-  border: 2px solid #D1D5DB !important; /* gray-300 border */
+  color: var(--text-primary) !important;
+  background-color: var(--bg-secondary) !important;
+  border: 2px solid var(--border) !important;
 }
 
 input::placeholder {
-  color: #9CA3AF !important; /* gray-400 - visible placeholder */
+  color: var(--text-muted) !important;
 }
 
 input:focus {
   outline: none !important;
-  border-color: #2563EB !important; /* blue-600 */
-  ring: 2px solid #2563EB !important;
+  border-color: var(--accent) !important;
+  ring: 2px solid var(--accent) !important;
 }
 
-/* Fix all text colors */
-.text-white { color: #ffffff !important; }
-.text-gray-900 { color: #111827 !important; }
-.text-gray-700 { color: #374151 !important; }
-.text-gray-600 { color: #4B5563 !important; }
-.text-gray-500 { color: #6B7280 !important; }
+/* Dark theme text colors */
+.text-white { color: var(--text-primary) !important; }
+.text-gray-900 { color: var(--text-primary) !important; }
+.text-gray-700 { color: var(--text-secondary) !important; }
+.text-gray-600 { color: var(--text-secondary) !important; }
+.text-gray-500 { color: var(--text-muted) !important; }
 
-/* Never allow these combinations */
+/* Dark theme backgrounds */
+.bg-white { background-color: var(--bg-secondary) !important; }
+.bg-gray-50 { background-color: var(--bg-tertiary) !important; }
+.bg-gray-100 { background-color: var(--bg-tertiary) !important; }
+.bg-gray-200 { background-color: var(--border) !important; }
+
+/* Never allow light text on dark backgrounds */
 .bg-white .text-white,
 .bg-gray-50 .text-gray-100,
 .bg-gray-100 .text-gray-200 {
-  color: #111827 !important; /* Force dark text */
+  color: var(--text-primary) !important;
 }
 
 :root {
