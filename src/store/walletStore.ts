@@ -20,6 +20,18 @@ export interface Wallet {
   createdAt: number;
 }
 
+export interface Token {
+  symbol: string;
+  name: string;
+  address: string;
+  chain: 'Ethereum' | 'Tron';
+  decimals: number;
+  balance: string;
+  logo: string;
+  isNative: boolean;
+  usdValue: string;
+}
+
 export interface WalletState {
   // Legacy single-wallet support (backwards compatible)
   accounts: WalletAccount[];
@@ -40,6 +52,11 @@ export interface WalletState {
   removeWallet: (id: string) => void;
   setCurrentWallet: (id: string) => void;
   renameWallet: (id: string, name: string) => void;
+  
+  // Token management
+  addToken: (token: Token) => void;
+  removeToken: (tokenAddress: string, chain: string) => void;
+  getTokens: () => Token[];
 }
 
 export const useWalletStore = create<WalletState>()(
@@ -126,6 +143,29 @@ export const useWalletStore = create<WalletState>()(
         set((state) => ({
           wallets: state.wallets.map(w => (w.id === id ? { ...w, name } : w)),
         })),
+      
+      // Token management
+      addToken: (token) => {
+        const tokens = get().getTokens();
+        const exists = tokens.some(t => t.address === token.address && t.chain === token.chain);
+        if (!exists) {
+          const newTokens = [...tokens, token];
+          localStorage.setItem('vordium-tokens', JSON.stringify(newTokens));
+        }
+      },
+      removeToken: (tokenAddress, chain) => {
+        const tokens = get().getTokens();
+        const newTokens = tokens.filter(t => !(t.address === tokenAddress && t.chain === chain));
+        localStorage.setItem('vordium-tokens', JSON.stringify(newTokens));
+      },
+      getTokens: () => {
+        try {
+          const stored = localStorage.getItem('vordium-tokens');
+          return stored ? JSON.parse(stored) : [];
+        } catch {
+          return [];
+        }
+      },
     }),
     {
       name: 'vordium-wallet-storage',

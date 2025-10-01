@@ -7,7 +7,7 @@ import QRCode from 'react-qr-code';
 import { RefreshCw } from 'lucide-react';
 import Link from 'next/link';
 import { AddTokenModal } from '@/components/AddTokenModal';
-import { WalletManagementModal } from '@/components/WalletManagementModal';
+import { WalletSwitcherModal } from '@/components/WalletSwitcherModal';
 import { BalanceService, type TokenBalance } from '@/services/balance.service';
 import { getTrustWalletLogo, NATIVE_LOGOS } from '@/lib/tokenLogos';
 
@@ -205,16 +205,15 @@ export default function DashboardPage() {
       </div>
 
       {/* Modals */}
-      <WalletManagementModal
+      <WalletSwitcherModal
         isOpen={showWalletModal}
         onClose={() => setShowWalletModal(false)}
       />
       
       {showAddToken && (
         <AddTokenModal
-          chain="EVM"
+          isOpen={showAddToken}
           onClose={() => setShowAddToken(false)}
-          onAdd={() => setShowAddToken(false)}
         />
       )}
     </div>

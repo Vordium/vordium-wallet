@@ -1,111 +1,345 @@
 'use client';
 
-import { useState } from 'react';
-import { X, Search } from 'lucide-react';
-import { Button } from './ui/Button';
+import { useState, useEffect } from 'react';
+import { ethers } from 'ethers';
+import TronWeb from 'tronweb';
+import { useWalletStore } from '@/store/walletStore';
 
-interface Token {
-  address: string;
+interface TokenSearchResult {
   symbol: string;
   name: string;
-  icon?: string;
+  address: string;
+  chain: 'Ethereum' | 'Tron';
+  decimals: number;
+  logo: string;
+  balance?: string;
 }
 
-const POPULAR_TOKENS: Record<string, Token[]> = {
-  EVM: [
-    { address: '0xdac17f958d2ee523a2206206994597c13d831ec7', symbol: 'USDT', name: 'Tether USD', icon: '💲' },
-    { address: '0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48', symbol: 'USDC', name: 'USD Coin', icon: '💲' },
-    { address: '0x6b175474e89094c44da98b954eedeac495271d0f', symbol: 'DAI', name: 'Dai Stablecoin', icon: '🟡' },
-    { address: '0x514910771af9ca656af840dff83e8264ecf986ca', symbol: 'LINK', name: 'Chainlink', icon: '🔗' },
-  ],
-  TRON: [
-    { address: 'TR7NHqjeKQxGTCi8q8ZY4pL8otSzgjLj6t', symbol: 'USDT', name: 'Tether USD', icon: '💲' },
-    { address: 'TEkxiTehnzSmSe2XqrBj4w32RUN966rdz8', symbol: 'USDC', name: 'USD Coin', icon: '💲' },
-  ],
-};
-
-interface AddTokenModalProps {
-  chain: 'EVM' | 'TRON';
-  onClose: () => void;
-  onAdd: (token: Token) => void;
-}
-
-export function AddTokenModal({ chain, onClose, onAdd }: AddTokenModalProps) {
-  const [search, setSearch] = useState('');
+export function AddTokenModal({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) {
+  const [searchQuery, setSearchQuery] = useState('');
+  const [searching, setSearching] = useState(false);
+  const [searchResults, setSearchResults] = useState<TokenSearchResult[]>([]);
   const [customAddress, setCustomAddress] = useState('');
+  const [selectedChain, setSelectedChain] = useState<'Ethereum' | 'Tron'>('Ethereum');
+  
+  const addToken = useWalletStore(state => state.addToken);
+  const accounts = useWalletStore(state => state.accounts);
 
-  const popular = POPULAR_TOKENS[chain] || [];
-  const filtered = popular.filter(
-    t => t.symbol.toLowerCase().includes(search.toLowerCase()) || 
-         t.name.toLowerCase().includes(search.toLowerCase())
-  );
+  // Popular tokens database
+  const popularTokens: TokenSearchResult[] = [
+    {
+      symbol: 'USDT',
+      name: 'Tether USD',
+      address: '0xdAC17F958D2ee523a2206206994597C13D831ec7',
+      chain: 'Ethereum',
+      decimals: 6,
+      logo: 'https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/0xdAC17F958D2ee523a2206206994597C13D831ec7/logo.png'
+    },
+    {
+      symbol: 'USDC',
+      name: 'USD Coin',
+      address: '0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48',
+      chain: 'Ethereum',
+      decimals: 6,
+      logo: 'https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48/logo.png'
+    },
+    {
+      symbol: 'DAI',
+      name: 'Dai Stablecoin',
+      address: '0x6B175474E89094C44Da98b954EedeAC495271d0F',
+      chain: 'Ethereum',
+      decimals: 18,
+      logo: 'https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/0x6B175474E89094C44Da98b954EedeAC495271d0F/logo.png'
+    },
+    {
+      symbol: 'USDT',
+      name: 'Tether USD',
+      address: 'TR7NHqjeKQxGTCi8q8ZY4pL8otSzgjLj6t',
+      chain: 'Tron',
+      decimals: 6,
+      logo: 'https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/tron/assets/TR7NHqjeKQxGTCi8q8ZY4pL8otSzgjLj6t/logo.png'
+    }
+  ];
+
+  // Search tokens
+  useEffect(() => {
+    if (searchQuery.length < 2) {
+      setSearchResults([]);
+      return;
+    }
+
+    const results = popularTokens.filter(token =>
+      token.symbol.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      token.name.toLowerCase().includes(searchQuery.toLowerCase())
+    );
+
+    setSearchResults(results);
+  }, [searchQuery]);
+
+  // Add token from search
+  async function handleAddToken(token: TokenSearchResult) {
+    try {
+      setSearching(true);
+      
+      // Get user address
+      const userAddress = accounts.find(a => 
+        a.chain === (token.chain === 'Ethereum' ? 'EVM' : 'TRON')
+      )?.address;
+      
+      if (!userAddress) {
+        alert('No account found for this chain');
+        return;
+      }
+
+      // Fetch balance
+      let balance = '0';
+      
+      if (token.chain === 'Ethereum') {
+        const provider = new ethers.JsonRpcProvider(process.env.NEXT_PUBLIC_ETHEREUM_RPC || 'https://eth.llamarpc.com');
+        const contract = new ethers.Contract(
+          token.address,
+          ['function balanceOf(address) view returns (uint256)'],
+          provider
+        );
+        const bal = await contract.balanceOf(userAddress);
+        balance = ethers.formatUnits(bal, token.decimals);
+      } else {
+        const tronWeb = new TronWeb({ fullHost: 'https://api.trongrid.io' });
+        const contract = await tronWeb.contract().at(token.address);
+        const bal = await contract.balanceOf(userAddress).call();
+        balance = (bal / Math.pow(10, token.decimals)).toString();
+      }
+
+      // Add to store
+      addToken({
+        symbol: token.symbol,
+        name: token.name,
+        address: token.address,
+        chain: token.chain,
+        decimals: token.decimals,
+        balance,
+        logo: token.logo,
+        isNative: false,
+        usdValue: '0'
+      });
+
+      alert(`${token.symbol} added successfully!`);
+      onClose();
+      
+      // Refresh page to show new token
+      window.location.reload();
+      
+    } catch (error) {
+      alert('Failed to add token: ' + error.message);
+    } finally {
+      setSearching(false);
+    }
+  }
+
+  // Add custom token by address
+  async function handleAddCustomToken() {
+    if (!customAddress) {
+      alert('Please enter a contract address');
+      return;
+    }
+
+    try {
+      setSearching(true);
+      
+      const userAddress = accounts.find(a => 
+        a.chain === (selectedChain === 'Ethereum' ? 'EVM' : 'TRON')
+      )?.address;
+
+      if (!userAddress) {
+        alert('No account found');
+        return;
+      }
+
+      let tokenInfo: TokenSearchResult;
+
+      if (selectedChain === 'Ethereum') {
+        if (!ethers.isAddress(customAddress)) {
+          throw new Error('Invalid Ethereum address');
+        }
+
+        const provider = new ethers.JsonRpcProvider(process.env.NEXT_PUBLIC_ETHEREUM_RPC || 'https://eth.llamarpc.com');
+        const contract = new ethers.Contract(
+          customAddress,
+          [
+            'function name() view returns (string)',
+            'function symbol() view returns (string)',
+            'function decimals() view returns (uint8)',
+            'function balanceOf(address) view returns (uint256)'
+          ],
+          provider
+        );
+
+        const [name, symbol, decimals, balance] = await Promise.all([
+          contract.name(),
+          contract.symbol(),
+          contract.decimals(),
+          contract.balanceOf(userAddress)
+        ]);
+
+        const checksumAddress = ethers.getAddress(customAddress);
+        const logo = `https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/${checksumAddress}/logo.png`;
+
+        tokenInfo = {
+          symbol,
+          name,
+          address: checksumAddress,
+          chain: 'Ethereum',
+          decimals: Number(decimals),
+          logo,
+          balance: ethers.formatUnits(balance, decimals)
+        };
+      } else {
+        const tronWeb = new TronWeb({ fullHost: 'https://api.trongrid.io' });
+        const contract = await tronWeb.contract().at(customAddress);
+
+        const [name, symbol, decimals, balance] = await Promise.all([
+          contract.name().call(),
+          contract.symbol().call(),
+          contract.decimals().call(),
+          contract.balanceOf(userAddress).call()
+        ]);
+
+        const logo = `https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/tron/assets/${customAddress}/logo.png`;
+
+        tokenInfo = {
+          symbol,
+          name,
+          address: customAddress,
+          chain: 'Tron',
+          decimals: Number(decimals),
+          logo,
+          balance: (balance / Math.pow(10, decimals)).toString()
+        };
+      }
+
+      // Add token
+      addToken({
+        symbol: tokenInfo.symbol,
+        name: tokenInfo.name,
+        address: tokenInfo.address,
+        chain: tokenInfo.chain,
+        decimals: tokenInfo.decimals,
+        balance: tokenInfo.balance!,
+        logo: tokenInfo.logo,
+        isNative: false,
+        usdValue: '0'
+      });
+
+      alert(`${tokenInfo.symbol} added!`);
+      onClose();
+      window.location.reload();
+
+    } catch (error) {
+      alert('Failed: ' + error.message);
+    } finally {
+      setSearching(false);
+    }
+  }
+
+  if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4" onClick={onClose}>
-      <div 
-        className="bg-white rounded-2xl w-full max-w-md p-6 space-y-4"
-        onClick={(e) => e.stopPropagation()}
-      >
-        <div className="flex items-center justify-between">
-          <h3 className="text-lg font-semibold text-gray-900">Add Token</h3>
-          <button onClick={onClose} className="p-1 hover:bg-gray-100 rounded-lg">
-            <X className="w-5 h-5" />
-          </button>
+    <div className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center p-4 z-50">
+      <div className="bg-white rounded-3xl max-w-lg w-full max-h-[90vh] overflow-hidden shadow-2xl">
+        {/* Header */}
+        <div className="bg-gradient-to-r from-blue-600 to-purple-600 p-6 text-white">
+          <div className="flex items-center justify-between">
+            <h2 className="text-2xl font-bold">Add Token</h2>
+            <button onClick={onClose} className="w-10 h-10 rounded-full bg-white bg-opacity-20 hover:bg-opacity-30 flex items-center justify-center">
+              <span className="text-2xl">×</span>
+            </button>
+          </div>
         </div>
 
-        {/* Search */}
-        <div className="relative">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
-          <input
-            type="text"
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            placeholder="Search or paste address"
-            className="w-full border rounded-lg pl-10 pr-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500"
-          />
-        </div>
+        <div className="p-6 overflow-y-auto max-h-[calc(90vh-120px)]">
+          {/* Search Bar */}
+          <div className="mb-6">
+            <input
+              type="text"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              placeholder="🔍 Search tokens (USDT, USDC, DAI...)"
+              className="w-full px-4 py-4 text-gray-900 bg-gray-50 border-2 border-gray-300 rounded-xl text-lg focus:border-blue-600 focus:ring-4 focus:ring-blue-100"
+              style={{ color: '#111827', backgroundColor: '#F9FAFB' }}
+            />
+          </div>
 
-        {/* Popular Tokens */}
-        {filtered.length > 0 && (
-          <div className="space-y-2">
-            <p className="text-sm font-medium text-gray-700">Popular Tokens</p>
-            <div className="space-y-2 max-h-60 overflow-y-auto">
-              {filtered.map((token) => (
+          {/* Search Results */}
+          {searchResults.length > 0 && (
+            <div className="mb-6 space-y-2">
+              {searchResults.map((token, index) => (
                 <button
-                  key={token.address}
-                  onClick={() => {
-                    onAdd(token);
-                    onClose();
-                  }}
-                  className="w-full flex items-center gap-3 p-3 border rounded-lg hover:bg-gray-50"
+                  key={index}
+                  onClick={() => handleAddToken(token)}
+                  disabled={searching}
+                  className="w-full flex items-center gap-3 p-4 bg-gray-50 rounded-xl hover:bg-gray-100 transition disabled:opacity-50"
                 >
-                  <span className="text-2xl">{token.icon}</span>
-                  <div className="text-left">
-                    <p className="font-medium text-gray-900">{token.symbol}</p>
-                    <p className="text-xs text-gray-500">{token.name}</p>
+                  <img src={token.logo} alt={token.symbol} className="w-10 h-10 rounded-full" onError={(e) => e.currentTarget.src = 'https://via.placeholder.com/40'} />
+                  <div className="flex-1 text-left">
+                    <div className="font-bold text-gray-900">{token.symbol}</div>
+                    <div className="text-sm text-gray-600">{token.name}</div>
+                  </div>
+                  <div className="px-3 py-1 bg-blue-100 text-blue-700 text-xs font-bold rounded-full">
+                    {token.chain}
                   </div>
                 </button>
               ))}
             </div>
-          </div>
-        )}
+          )}
 
-        {/* Custom Token */}
-        <div className="space-y-2">
-          <p className="text-sm font-medium text-gray-700">Custom Token</p>
-          <input
-            type="text"
-            value={customAddress}
-            onChange={(e) => setCustomAddress(e.target.value)}
-            placeholder="Contract Address"
-            className="w-full border rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500"
-          />
-          <Button disabled={!customAddress} onClick={() => alert('Custom token import coming soon')}>
-            Import Token
-          </Button>
+          {/* Custom Token */}
+          <div className="border-t-2 border-gray-200 pt-6">
+            <h3 className="font-bold text-gray-900 mb-4">Add Custom Token</h3>
+            
+            {/* Chain Selector */}
+            <div className="flex gap-2 mb-4">
+              <button
+                onClick={() => setSelectedChain('Ethereum')}
+                className={`flex-1 py-3 rounded-xl font-bold transition ${
+                  selectedChain === 'Ethereum'
+                    ? 'bg-blue-600 text-white'
+                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                }`}
+              >
+                Ethereum
+              </button>
+              <button
+                onClick={() => setSelectedChain('Tron')}
+                className={`flex-1 py-3 rounded-xl font-bold transition ${
+                  selectedChain === 'Tron'
+                    ? 'bg-blue-600 text-white'
+                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                }`}
+              >
+                TRON
+              </button>
+            </div>
+
+            {/* Contract Address Input */}
+            <input
+              type="text"
+              value={customAddress}
+              onChange={(e) => setCustomAddress(e.target.value)}
+              placeholder={selectedChain === 'Ethereum' ? '0x...' : 'T...'}
+              className="w-full px-4 py-4 text-gray-900 bg-gray-50 border-2 border-gray-300 rounded-xl font-mono text-sm mb-4 focus:border-blue-600 focus:ring-4 focus:ring-blue-100"
+              style={{ color: '#111827', backgroundColor: '#F9FAFB' }}
+            />
+
+            <button
+              onClick={handleAddCustomToken}
+              disabled={!customAddress || searching}
+              className="w-full py-4 bg-gradient-to-r from-blue-600 to-purple-600 text-white font-bold rounded-xl hover:from-blue-700 hover:to-purple-700 disabled:from-gray-300 disabled:to-gray-400 transition"
+            >
+              {searching ? 'Adding...' : 'Add Token'}
+            </button>
+          </div>
         </div>
       </div>
     </div>
   );
 }
-
