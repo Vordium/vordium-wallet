@@ -60,7 +60,7 @@ export interface WalletState {
 }
 
 // Helper functions for loading from localStorage
-const loadWallets = () => {
+const loadWallets = (): Wallet[] => {
   try {
     const stored = localStorage.getItem('vordium-wallets');
     return stored ? JSON.parse(stored) : [];
@@ -69,7 +69,7 @@ const loadWallets = () => {
   }
 };
 
-const loadCurrentWallet = () => {
+const loadCurrentWallet = (): string | null => {
   try {
     return localStorage.getItem('vordium-current-wallet');
   } catch {
