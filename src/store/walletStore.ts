@@ -93,7 +93,7 @@ export const useWalletStore = create<WalletState>()(
         wallets: initialWallets,
         currentWalletId: initialCurrentWallet,
       
-      // Legacy actions (maintain backwards compatibility)
+        // Legacy actions (maintain backwards compatibility)
       addAccount: (account) =>
         set((state) => {
           const newAccounts = [...state.accounts, account];
@@ -197,10 +197,10 @@ export const useWalletStore = create<WalletState>()(
           return [];
         }
       },
-    }),
-    {
-      name: 'vordium-wallet-storage',
-      storage: createJSONStorage(() => localStorage),
-    }
-  )
+    };
+  }),
+  {
+    name: 'vordium-wallet-storage',
+    storage: createJSONStorage(() => localStorage),
+  }
 );
