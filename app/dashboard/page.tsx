@@ -7,6 +7,7 @@ import QRCode from 'react-qr-code';
 import { RefreshCw } from 'lucide-react';
 import Link from 'next/link';
 import { AddTokenModal } from '@/components/AddTokenModal';
+import { WalletManagementModal } from '@/components/WalletManagementModal';
 import { BalanceService, type TokenBalance } from '@/services/balance.service';
 import { getTrustWalletLogo, NATIVE_LOGOS } from '@/lib/tokenLogos';
 
@@ -19,8 +20,7 @@ export default function DashboardPage() {
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [showAddToken, setShowAddToken] = useState(false);
-  const [showAddressModal, setShowAddressModal] = useState(false);
-  const [copied, setCopied] = useState('');
+  const [showWalletModal, setShowWalletModal] = useState(false);
   const [mounted, setMounted] = useState(false);
 
   const evmAccount = accounts.find(a => a.chain === 'EVM');
@@ -78,18 +78,27 @@ export default function DashboardPage() {
   return (
     <div className="min-h-screen bg-white">
       {/* Top Bar */}
-      <div className="flex items-center justify-between p-4 border-b border-gray-100">
+      <div className="flex items-center justify-between p-4 border-b border-gray-200">
         <button
-          onClick={() => setShowAddressModal(true)}
-          className="w-10 h-10 rounded-full bg-blue-600 text-white flex items-center justify-center text-xl font-bold"
+          onClick={() => setShowWalletModal(true)}
+          className="flex items-center gap-2 px-4 py-2 bg-gray-100 rounded-full hover:bg-gray-200 transition"
         >
-          {(localStorage.getItem('vordium_wallet_name') || 'M')[0]}
+          <div className="w-8 h-8 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white font-bold">
+            {(localStorage.getItem('vordium_wallet_name') || 'M')[0]}
+          </div>
+          <span className="font-semibold text-gray-900">{localStorage.getItem('vordium_wallet_name') || 'My Wallet'}</span>
+          <span className="text-gray-500">▼</span>
         </button>
         <div className="flex gap-2">
-          <Link href="/settings">
-            <button className="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center">⚙️</button>
-          </Link>
-          <button className="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center">🔔</button>
+          <button
+            onClick={() => router.push('/settings')}
+            className="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center text-gray-700 hover:bg-gray-200 transition"
+          >
+            ⚙️
+          </button>
+          <button className="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center text-gray-700 hover:bg-gray-200 transition">
+            🔔
+          </button>
         </div>
       </div>
 
@@ -106,10 +115,37 @@ export default function DashboardPage() {
       {/* Action Buttons */}
       <div className="px-4 mb-6">
         <div className="grid grid-cols-4 gap-3">
-          <ActionButton icon="📤" label="Send" onClick={() => router.push('/send')} />
-          <ActionButton icon="📥" label="Receive" onClick={() => router.push('/receive')} />
-          <ActionButton icon="💳" label="Buy" onClick={() => {}} disabled />
-          <ActionButton icon="🔄" label="Swap" onClick={() => {}} disabled />
+          <button
+            onClick={() => router.push('/send')}
+            className="flex flex-col items-center gap-2 py-4 bg-blue-600 rounded-2xl hover:bg-blue-700 active:scale-95 transition"
+          >
+            <span className="text-2xl">📤</span>
+            <span className="text-sm font-semibold text-white">Send</span>
+          </button>
+          
+          <button
+            onClick={() => router.push('/receive')}
+            className="flex flex-col items-center gap-2 py-4 bg-green-600 rounded-2xl hover:bg-green-700 active:scale-95 transition"
+          >
+            <span className="text-2xl">📥</span>
+            <span className="text-sm font-semibold text-white">Receive</span>
+          </button>
+          
+          <button
+            disabled
+            className="flex flex-col items-center gap-2 py-4 bg-gray-200 rounded-2xl cursor-not-allowed"
+          >
+            <span className="text-2xl opacity-50">💳</span>
+            <span className="text-sm font-semibold text-gray-500">Buy</span>
+          </button>
+          
+          <button
+            disabled
+            className="flex flex-col items-center gap-2 py-4 bg-gray-200 rounded-2xl cursor-not-allowed"
+          >
+            <span className="text-2xl opacity-50">🔄</span>
+            <span className="text-sm font-semibold text-gray-500">Swap</span>
+          </button>
         </div>
       </div>
 
@@ -169,46 +205,10 @@ export default function DashboardPage() {
       </div>
 
       {/* Modals */}
-      {showAddressModal && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4" onClick={() => setShowAddressModal(false)}>
-          <div className="bg-white rounded-3xl p-6 max-w-md w-full space-y-6" onClick={(e) => e.stopPropagation()}>
-            <h2 className="text-2xl font-bold">Your Addresses</h2>
-            
-            {[
-              { name: 'Ethereum', icon: '⚡', account: evmAccount },
-              { name: 'TRON', icon: '🔺', account: tronAccount },
-            ].map((item) => (
-              <div key={item.name} className="border-2 border-gray-100 rounded-2xl p-4">
-                <h3 className="font-semibold mb-3 flex items-center gap-2 text-lg">
-                  <span>{item.icon}</span>
-                  {item.name}
-                </h3>
-                <div className="bg-white inline-block p-3 rounded-xl border border-gray-200">
-                  <QRCode value={item.account.address} size={150} />
-                </div>
-                <p className="text-xs font-mono mt-3 break-all text-gray-600">{item.account.address}</p>
-                <button
-                  onClick={() => {
-                    navigator.clipboard.writeText(item.account.address);
-                    setCopied(item.name);
-                    setTimeout(() => setCopied(''), 2000);
-                  }}
-                  className="mt-3 w-full py-2 bg-blue-600 text-white rounded-xl font-semibold hover:bg-blue-700"
-                >
-                  {copied === item.name ? 'Copied!' : 'Copy Address'}
-                </button>
-              </div>
-            ))}
-            
-            <button
-              onClick={() => setShowAddressModal(false)}
-              className="w-full py-3 border-2 border-gray-300 rounded-xl font-semibold hover:bg-gray-50"
-            >
-              Close
-            </button>
-          </div>
-        </div>
-      )}
+      <WalletManagementModal
+        isOpen={showWalletModal}
+        onClose={() => setShowWalletModal(false)}
+      />
       
       {showAddToken && (
         <AddTokenModal
@@ -221,18 +221,6 @@ export default function DashboardPage() {
   );
 }
 
-function ActionButton({ icon, label, onClick, disabled = false }: any) {
-  return (
-    <button
-      onClick={onClick}
-      disabled={disabled}
-      className="flex flex-col items-center gap-2 py-4 bg-gray-50 rounded-2xl hover:bg-gray-100 active:scale-95 transition disabled:opacity-50 disabled:cursor-not-allowed"
-    >
-      <span className="text-2xl">{icon}</span>
-      <span className="text-sm font-semibold text-gray-700">{label}</span>
-    </button>
-  );
-}
 
 function TokenRow({ token, logoUrl, onClick }: { token: TokenBalance; logoUrl: string; onClick: () => void }) {
   const [logoError, setLogoError] = useState(false);

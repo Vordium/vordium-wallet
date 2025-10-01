@@ -2,25 +2,27 @@
 
 import React from 'react';
 
-type ButtonVariant = 'primary' | 'secondary' | 'icon';
+type ButtonVariant = 'primary' | 'secondary' | 'danger' | 'ghost';
 type ButtonSize = 'sm' | 'md' | 'lg';
 
 interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: ButtonVariant;
   size?: ButtonSize;
   loading?: boolean;
+  children: React.ReactNode;
 }
 
 const sizeClasses: Record<ButtonSize, string> = {
-  sm: 'px-3 py-2 text-sm',
-  md: 'px-4 py-2',
-  lg: 'px-5 py-3 text-base',
+  sm: 'px-4 py-2 text-sm',
+  md: 'px-6 py-3 text-base',
+  lg: 'px-8 py-4 text-lg',
 };
 
 const variantClasses: Record<ButtonVariant, string> = {
-  primary: 'bg-gradient-to-r from-blue-500 to-purple-600 text-white hover:from-blue-600 hover:to-purple-700',
-  secondary: 'border border-gray-300 text-gray-900 hover:bg-gray-50',
-  icon: 'p-2 border border-gray-300 text-gray-700 hover:bg-gray-50',
+  primary: 'bg-blue-600 text-white hover:bg-blue-700 active:scale-95 disabled:bg-gray-200 disabled:text-gray-500',
+  secondary: 'bg-white text-gray-900 border-2 border-gray-300 hover:bg-gray-50 active:scale-95 disabled:bg-gray-100 disabled:text-gray-400',
+  danger: 'bg-red-600 text-white hover:bg-red-700 active:scale-95 disabled:bg-gray-200 disabled:text-gray-500',
+  ghost: 'bg-transparent text-gray-700 hover:bg-gray-100 active:scale-95 disabled:text-gray-400',
 };
 
 export function Button({
@@ -32,10 +34,12 @@ export function Button({
   disabled,
   ...props
 }: ButtonProps) {
-  const base = 'rounded-lg transition transform active:scale-[0.98] disabled:opacity-60 disabled:cursor-not-allowed';
+  const base = 'rounded-xl font-semibold transition-all duration-200 flex items-center justify-center gap-2';
   return (
     <button
-      className={`${base} ${sizeClasses[size]} ${variantClasses[variant]} ${className}`}
+      className={`${base} ${sizeClasses[size]} ${variantClasses[variant]} ${className} ${
+        disabled ? 'cursor-not-allowed' : 'cursor-pointer'
+      }`}
       disabled={disabled || loading}
       {...props}
     >
