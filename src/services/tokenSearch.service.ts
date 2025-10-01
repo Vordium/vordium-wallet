@@ -11,9 +11,9 @@ export interface TokenSearchResult {
   verified?: boolean;
 }
 
-// Popular tokens database with comprehensive coverage
+// Comprehensive tokens database with extensive coverage
 export const POPULAR_TOKENS: TokenSearchResult[] = [
-  // Ethereum Tokens
+  // Ethereum Tokens - Major DeFi & Stablecoins
   {
     symbol: 'USDT',
     name: 'Tether USD',
@@ -104,8 +104,98 @@ export const POPULAR_TOKENS: TokenSearchResult[] = [
     logo: 'https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/0xC011a73ee8576Fb46F5E1c5751cA3B9Fe0af2a6F/logo.png',
     verified: true
   },
+  {
+    symbol: 'COMP',
+    name: 'Compound',
+    address: '0xc00e94Cb662C3520282E6f5717214004A7f26888',
+    chain: 'Ethereum',
+    decimals: 18,
+    logo: 'https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/0xc00e94Cb662C3520282E6f5717214004A7f26888/logo.png',
+    verified: true
+  },
+  {
+    symbol: 'YFI',
+    name: 'yearn.finance',
+    address: '0x0bc529c00C6401aEF6D220BE8c6Ea1667F6Ad93e',
+    chain: 'Ethereum',
+    decimals: 18,
+    logo: 'https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/0x0bc529c00C6401aEF6D220BE8c6Ea1667F6Ad93e/logo.png',
+    verified: true
+  },
+  {
+    symbol: 'SUSHI',
+    name: 'SushiToken',
+    address: '0x6B3595068778DD592e39A122f4f5a5cF09C90fE2',
+    chain: 'Ethereum',
+    decimals: 18,
+    logo: 'https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/0x6B3595068778DD592e39A122f4f5a5cF09C90fE2/logo.png',
+    verified: true
+  },
+  {
+    symbol: '1INCH',
+    name: '1inch',
+    address: '0x111111111117dC0aa78b770fA6A738034120C302',
+    chain: 'Ethereum',
+    decimals: 18,
+    logo: 'https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/0x111111111117dC0aa78b770fA6A738034120C302/logo.png',
+    verified: true
+  },
+  {
+    symbol: 'BAT',
+    name: 'Basic Attention Token',
+    address: '0x0D8775F648430679A709E98d2b0Cb6250d2887EF',
+    chain: 'Ethereum',
+    decimals: 18,
+    logo: 'https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/0x0D8775F648430679A709E98d2b0Cb6250d2887EF/logo.png',
+    verified: true
+  },
+  {
+    symbol: 'ZRX',
+    name: '0x Protocol Token',
+    address: '0xE41d2489571d322189246DaFA5ebDe1F4699F498',
+    chain: 'Ethereum',
+    decimals: 18,
+    logo: 'https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/0xE41d2489571d322189246DaFA5ebDe1F4699F498/logo.png',
+    verified: true
+  },
+  {
+    symbol: 'LEND',
+    name: 'Aave LEND',
+    address: '0x80fB784B7eD66730e8b1DBd9820aFD29931aab03',
+    chain: 'Ethereum',
+    decimals: 18,
+    logo: 'https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/0x80fB784B7eD66730e8b1DBd9820aFD29931aab03/logo.png',
+    verified: true
+  },
+  {
+    symbol: 'KNC',
+    name: 'Kyber Network Crystal',
+    address: '0xdd974D5C2e2928deA5F71b9825b8b646686BD200',
+    chain: 'Ethereum',
+    decimals: 18,
+    logo: 'https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/0xdd974D5C2e2928deA5F71b9825b8b646686BD200/logo.png',
+    verified: true
+  },
+  {
+    symbol: 'REN',
+    name: 'Republic Protocol',
+    address: '0x408e41876cCCDC0F92210600ef50372656052a38',
+    chain: 'Ethereum',
+    decimals: 18,
+    logo: 'https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/0x408e41876cCCDC0F92210600ef50372656052a38/logo.png',
+    verified: true
+  },
+  {
+    symbol: 'LRC',
+    name: 'Loopring',
+    address: '0xBBbbCA6A901c926F240b89EacB641d8Aec7AEafD',
+    chain: 'Ethereum',
+    decimals: 18,
+    logo: 'https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/0xBBbbCA6A901c926F240b89EacB641d8Aec7AEafD/logo.png',
+    verified: true
+  },
 
-  // TRON Tokens
+  // TRON Tokens - Major TRC20 tokens
   {
     symbol: 'USDT',
     name: 'Tether USD',

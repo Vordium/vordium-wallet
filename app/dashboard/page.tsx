@@ -89,103 +89,108 @@ export default function DashboardPage() {
   const isPositive = parseFloat(change24h.percent) >= 0;
 
   return (
-    <div className="min-h-screen bg-gray-900 text-white pb-20">
+    <div className="min-h-screen bg-gray-100 dark:bg-gray-900 text-white pb-20">
       {/* Top Bar */}
-      <div className="flex items-center justify-between p-4 border-b border-gray-700">
+      <div className="flex items-center justify-between p-4 border-b border-gray-200 dark:border-gray-700">
         <button
           onClick={() => setShowWalletModal(true)}
-          className="flex items-center gap-2 px-4 py-2 bg-gray-800 rounded-full hover:bg-gray-700 transition"
+          className="flex items-center gap-2 px-4 py-2 bg-white dark:bg-gray-800 rounded-full hover:bg-gray-50 dark:hover:bg-gray-700 transition"
         >
           <div className="w-8 h-8 rounded-full bg-gradient-to-br from-gray-600 to-gray-800 flex items-center justify-center text-white font-bold">
             {(localStorage.getItem('vordium_wallet_name') || 'M')[0]}
           </div>
-          <span className="font-semibold text-white">{localStorage.getItem('vordium_wallet_name') || 'My Wallet'}</span>
-          <span className="text-gray-400">▼</span>
+          <span className="font-semibold text-gray-900 dark:text-white">{localStorage.getItem('vordium_wallet_name') || 'My Wallet'}</span>
+          <span className="text-gray-500 dark:text-gray-400">▼</span>
         </button>
         <div className="flex gap-2">
           <button
             onClick={() => router.push('/settings')}
-            className="w-10 h-10 rounded-full bg-gray-800 flex items-center justify-center text-gray-400 hover:bg-gray-700 transition"
+            className="w-10 h-10 rounded-full bg-white dark:bg-gray-800 flex items-center justify-center text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700 transition"
           >
             <SettingsIcon className="w-5 h-5" />
           </button>
-          <button className="w-10 h-10 rounded-full bg-gray-800 flex items-center justify-center text-gray-400 hover:bg-gray-700 transition">
+          <button className="w-10 h-10 rounded-full bg-white dark:bg-gray-800 flex items-center justify-center text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700 transition">
             <BellIcon className="w-5 h-5" />
           </button>
         </div>
       </div>
 
-      {/* Total Balance */}
-      <div className="text-center py-8 px-4">
-        <div className="text-5xl font-bold mb-2 text-white">
-          ${loading ? '...' : totalBalance}
-        </div>
-        <div className={`text-lg ${isPositive ? 'text-green-400' : 'text-red-400'}`}>
-          {isPositive ? '+' : ''}${change24h.value} ({change24h.percent}%)
-        </div>
-      </div>
+      {/* Main Card Container */}
+      <div className="p-4">
+        <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6 mb-6">
+          {/* Total Balance */}
+          <div className="text-center py-6">
+            <div className="text-5xl font-bold mb-2 text-gray-900 dark:text-white">
+              ${loading ? '...' : totalBalance}
+            </div>
+            <div className={`text-lg ${isPositive ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}`}>
+              {isPositive ? '+' : ''}${change24h.value} ({change24h.percent}%)
+            </div>
+          </div>
 
-      {/* Action Buttons */}
-      <div className="px-4 mb-6">
-        <div className="grid grid-cols-4 gap-3">
-          <button
-            onClick={() => router.push('/send')}
-            className="flex flex-col items-center gap-2 py-4 bg-gray-800 rounded-2xl hover:bg-gray-700 active:scale-95 transition border border-gray-600"
-          >
-            <SendIcon className="w-6 h-6 text-gray-300" />
-            <span className="text-sm font-semibold text-gray-300">Send</span>
-          </button>
-          
-          <button
-            onClick={() => router.push('/receive')}
-            className="flex flex-col items-center gap-2 py-4 bg-gray-800 rounded-2xl hover:bg-gray-700 active:scale-95 transition border border-gray-600"
-          >
-            <ReceiveIcon className="w-6 h-6 text-gray-300" />
-            <span className="text-sm font-semibold text-gray-300">Receive</span>
-          </button>
-          
-          <button
-            disabled
-            className="flex flex-col items-center gap-2 py-4 bg-gray-800 rounded-2xl cursor-not-allowed border border-gray-700 opacity-50"
-          >
-            <BuyIcon className="w-6 h-6 text-gray-500" />
-            <span className="text-sm font-semibold text-gray-500">Buy</span>
-          </button>
-          
-          <button
-            disabled
-            className="flex flex-col items-center gap-2 py-4 bg-gray-800 rounded-2xl cursor-not-allowed border border-gray-700 opacity-50"
-          >
-            <SwapIcon className="w-6 h-6 text-gray-500" />
-            <span className="text-sm font-semibold text-gray-500">Swap</span>
-          </button>
+          {/* Action Buttons */}
+          <div className="grid grid-cols-4 gap-3">
+            <button
+              onClick={() => router.push('/send')}
+              className="flex flex-col items-center gap-2 py-4 bg-gray-50 dark:bg-gray-700 rounded-2xl hover:bg-gray-100 dark:hover:bg-gray-600 active:scale-95 transition border border-gray-200 dark:border-gray-600"
+            >
+              <SendIcon className="w-6 h-6 text-gray-600 dark:text-gray-300" />
+              <span className="text-sm font-semibold text-gray-700 dark:text-gray-300">Send</span>
+            </button>
+            
+            <button
+              onClick={() => router.push('/receive')}
+              className="flex flex-col items-center gap-2 py-4 bg-gray-50 dark:bg-gray-700 rounded-2xl hover:bg-gray-100 dark:hover:bg-gray-600 active:scale-95 transition border border-gray-200 dark:border-gray-600"
+            >
+              <ReceiveIcon className="w-6 h-6 text-gray-600 dark:text-gray-300" />
+              <span className="text-sm font-semibold text-gray-700 dark:text-gray-300">Receive</span>
+            </button>
+            
+            <button
+              disabled
+              className="flex flex-col items-center gap-2 py-4 bg-gray-50 dark:bg-gray-700 rounded-2xl cursor-not-allowed border border-gray-200 dark:border-gray-600 opacity-50"
+            >
+              <BuyIcon className="w-6 h-6 text-gray-400 dark:text-gray-500" />
+              <span className="text-sm font-semibold text-gray-500 dark:text-gray-500">Buy</span>
+            </button>
+            
+            <button
+              disabled
+              className="flex flex-col items-center gap-2 py-4 bg-gray-50 dark:bg-gray-700 rounded-2xl cursor-not-allowed border border-gray-200 dark:border-gray-600 opacity-50"
+            >
+              <SwapIcon className="w-6 h-6 text-gray-400 dark:text-gray-500" />
+              <span className="text-sm font-semibold text-gray-500 dark:text-gray-500">Swap</span>
+            </button>
+          </div>
         </div>
       </div>
 
       {/* Tokens Section */}
       <div className="px-4">
         <div className="flex items-center justify-between mb-4">
-          <h2 className="text-2xl font-bold">Tokens</h2>
+          <h2 className="text-2xl font-bold text-gray-900 dark:text-white">Tokens</h2>
           <div className="flex gap-2">
             <button
               onClick={() => loadWalletData()}
               disabled={refreshing}
-              className="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center"
+              className="w-10 h-10 rounded-full bg-white dark:bg-gray-800 flex items-center justify-center text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700 transition"
             >
               <RefreshIcon className={`w-5 h-5 ${refreshing ? 'animate-spin' : ''}`} />
             </button>
-            <button className="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center">🔍</button>
+            <button className="w-10 h-10 rounded-full bg-white dark:bg-gray-800 flex items-center justify-center text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700 transition">
+              <SearchIcon className="w-5 h-5" />
+            </button>
           </div>
         </div>
 
         {loading ? (
           <div className="space-y-1">
             {[1, 2, 3].map(i => (
-              <div key={i} className="bg-gray-50 rounded-2xl h-20 animate-pulse" />
+              <div key={i} className="bg-gray-50 dark:bg-gray-700 rounded-2xl h-20 animate-pulse" />
             ))}
           </div>
         ) : tokens.length === 0 ? (
-          <div className="text-center py-12 text-gray-500">
+          <div className="text-center py-12 text-gray-500 dark:text-gray-400">
             <p className="text-lg">No tokens found</p>
             <p className="text-sm mt-2">Receive crypto to get started</p>
           </div>
@@ -211,7 +216,7 @@ export default function DashboardPage() {
         {/* Add Token */}
         <button
           onClick={() => setShowAddToken(true)}
-          className="w-full mt-4 py-4 border-2 border-dashed border-gray-600 rounded-2xl text-gray-400 font-semibold hover:bg-gray-800 hover:text-gray-300 transition flex items-center justify-center gap-2"
+          className="w-full mt-4 py-4 border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-2xl text-gray-500 dark:text-gray-400 font-semibold hover:bg-gray-50 dark:hover:bg-gray-800 hover:text-gray-700 dark:hover:text-gray-300 transition flex items-center justify-center gap-2"
         >
           <PlusIcon className="w-5 h-5" />
           Add Token
@@ -244,7 +249,7 @@ function TokenRow({ token, logoUrl, onClick }: { token: TokenBalance; logoUrl: s
   return (
     <button
       onClick={onClick}
-      className="w-full flex items-center gap-3 py-3 px-2 hover:bg-gray-50 rounded-2xl transition active:scale-98"
+      className="w-full flex items-center gap-3 py-3 px-2 hover:bg-gray-50 dark:hover:bg-gray-700 rounded-2xl transition active:scale-98"
     >
       <div className="relative w-12 h-12 flex-shrink-0">
         {!logoError && logoUrl ? (
@@ -270,18 +275,18 @@ function TokenRow({ token, logoUrl, onClick }: { token: TokenBalance; logoUrl: s
       </div>
 
       <div className="flex-1 text-left min-w-0">
-        <div className="font-semibold text-gray-900 truncate">{token.symbol}</div>
-        <div className="text-sm text-gray-500 truncate">{token.name}</div>
+        <div className="font-semibold text-gray-900 dark:text-white truncate">{token.symbol}</div>
+        <div className="text-sm text-gray-500 dark:text-gray-400 truncate">{token.name}</div>
         {!token.isNative && (
-          <div className="text-xs text-gray-400 mt-0.5">{token.chain}</div>
+          <div className="text-xs text-gray-400 dark:text-gray-500 mt-0.5">{token.chain}</div>
         )}
       </div>
 
       <div className="text-right">
-        <div className="font-semibold text-gray-900">
+        <div className="font-semibold text-gray-900 dark:text-white">
           {parseFloat(token.balance).toFixed(4)}
         </div>
-        <div className="text-sm text-gray-500">
+        <div className="text-sm text-gray-500 dark:text-gray-400">
           ${token.usdValue}
         </div>
       </div>
