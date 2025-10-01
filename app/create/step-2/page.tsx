@@ -56,10 +56,56 @@ Keep this backup safe and secure!`;
     router.push('/create/step-3');
   }
 
-  function handleSkip() {
+  async function handleSkip() {
     if (confirm('⚠️ Skipping verification is risky. You won&apos;t be able to prove you saved your phrase. Are you sure?')) {
       sessionStorage.setItem('verification_skipped', 'true');
-      router.push('/create/complete');
+      // Complete wallet creation without verification
+      await completeWalletCreation();
+    }
+  }
+
+  async function completeWalletCreation() {
+    try {
+      const { CryptoService } = await import('@/services/crypto.service');
+      const { useWalletStore } = await import('@/store/walletStore');
+      
+      const password = sessionStorage.getItem('temp_password');
+      const walletName = sessionStorage.getItem('temp_wallet_name');
+      const mnemonicStr = sessionStorage.getItem('temp_mnemonic');
+      
+      if (!password || !mnemonicStr) {
+        throw new Error('Missing required data');
+      }
+      
+      // Encrypt and store vault
+      const vault = await CryptoService.encrypt(mnemonicStr, password);
+      localStorage.setItem('vordium_vault', JSON.stringify(vault));
+      localStorage.setItem('vordium_wallet_name', walletName || 'My Wallet');
+      localStorage.setItem('vordium_created_at', Date.now().toString());
+      
+      // Derive accounts
+      const seed = await CryptoService.mnemonicToSeed(mnemonicStr);
+      const evm = await CryptoService.deriveAccount(seed, 'EVM', 0);
+      const tron = await CryptoService.deriveAccount(seed, 'TRON', 0);
+      
+      // Store in Zustand
+      const store = useWalletStore.getState();
+      store.addAccount({ id: 'evm-0', name: 'Ethereum Account 1', address: evm.address, chain: 'EVM' });
+      store.addAccount({ id: 'tron-0', name: 'TRON Account 1', address: tron.address, chain: 'TRON' });
+      store.selectAccount('evm-0');
+      
+      // Mark as unlocked
+      localStorage.setItem('vordium_unlocked', 'true');
+      
+      // Clear temp data
+      sessionStorage.removeItem('temp_password');
+      sessionStorage.removeItem('temp_wallet_name');
+      sessionStorage.removeItem('temp_mnemonic');
+      
+      // Navigate to success
+      router.push('/create/success');
+    } catch (e) {
+      alert('Failed to create wallet: ' + (e as Error).message);
     }
   }
 

@@ -1,44 +1,33 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { useWalletStore } from '@/store/walletStore';
-import { Dashboard as WalletDashboard } from '@/components/Dashboard';
 
-export default function Home() {
+export default function LandingPage() {
   const router = useRouter();
-  const { accounts } = useWalletStore();
+  const [isChecking, setIsChecking] = useState(true);
 
   useEffect(() => {
-    // Check if wallet exists
-    const vault = localStorage.getItem('vordium_vault');
-    const unlocked = localStorage.getItem('vordium_unlocked');
-    
-    if (vault && !unlocked) {
-      // Wallet exists but locked, go to unlock
-      router.push('/unlock');
-    } else if (!vault) {
-      // No wallet, show welcome
-      router.push('/welcome');
-    }
-    // If vault exists and unlocked, stay on dashboard
+    const checkAuth = () => {
+      const hasVault = localStorage.getItem('vordium_vault');
+      const isUnlocked = localStorage.getItem('vordium_unlocked') === 'true';
+      
+      if (hasVault && isUnlocked) {
+        router.replace('/dashboard');
+      } else if (hasVault && !isUnlocked) {
+        router.replace('/unlock');
+      } else {
+        router.replace('/welcome');
+      }
+    };
+
+    checkAuth();
   }, [router]);
 
-  // If we have accounts, show dashboard
-  if (accounts.length > 0) {
-    return (
-      <main className="min-h-screen bg-gray-100 p-4">
-        <div className="max-w-2xl mx-auto">
-          <WalletDashboard />
-        </div>
-      </main>
-    );
-  }
-
-  // Loading state while checking
+  // Always show loading while checking
   return (
-    <main className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-600 via-purple-500 to-indigo-600">
-      <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-white"></div>
-    </main>
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-600 via-purple-500 to-indigo-600">
+      <div className="animate-spin rounded-full h-12 w-12 border-4 border-white border-t-transparent"></div>
+    </div>
   );
 }

@@ -14,7 +14,7 @@ export default function CreateSuccess() {
       setCountdown((prev) => {
         if (prev <= 1) {
           clearInterval(timer);
-          router.push('/');
+          router.push('/dashboard');
           return 0;
         }
         return prev - 1;
@@ -86,7 +86,7 @@ export default function CreateSuccess() {
         {/* Action Button */}
         <div className="space-y-3">
           <button
-            onClick={() => router.push('/')}
+            onClick={() => router.push('/dashboard')}
             className="w-full h-14 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white rounded-xl font-semibold shadow-lg transition transform hover:scale-[1.02] active:scale-[0.98]"
           >
             Open My Wallet

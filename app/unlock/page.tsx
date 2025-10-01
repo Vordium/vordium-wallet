@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { Eye, EyeOff } from 'lucide-react';
 import { CryptoService } from '@/services/crypto.service';
@@ -13,6 +13,17 @@ export default function UnlockPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    const vault = localStorage.getItem('vordium_vault');
+    const unlocked = localStorage.getItem('vordium_unlocked') === 'true';
+    
+    if (!vault) {
+      router.replace('/');
+    } else if (unlocked) {
+      router.replace('/dashboard');
+    }
+  }, [router]);
 
   async function handleUnlock() {
     if (!password) {
@@ -46,7 +57,7 @@ export default function UnlockPage() {
       localStorage.setItem('vordium_unlocked', 'true');
 
       // Navigate to dashboard
-      router.push('/');
+      router.replace('/dashboard');
     } catch (e) {
       setError('Incorrect password');
       setLoading(false);
