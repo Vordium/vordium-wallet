@@ -59,27 +59,27 @@ export interface WalletState {
   getTokens: () => Token[];
 }
 
+// Helper functions for loading from localStorage
+const loadWallets = () => {
+  try {
+    const stored = localStorage.getItem('vordium-wallets');
+    return stored ? JSON.parse(stored) : [];
+  } catch {
+    return [];
+  }
+};
+
+const loadCurrentWallet = () => {
+  try {
+    return localStorage.getItem('vordium-current-wallet');
+  } catch {
+    return null;
+  }
+};
+
 export const useWalletStore = create<WalletState>()(
   persist(
     (set, get) => {
-      // Load wallets from localStorage on initialization
-      const loadWallets = () => {
-        try {
-          const stored = localStorage.getItem('vordium-wallets');
-          return stored ? JSON.parse(stored) : [];
-        } catch {
-          return [];
-        }
-      };
-
-      const loadCurrentWallet = () => {
-        try {
-          return localStorage.getItem('vordium-current-wallet');
-        } catch {
-          return null;
-        }
-      };
-
       const initialWallets = loadWallets();
       const initialCurrentWallet = loadCurrentWallet();
       const currentWallet = initialWallets.find(w => w.id === initialCurrentWallet);
