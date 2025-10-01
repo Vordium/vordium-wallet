@@ -1,14 +1,14 @@
 'use client';
 
 import { useRouter, useSearchParams } from 'next/navigation';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import { useWalletStore } from '@/store/walletStore';
 import QRCode from 'react-qr-code';
 import { ArrowLeft, Copy, Share2, Search } from 'lucide-react';
 import { BalanceService, type TokenBalance } from '@/services/balance.service';
 import { getTrustWalletLogo, NATIVE_LOGOS } from '@/lib/tokenLogos';
 
-export default function ReceivePage() {
+function ReceivePageContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { accounts } = useWalletStore();
@@ -187,5 +187,17 @@ export default function ReceivePage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function ReceivePage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-white flex items-center justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-4 border-blue-600 border-t-transparent"></div>
+      </div>
+    }>
+      <ReceivePageContent />
+    </Suspense>
   );
 }

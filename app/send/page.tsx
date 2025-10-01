@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { isValidAddress, isPositiveNumber } from '@/utils/safety.utils';
 import { useWalletStore } from '@/store/walletStore';
@@ -8,7 +8,7 @@ import { ArrowLeft, QrCode, Search } from 'lucide-react';
 import { BalanceService, type TokenBalance } from '@/services/balance.service';
 import { getTrustWalletLogo, NATIVE_LOGOS } from '@/lib/tokenLogos';
 
-export default function SendPage() {
+function SendPageContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { accounts } = useWalletStore();
@@ -294,5 +294,17 @@ export default function SendPage() {
         </div>
       )}
     </div>
+  );
+}
+
+export default function SendPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-white flex items-center justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-4 border-blue-600 border-t-transparent"></div>
+      </div>
+    }>
+      <SendPageContent />
+    </Suspense>
   );
 }
