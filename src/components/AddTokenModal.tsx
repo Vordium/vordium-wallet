@@ -130,7 +130,7 @@ export function AddTokenModal({ isOpen, onClose }: { isOpen: boolean; onClose: (
       window.location.reload();
       
     } catch (error) {
-      alert('Failed to add token: ' + error.message);
+      alert('Failed to add token: ' + (error as Error).message);
     } finally {
       setSearching(false);
     }
@@ -235,7 +235,7 @@ export function AddTokenModal({ isOpen, onClose }: { isOpen: boolean; onClose: (
       window.location.reload();
 
     } catch (error) {
-      alert('Failed: ' + error.message);
+      alert('Failed: ' + (error as Error).message);
     } finally {
       setSearching(false);
     }

@@ -14,7 +14,7 @@ export default function CreatePage() {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [step, setStep] = useState<1 | 2 | 3>(1);
   const [mnemonic, setMnemonic] = useState<string>('');
-  const [confirmChecks, setConfirmChecks] = useState({ a: false, b: false, c: false });
+  const [confirmChecks, setConfirmChecks] = useState<{ a: boolean; b: boolean; c: boolean }>({ a: false, b: false, c: false });
   
   const addWallet = useWalletStore(state => state.addWallet);
   const setCurrentWallet = useWalletStore(state => state.setCurrentWallet);
@@ -164,7 +164,7 @@ export default function CreatePage() {
               <label key={key} className="flex items-start gap-3 p-4 bg-gray-50 rounded-xl cursor-pointer hover:bg-gray-100 transition">
                 <input
                   type="checkbox"
-                  checked={confirmChecks[key]}
+                  checked={confirmChecks[key as keyof typeof confirmChecks]}
                   onChange={(e) => setConfirmChecks(v => ({ ...v, [key]: e.target.checked }))}
                   className="mt-1 w-5 h-5 text-blue-600 rounded focus:ring-2 focus:ring-blue-500"
                 />
@@ -219,8 +219,9 @@ export default function CreatePage() {
                 }
                 
                 // Generate accounts
-                const evmAccount = CryptoService.deriveEVMAccount(mnemonic, 0);
-                const tronAccount = CryptoService.deriveTRONAccount(mnemonic, 0);
+                const seed = await CryptoService.mnemonicToSeed(mnemonic);
+                const evmAccount = await CryptoService.deriveAccount(seed, 'EVM', 0);
+                const tronAccount = await CryptoService.deriveAccount(seed, 'TRON', 0);
                 
                 const newWallet = {
                   id: Date.now().toString(),
@@ -255,7 +256,7 @@ export default function CreatePage() {
                 
                 router.push('/dashboard');
               } catch (error) {
-                alert('Failed: ' + error.message);
+                alert('Failed: ' + (error as Error).message);
               }
             }}
             className="w-full py-4 bg-gradient-to-r from-green-500 to-green-600 text-white text-lg font-bold rounded-xl hover:from-green-600 hover:to-green-700 active:scale-98 transition shadow-lg"
