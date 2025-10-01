@@ -24,7 +24,7 @@ export default function CreatePage() {
     const adding = localStorage.getItem('adding_wallet') === 'true';
     setIsAddingWallet(adding);
     setName(adding ? `Wallet ${wallets.length + 1}` : 'My Wallet');
-  }, []);
+  }, [wallets.length]);
 
   // STEP 1: Wallet Name (and Password for first wallet)
   if (step === 1) {

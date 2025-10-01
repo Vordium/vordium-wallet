@@ -22,6 +22,7 @@ import {
   MoreIcon, 
   RefreshIcon 
 } from '@/components/icons/GrayIcons';
+import Image from 'next/image';
 
 export default function DashboardPage() {
   const router = useRouter();
@@ -171,7 +172,7 @@ export default function DashboardPage() {
               disabled={refreshing}
               className="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center"
             >
-              <RefreshCw className={`w-5 h-5 ${refreshing ? 'animate-spin' : ''}`} />
+              <RefreshIcon className={`w-5 h-5 ${refreshing ? 'animate-spin' : ''}`} />
             </button>
             <button className="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center">🔍</button>
           </div>
@@ -247,9 +248,11 @@ function TokenRow({ token, logoUrl, onClick }: { token: TokenBalance; logoUrl: s
     >
       <div className="relative w-12 h-12 flex-shrink-0">
         {!logoError && logoUrl ? (
-          <img
+          <Image
             src={logoUrl}
             alt={token.symbol}
+            width={48}
+            height={48}
             className="w-full h-full rounded-full"
             onError={() => setLogoError(true)}
           />

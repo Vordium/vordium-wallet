@@ -6,6 +6,7 @@ import TronWeb from 'tronweb';
 import { useWalletStore } from '@/store/walletStore';
 import { TokenSearchService, type TokenSearchResult } from '@/services/tokenSearch.service';
 import { SearchIcon, PlusIcon } from './icons/GrayIcons';
+import Image from 'next/image';
 
 interface TokenSearchResult {
   symbol: string;
@@ -243,7 +244,7 @@ export function AddTokenModal({ isOpen, onClose }: { isOpen: boolean; onClose: (
                   disabled={searching}
                   className="w-full flex items-center gap-3 p-4 bg-gray-700 rounded-xl hover:bg-gray-600 transition disabled:opacity-50"
                 >
-                  <img src={token.logo} alt={token.symbol} className="w-10 h-10 rounded-full" onError={(e) => e.currentTarget.src = 'https://via.placeholder.com/40'} />
+                  <Image src={token.logo} alt={token.symbol} width={40} height={40} className="w-10 h-10 rounded-full" onError={(e) => e.currentTarget.src = 'https://via.placeholder.com/40'} />
                   <div className="flex-1 text-left">
                     <div className="font-bold text-white">{token.symbol}</div>
                     <div className="text-sm text-gray-300">{token.name}</div>
