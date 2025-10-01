@@ -38,10 +38,12 @@ export default function TokenDetailPage({
 
   useEffect(() => {
     loadTokenData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [params]);
 
   useEffect(() => {
     loadPriceData(timeframe);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [timeframe]);
 
   useEffect(() => {
@@ -55,6 +57,7 @@ export default function TokenDetailPage({
         chartRef.current = null;
       }
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [priceHistory]);
 
   async function loadTokenData() {

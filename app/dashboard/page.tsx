@@ -39,6 +39,7 @@ export default function DashboardPage() {
       const interval = setInterval(() => loadWalletData(true), 30000);
       return () => clearInterval(interval);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [router, evmAccount, tronAccount]);
 
   async function loadWalletData(silent = false) {

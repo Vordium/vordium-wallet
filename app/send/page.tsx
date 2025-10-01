@@ -27,6 +27,7 @@ export default function SendPage() {
 
   useEffect(() => {
     loadTokens();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [evmAccount, tronAccount]);
 
   async function loadTokens() {
@@ -115,7 +116,6 @@ export default function SendPage() {
           <div className="space-y-1">
             {filteredTokens.map((token) => {
               const logoUrl = token.isNative ? NATIVE_LOGOS[token.symbol] : getTrustWalletLogo(token.chain, token.address || '');
-              const [logoError, setLogoError] = useState(false);
 
               return (
                 <button
@@ -123,19 +123,8 @@ export default function SendPage() {
                   onClick={() => setSelectedToken(token)}
                   className="w-full flex items-center gap-3 p-4 hover:bg-gray-50 rounded-2xl transition"
                 >
-                  <div className="w-12 h-12">
-                    {!logoError && logoUrl ? (
-                      <img
-                        src={logoUrl}
-                        alt={token.symbol}
-                        className="w-full h-full rounded-full"
-                        onError={() => setLogoError(true)}
-                      />
-                    ) : (
-                      <div className="w-full h-full rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white font-bold text-xl">
-                        {token.symbol.charAt(0)}
-                      </div>
-                    )}
+                  <div className="w-12 h-12 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white font-bold text-xl">
+                    {token.icon || token.symbol.charAt(0)}
                   </div>
 
                   <div className="flex-1 text-left">
@@ -180,7 +169,9 @@ export default function SendPage() {
         {/* Selected Token Display */}
         <div className="flex items-center justify-between p-4 bg-gray-50 rounded-2xl">
           <div className="flex items-center gap-3">
-            <img src={logoUrl} alt={selectedToken.symbol} className="w-10 h-10 rounded-full" onError={(e) => (e.currentTarget.style.display = 'none')} />
+            <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white font-bold">
+              {selectedToken.icon || selectedToken.symbol.charAt(0)}
+            </div>
             <div>
               <div className="font-semibold">{selectedToken.symbol}</div>
               <div className="text-sm text-gray-500">{selectedToken.chain}</div>
