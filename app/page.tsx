@@ -115,7 +115,7 @@ export default function Home() {
   const Dashboard = WalletDashboard;
 
   return (
-    <main className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-500 to-purple-600 p-4">
+    <main className="min-h-screen flex items-center justify-center bg-gray-100 p-4">
       <div className="bg-white rounded-2xl shadow-2xl p-6 md:p-8 w-full max-w-lg">
         {view === 'landing' && <Landing />}
         {view === 'create' && <CreateFlow />}

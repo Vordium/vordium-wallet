@@ -7,6 +7,7 @@ import { TokenCard } from './TokenCard';
 import { ReceiveCard } from './ReceiveCard';
 import Link from 'next/link';
 import { useWalletStore } from '@/store/walletStore';
+import { Settings } from 'lucide-react';
 
 export function Dashboard() {
   const { accounts, selectedAccountId, selectAccount } = useWalletStore();
@@ -15,6 +16,13 @@ export function Dashboard() {
 
   return (
     <div className="space-y-6">
+      <div className="flex justify-end mb-2">
+        <Link href="/settings">
+          <button className="p-2 rounded-lg hover:bg-gray-100">
+            <Settings className="w-5 h-5 text-gray-600" />
+          </button>
+        </Link>
+      </div>
       <BalanceCard
         balance={hide ? '••••••' : '$0.00'}
         change={'+0.00%'}
@@ -29,7 +37,7 @@ export function Dashboard() {
           {accounts.map((a) => (
             <button key={a.id} onClick={() => selectAccount(a.id)} className={`text-left border rounded-lg p-3 ${selectedAccountId === a.id ? 'border-indigo-500 bg-indigo-50' : ''}`}>
               <div className="text-sm text-gray-500">{a.name} · {a.chain}</div>
-              <div className="font-mono text-sm break-all">{a.address}</div>
+              <div className="font-mono text-sm break-all text-gray-900">{a.address}</div>
             </button>
           ))}
           {accounts.length === 0 && (

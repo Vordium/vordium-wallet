@@ -30,7 +30,7 @@ export default function CreatePage() {
 
   if (step === 2) {
     return (
-      <main className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-500 to-purple-600 p-4">
+      <main className="min-h-screen flex items-center justify-center bg-gray-100 p-4">
         <div className="bg-white rounded-2xl shadow p-6 w-full max-w-2xl space-y-5">
           <div className="flex items-center justify-between">
             <h1 className="text-xl font-semibold">Secret Recovery Phrase</h1>
@@ -63,7 +63,7 @@ export default function CreatePage() {
 
   if (step === 3) {
     return (
-      <main className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-500 to-purple-600 p-4">
+      <main className="min-h-screen flex items-center justify-center bg-gray-100 p-4">
         <div className="bg-white rounded-2xl shadow p-6 w-full max-w-lg space-y-5">
           <div className="flex items-center justify-between">
             <h1 className="text-xl font-semibold">Verify Your Phrase</h1>
@@ -97,7 +97,7 @@ export default function CreatePage() {
   }
 
   return (
-    <main className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-500 to-purple-600 p-4">
+    <main className="min-h-screen flex items-center justify-center bg-gray-100 p-4">
       <div className="bg-white rounded-2xl shadow p-6 w-full max-w-lg space-y-5">
         <div className="flex items-center justify-between">
           <h1 className="text-xl font-semibold">Create New Wallet</h1>
