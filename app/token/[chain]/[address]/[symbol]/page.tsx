@@ -185,7 +185,7 @@ export default function TokenDetailPage({
       lastValueVisible: false,
     });
 
-    areaSeries.setData(priceHistory);
+    areaSeries.setData(priceHistory as any);
     chart.timeScale().fitContent();
 
     chartRef.current = chart;
