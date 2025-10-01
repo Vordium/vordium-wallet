@@ -8,16 +8,6 @@ import { TokenSearchService, type TokenSearchResult } from '@/services/tokenSear
 import { SearchIcon, PlusIcon } from './icons/GrayIcons';
 import Image from 'next/image';
 
-interface TokenSearchResult {
-  symbol: string;
-  name: string;
-  address: string;
-  chain: 'Ethereum' | 'Tron';
-  decimals: number;
-  logo: string;
-  balance?: string;
-}
-
 export function AddTokenModal({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) {
   const [searchQuery, setSearchQuery] = useState('');
   const [searching, setSearching] = useState(false);
