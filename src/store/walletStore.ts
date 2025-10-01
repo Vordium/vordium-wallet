@@ -198,9 +198,10 @@ export const useWalletStore = create<WalletState>()(
         }
       },
     };
-  }),
-  {
-    name: 'vordium-wallet-storage',
-    storage: createJSONStorage(() => localStorage),
-  }
+    },
+    {
+      name: 'vordium-wallet-storage',
+      storage: createJSONStorage(() => localStorage),
+    }
+  )
 );
