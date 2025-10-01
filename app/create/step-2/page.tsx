@@ -190,7 +190,7 @@ Keep this backup safe and secure!`;
             onClick={handleSkip}
             className="w-full text-sm text-gray-500 hover:text-gray-700 underline py-2"
           >
-            I'll do this later
+            I&apos;ll do this later
           </button>
         </div>
       </div>
