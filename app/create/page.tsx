@@ -26,8 +26,9 @@ export default function CreatePage() {
   const match = pw && pw === pw2;
   const valid = validLen && hasUpper && hasNum && match;
 
+  const words = useMemo(() => (mnemonic ? mnemonic.split(' ') : []), [mnemonic]);
+
   if (step === 2) {
-    const words = useMemo(() => (mnemonic ? mnemonic.split(' ') : []), [mnemonic]);
     return (
       <main className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-500 to-purple-600 p-4">
         <div className="bg-white rounded-2xl shadow p-6 w-full max-w-2xl space-y-5">
