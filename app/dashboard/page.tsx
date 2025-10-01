@@ -17,22 +17,23 @@ export default function DashboardPage() {
   const [showNetworkSelector, setShowNetworkSelector] = useState(false);
   const [showAddToken, setShowAddToken] = useState(false);
   const [showVerificationWarning, setShowVerificationWarning] = useState(false);
+  const [mounted, setMounted] = useState(false);
 
   const currentAccount = useMemo(() => {
     return accounts.find(a => a.chain === selectedChain) || accounts[0];
   }, [accounts, selectedChain]);
 
   useEffect(() => {
-    const skipped = sessionStorage.getItem('verification_skipped') === 'true';
-    const verified = localStorage.getItem('vordium_verified') === 'true';
-    setShowVerificationWarning(skipped && !verified);
-  }, []);
-
-  useEffect(() => {
+    setMounted(true);
     const unlocked = localStorage.getItem('vordium_unlocked') === 'true';
     if (!unlocked) {
       router.replace('/unlock');
+      return;
     }
+    
+    const skipped = sessionStorage.getItem('verification_skipped') === 'true';
+    const verified = localStorage.getItem('vordium_verified') === 'true';
+    setShowVerificationWarning(skipped && !verified);
   }, [router]);
 
   function handleCopy() {
@@ -52,9 +53,9 @@ export default function DashboardPage() {
     }
   }
 
-  if (!currentAccount) {
+  if (!mounted || !currentAccount) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
         <div className="animate-spin rounded-full h-12 w-12 border-4 border-blue-600 border-t-transparent"></div>
       </div>
     );
