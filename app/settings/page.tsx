@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/Button';
 import { ArrowLeftIcon, ShieldIcon, WalletIcon, BellIcon, GlobeIcon, LockIcon, KeyIcon, EyeIcon, EyeOffIcon, CheckIcon, AlertTriangleIcon } from '@/components/icons/GrayIcons';
 import { useWalletStore } from '@/store/walletStore';
 import { BackupModal } from '@/components/BackupModal';
+import { PrivateKeyExportModal } from '@/components/PrivateKeyExportModal';
 
 interface SecuritySettings {
   pinEnabled: boolean;
@@ -42,6 +43,7 @@ export default function SettingsPage() {
   const [showPin, setShowPin] = useState(false);
   const [showConfirmPin, setShowConfirmPin] = useState(false);
   const [showBackupModal, setShowBackupModal] = useState(false);
+  const [showPrivateKeyModal, setShowPrivateKeyModal] = useState(false);
 
   const [security, setSecurity] = useState<SecuritySettings>({
     pinEnabled: false,
@@ -110,6 +112,16 @@ export default function SettingsPage() {
       setShowResetConfirm(true);
       setTimeout(() => setShowResetConfirm(false), 5000);
     }
+  };
+
+  const getPrivateKeys = () => {
+    const evmAccount = accounts.find(a => a.chain === 'EVM');
+    const tronAccount = accounts.find(a => a.chain === 'TRON');
+    
+    return {
+      evm: evmAccount?.privateKey,
+      tron: tronAccount?.privateKey
+    };
   };
 
   const toggleSetting = (type: 'security' | 'privacy' | 'display', key: string) => {
@@ -382,7 +394,7 @@ export default function SettingsPage() {
                 icon={<ShieldIcon className="w-5 h-5 text-gray-300" />}
                 title="Export Private Keys"
                 subtitle="Advanced: Export individual keys"
-                onPress={() => {/* Export flow */}}
+                onPress={() => setShowPrivateKeyModal(true)}
               />
             </div>
 
@@ -515,6 +527,13 @@ export default function SettingsPage() {
         isOpen={showBackupModal}
         onClose={() => setShowBackupModal(false)}
         mnemonic={wallets[0]?.mnemonic}
+      />
+
+      {/* Private Key Export Modal */}
+      <PrivateKeyExportModal
+        isOpen={showPrivateKeyModal}
+        onClose={() => setShowPrivateKeyModal(false)}
+        privateKeys={getPrivateKeys()}
       />
     </div>
   );

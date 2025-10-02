@@ -8,6 +8,7 @@ import Link from 'next/link';
 import { AddTokenModal } from '@/components/AddTokenModal';
 import { WalletSwitcherModal } from '@/components/WalletSwitcherModal';
 import { BottomNavigation } from '@/components/BottomNavigation';
+import { WalletImportModal } from '@/components/WalletImportModal';
 import { BalanceService, type TokenBalance } from '@/services/balance.service';
 import { PageSkeleton, BalanceCardSkeleton, TokenRowSkeleton } from '@/components/ui/Skeleton';
 import { getTrustWalletLogo, NATIVE_LOGOS } from '@/lib/tokenLogos';
@@ -35,6 +36,7 @@ export default function DashboardPage() {
   const [refreshing, setRefreshing] = useState(false);
   const [showAddToken, setShowAddToken] = useState(false);
   const [showWalletModal, setShowWalletModal] = useState(false);
+  const [showImportWallet, setShowImportWallet] = useState(false);
   const [mounted, setMounted] = useState(false);
 
   const evmAccount = accounts.find(a => a.chain === 'EVM');
@@ -115,6 +117,12 @@ export default function DashboardPage() {
           <span className="text-gray-400">▼</span>
         </button>
         <div className="flex gap-2">
+          <button
+            onClick={() => setShowImportWallet(true)}
+            className="px-4 py-2 bg-gray-800 rounded-full hover:bg-gray-700 transition text-white text-sm font-medium"
+          >
+            Import
+          </button>
           <button
             onClick={() => router.push('/settings')}
             className="w-10 h-10 rounded-full bg-gray-800 flex items-center justify-center text-gray-400 hover:bg-gray-700 transition"
@@ -242,6 +250,15 @@ export default function DashboardPage() {
       <WalletSwitcherModal
         isOpen={showWalletModal}
         onClose={() => setShowWalletModal(false)}
+      />
+      
+      <WalletImportModal
+        isOpen={showImportWallet}
+        onClose={() => setShowImportWallet(false)}
+        onSuccess={() => {
+          setShowImportWallet(false);
+          window.location.reload();
+        }}
       />
       
       {showAddToken && (
