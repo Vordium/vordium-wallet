@@ -10,6 +10,7 @@ import { WalletSwitcherModal } from '@/components/WalletSwitcherModal';
 import { BottomNavigation } from '@/components/BottomNavigation';
 import { WalletImportModal } from '@/components/WalletImportModal';
 import { BalanceService, type TokenBalance } from '@/services/balance.service';
+import { NotificationCenter, useNotifications } from '@/components/NotificationSystem';
 import { PageSkeleton, BalanceCardSkeleton, TokenRowSkeleton } from '@/components/ui/Skeleton';
 import { getTrustWalletLogo, NATIVE_LOGOS } from '@/lib/tokenLogos';
 import { 
@@ -24,13 +25,15 @@ import {
   MoreIcon, 
   RefreshIcon,
   FilterIcon,
-  TrendingUpIcon
+  TrendingUpIcon,
+  LockIcon
 } from '@/components/icons/GrayIcons';
 import Image from 'next/image';
 
 export default function DashboardPage() {
   const router = useRouter();
   const { accounts } = useWalletStore();
+  const { addNotification } = useNotifications();
   const [tokens, setTokens] = useState<TokenBalance[]>([]);
   const [totalBalance, setTotalBalance] = useState('0.00');
   const [change24h, setChange24h] = useState({ value: '0.00', percent: '0.00' });
@@ -86,8 +89,22 @@ export default function DashboardPage() {
       
       // TODO: Calculate 24h change
       setChange24h({ value: '0.00', percent: '0.00' });
+      
+      // Add success notification
+      if (!silent) {
+        addNotification({
+          type: 'success',
+          title: 'Balances Updated',
+          message: `Portfolio value: ${total}`,
+        });
+      }
     } catch (error) {
       console.error('Failed to load wallet data:', error);
+      addNotification({
+        type: 'error',
+        title: 'Failed to Load Balances',
+        message: 'Please check your connection and try again.',
+      });
     } finally {
       setLoading(false);
       setRefreshing(false);
@@ -131,9 +148,7 @@ export default function DashboardPage() {
           >
             <SettingsIcon className="w-5 h-5" />
           </button>
-          <button className="w-10 h-10 rounded-full bg-gray-800 flex items-center justify-center text-gray-400 hover:bg-gray-700 transition">
-            <BellIcon className="w-5 h-5" />
-          </button>
+          <NotificationCenter />
         </div>
       </div>
 
@@ -155,7 +170,7 @@ export default function DashboardPage() {
           </div>
 
         {/* Action Buttons */}
-        <div className="grid grid-cols-5 gap-3">
+        <div className="grid grid-cols-6 gap-3">
             <button
               onClick={() => router.push('/send')}
               className="flex flex-col items-center gap-2 py-4 bg-gray-700 rounded-2xl hover:bg-gray-600 active:scale-95 transition border border-gray-600"
@@ -186,6 +201,14 @@ export default function DashboardPage() {
             >
               <TrendingUpIcon className="w-6 h-6 text-gray-300" />
               <span className="text-sm font-semibold text-gray-300">Portfolio</span>
+            </button>
+            
+            <button
+              onClick={() => router.push('/defi')}
+              className="flex flex-col items-center gap-2 py-4 bg-gray-700 rounded-2xl hover:bg-gray-600 active:scale-95 transition border border-gray-600"
+            >
+              <LockIcon className="w-6 h-6 text-gray-300" />
+              <span className="text-sm font-semibold text-gray-300">DeFi</span>
             </button>
             
             <button
