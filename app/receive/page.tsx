@@ -4,7 +4,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { useState, useEffect, Suspense } from 'react';
 import { useWalletStore } from '@/store/walletStore';
 import QRCode from 'react-qr-code';
-import { ArrowLeft, Copy, Share2, Search } from 'lucide-react';
+import { ArrowLeftIcon, CopyIcon, ShareIcon, SearchIcon } from '@/components/icons/GrayIcons';
 import { BalanceService, type TokenBalance } from '@/services/balance.service';
 import { getTrustWalletLogo, NATIVE_LOGOS } from '@/lib/tokenLogos';
 
@@ -89,7 +89,7 @@ function ReceivePageContent() {
       <div className="min-h-screen bg-white">
         <div className="sticky top-0 bg-white border-b border-gray-100 px-4 py-4 flex items-center justify-between z-10">
           <button onClick={() => router.back()} className="p-2 hover:bg-gray-50 rounded-lg">
-            <ArrowLeft className="w-5 h-5" />
+            <ArrowLeftIcon className="w-5 h-5 text-gray-300" />
           </button>
           <h1 className="text-lg font-semibold">Select Asset</h1>
           <div className="w-9" />
@@ -97,12 +97,12 @@ function ReceivePageContent() {
 
         <div className="p-4 space-y-4">
           <div className="relative">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+            <SearchIcon className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
             <input
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="🔍 Search token..."
+              placeholder="Search token..."
               className="w-full border border-gray-300 rounded-2xl pl-10 pr-4 py-4 focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
           </div>
@@ -162,14 +162,14 @@ function ReceivePageContent() {
             onClick={handleCopy}
             className="flex-1 flex items-center justify-center gap-2 border-2 border-gray-300 hover:border-gray-400 rounded-2xl py-4 font-semibold transition"
           >
-            <Copy className="w-5 h-5" />
+            <CopyIcon className="w-5 h-5 text-gray-300" />
             {copied ? 'Copied!' : 'Copy'}
           </button>
           <button
             onClick={handleShare}
             className="flex-1 flex items-center justify-center gap-2 border-2 border-gray-300 hover:border-gray-400 rounded-2xl py-4 font-semibold transition"
           >
-            <Share2 className="w-5 h-5" />
+            <ShareIcon className="w-5 h-5 text-gray-300" />
             Share
           </button>
         </div>
