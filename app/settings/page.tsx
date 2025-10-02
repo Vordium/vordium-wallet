@@ -33,7 +33,7 @@ interface DisplaySettings {
 
 export default function SettingsPage() {
   const router = useRouter();
-  const { wallets } = useWalletStore();
+  const { wallets, accounts } = useWalletStore();
   const [activeTab, setActiveTab] = useState<'security' | 'privacy' | 'display' | 'advanced'>('security');
   const [showResetConfirm, setShowResetConfirm] = useState(false);
   const [showPinSetup, setShowPinSetup] = useState(false);
