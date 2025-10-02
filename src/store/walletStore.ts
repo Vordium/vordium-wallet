@@ -18,6 +18,7 @@ export interface Wallet {
   id: string;
   name: string;
   accounts: WalletAccount[];
+  mnemonic?: string;
   createdAt: number;
 }
 
