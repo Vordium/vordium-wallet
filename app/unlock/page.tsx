@@ -65,20 +65,20 @@ export default function UnlockPage() {
   }
 
   return (
-    <main className="min-h-screen bg-gradient-to-br from-blue-600 via-purple-500 to-indigo-600 flex items-center justify-center p-4">
-      <div className="bg-white rounded-3xl shadow-2xl p-8 w-full max-w-md space-y-6">
+    <main className="min-h-screen bg-gray-900 flex items-center justify-center p-4">
+      <div className="bg-gray-800 rounded-3xl shadow-2xl p-8 w-full max-w-md space-y-6">
         {/* Logo */}
         <div className="text-center">
-          <div className="w-20 h-20 mx-auto bg-gradient-to-br from-blue-600 to-purple-600 rounded-2xl flex items-center justify-center text-4xl mb-4">
-            💎
+          <div className="w-20 h-20 mx-auto bg-gray-600 rounded-2xl flex items-center justify-center text-4xl mb-4">
+            <span className="text-white">🔒</span>
           </div>
-          <h1 className="text-2xl font-bold text-gray-900">Welcome Back</h1>
-          <p className="text-gray-600 mt-1">Unlock your wallet to continue</p>
+          <h1 className="text-2xl font-bold text-white">Welcome Back</h1>
+          <p className="text-gray-400 mt-1">Unlock your wallet to continue</p>
         </div>
 
         {/* Password Input */}
         <div className="space-y-2">
-          <label className="text-sm font-medium text-gray-700">Password</label>
+          <label className="text-sm font-medium text-white">Password</label>
           <div className="relative">
             <input
               type={showPassword ? 'text' : 'password'}
@@ -86,32 +86,32 @@ export default function UnlockPage() {
               onChange={(e) => setPassword(e.target.value)}
               onKeyPress={(e) => e.key === 'Enter' && handleUnlock()}
               placeholder="Enter your password"
-              className="w-full border border-gray-300 rounded-lg p-4 pr-12 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full border border-gray-600 bg-gray-700 text-white rounded-lg p-4 pr-12 focus:outline-none focus:ring-2 focus:ring-gray-500"
               autoFocus
             />
             <button
               type="button"
               onClick={() => setShowPassword(!showPassword)}
-              className="absolute right-3 top-1/2 -translate-y-1/2 p-1 text-gray-500 hover:text-gray-700"
+              className="absolute right-3 top-1/2 -translate-y-1/2 p-1 text-gray-400 hover:text-gray-300"
             >
-              {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+              {showPassword ? '🙈' : '👁️'}
             </button>
           </div>
-          {error && <p className="text-sm text-red-600">{error}</p>}
+          {error && <p className="text-sm text-gray-400">{error}</p>}
         </div>
 
         {/* Unlock Button */}
         <button
           onClick={handleUnlock}
           disabled={loading}
-          className="w-full h-14 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 disabled:opacity-50 text-white rounded-xl font-semibold transition transform hover:scale-[1.02] active:scale-[0.98]"
+          className="w-full h-14 bg-gray-600 hover:bg-gray-500 disabled:opacity-50 text-white rounded-xl font-semibold transition transform hover:scale-[1.02] active:scale-[0.98]"
         >
           {loading ? 'Unlocking...' : 'Unlock Wallet'}
         </button>
 
         {/* Reset Warning */}
         <div className="text-center">
-          <p className="text-xs text-gray-500">
+          <p className="text-xs text-gray-400">
             Forgot password? You&apos;ll need your recovery phrase to restore your wallet.
           </p>
         </div>

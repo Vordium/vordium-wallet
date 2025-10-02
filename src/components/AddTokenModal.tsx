@@ -216,13 +216,13 @@ export function AddTokenModal({ isOpen, onClose }: { isOpen: boolean; onClose: (
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center p-4 z-50">
-      <div className="bg-white dark:bg-gray-800 rounded-3xl max-w-lg w-full max-h-[90vh] overflow-hidden shadow-2xl">
+      <div className="bg-gray-800 rounded-3xl max-w-lg w-full max-h-[90vh] overflow-hidden shadow-2xl">
         {/* Header */}
-        <div className="bg-gradient-to-r from-gray-100 to-gray-200 dark:from-gray-700 dark:to-gray-600 p-6">
+        <div className="bg-gray-700 p-6">
           <div className="flex items-center justify-between">
-            <h2 className="text-2xl font-bold text-gray-900 dark:text-white">Add Token</h2>
-            <button onClick={onClose} className="w-10 h-10 rounded-full bg-gray-200 dark:bg-gray-600 hover:bg-gray-300 dark:hover:bg-gray-500 flex items-center justify-center transition">
-              <span className="text-2xl text-gray-600 dark:text-white">×</span>
+            <h2 className="text-2xl font-bold text-white">Add Token</h2>
+            <button onClick={onClose} className="w-10 h-10 rounded-full bg-gray-600 hover:bg-gray-500 flex items-center justify-center transition">
+              <span className="text-2xl text-white">×</span>
             </button>
           </div>
         </div>
@@ -230,8 +230,8 @@ export function AddTokenModal({ isOpen, onClose }: { isOpen: boolean; onClose: (
         <div className="p-6 overflow-y-auto max-h-[calc(90vh-120px)]">
           {/* Success Message */}
           {successMessage && (
-            <div className="mb-4 p-4 bg-green-50 dark:bg-green-900 border border-green-200 dark:border-green-700 rounded-xl">
-              <p className="text-green-800 dark:text-green-200 font-medium">{successMessage}</p>
+            <div className="mb-4 p-4 bg-gray-700 border border-gray-600 rounded-xl">
+              <p className="text-white font-medium">{successMessage}</p>
             </div>
           )}
 
@@ -239,13 +239,13 @@ export function AddTokenModal({ isOpen, onClose }: { isOpen: boolean; onClose: (
           <div className="mb-6">
             <div className="relative">
               <SearchIcon className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
-                  <input
-                    type="text"
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    placeholder="Search tokens (USDT, USDC, DAI, UNI...)"
-                    className="w-full pl-10 pr-4 py-4 text-gray-900 dark:text-white bg-gray-50 dark:bg-gray-700 border-2 border-gray-300 dark:border-gray-600 rounded-xl text-lg focus:border-gray-500 dark:focus:border-gray-500 focus:ring-4 focus:ring-gray-200 dark:focus:ring-gray-500"
-                  />
+                <input
+                  type="text"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  placeholder="Search tokens (USDT, USDC, DAI, UNI...)"
+                  className="w-full pl-10 pr-4 py-4 text-white bg-gray-700 border-2 border-gray-600 rounded-xl text-lg focus:border-gray-500 focus:ring-4 focus:ring-gray-500"
+                />
             </div>
           </div>
 
