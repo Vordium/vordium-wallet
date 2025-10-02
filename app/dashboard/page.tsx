@@ -22,7 +22,9 @@ import {
   SearchIcon, 
   PlusIcon, 
   MoreIcon, 
-  RefreshIcon 
+  RefreshIcon,
+  FilterIcon,
+  TrendingUpIcon
 } from '@/components/icons/GrayIcons';
 import Image from 'next/image';
 
@@ -152,8 +154,8 @@ export default function DashboardPage() {
             </div>
           </div>
 
-          {/* Action Buttons */}
-          <div className="grid grid-cols-4 gap-3">
+        {/* Action Buttons */}
+        <div className="grid grid-cols-5 gap-3">
             <button
               onClick={() => router.push('/send')}
               className="flex flex-col items-center gap-2 py-4 bg-gray-700 rounded-2xl hover:bg-gray-600 active:scale-95 transition border border-gray-600"
@@ -171,11 +173,19 @@ export default function DashboardPage() {
             </button>
             
             <button
-              disabled
-              className="flex flex-col items-center gap-2 py-4 bg-gray-700 rounded-2xl cursor-not-allowed border border-gray-600 opacity-50"
+              onClick={() => router.push('/transactions')}
+              className="flex flex-col items-center gap-2 py-4 bg-gray-700 rounded-2xl hover:bg-gray-600 active:scale-95 transition border border-gray-600"
             >
-              <BuyIcon className="w-6 h-6 text-gray-500" />
-              <span className="text-sm font-semibold text-gray-500">Buy</span>
+              <FilterIcon className="w-6 h-6 text-gray-300" />
+              <span className="text-sm font-semibold text-gray-300">History</span>
+            </button>
+            
+            <button
+              onClick={() => router.push('/portfolio')}
+              className="flex flex-col items-center gap-2 py-4 bg-gray-700 rounded-2xl hover:bg-gray-600 active:scale-95 transition border border-gray-600"
+            >
+              <TrendingUpIcon className="w-6 h-6 text-gray-300" />
+              <span className="text-sm font-semibold text-gray-300">Portfolio</span>
             </button>
             
             <button
