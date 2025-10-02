@@ -32,11 +32,11 @@ export default function CreatePage() {
     const passwordValid = needsPassword ? (password.length >= 8 && password === confirmPassword) : true;
     
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-600 via-purple-600 to-indigo-700 p-4">
-        <div className="bg-white rounded-3xl shadow-2xl p-8 w-full max-w-lg">
+      <div className="min-h-screen flex items-center justify-center bg-gray-900 p-4">
+        <div className="bg-gray-800 rounded-3xl shadow-2xl p-8 w-full max-w-lg">
           {/* Header */}
           <div className="flex items-center justify-between mb-6">
-            <h1 className="text-3xl font-bold text-gray-900">
+            <h1 className="text-3xl font-bold text-white">
               {isAddingWallet ? 'Add Wallet' : 'Create Wallet'}
             </h1>
             <button 
@@ -44,7 +44,7 @@ export default function CreatePage() {
                 localStorage.removeItem('adding_wallet');
                 router.push(isAddingWallet ? '/dashboard' : '/');
               }}
-              className="text-blue-600 font-semibold hover:text-blue-700"
+              className="text-gray-400 font-semibold hover:text-gray-300"
             >
               Cancel
             </button>
@@ -52,7 +52,7 @@ export default function CreatePage() {
 
           {/* Wallet Name Input */}
           <div className="mb-6">
-            <label className="block text-sm font-bold text-gray-900 mb-2">
+            <label className="block text-sm font-bold text-white mb-2">
               Wallet Name
             </label>
             <input
@@ -60,8 +60,7 @@ export default function CreatePage() {
               value={name}
               onChange={(e) => setName(e.target.value)}
               placeholder="Enter wallet name"
-              className="w-full px-4 py-4 text-gray-900 bg-white border-2 border-gray-300 rounded-xl text-lg focus:border-blue-600 focus:ring-4 focus:ring-blue-100 transition"
-              style={{ color: '#111827', backgroundColor: '#ffffff' }}
+              className="w-full px-4 py-4 text-white bg-gray-700 border-2 border-gray-600 rounded-xl text-lg focus:border-gray-500 focus:ring-4 focus:ring-gray-500 transition"
             />
           </div>
 
@@ -69,7 +68,7 @@ export default function CreatePage() {
           {needsPassword && (
             <>
               <div className="mb-6">
-                <label className="block text-sm font-bold text-gray-900 mb-2">
+                <label className="block text-sm font-bold text-white mb-2">
                   Password
                 </label>
                 <input
@@ -77,13 +76,12 @@ export default function CreatePage() {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="Enter password (min 8 characters)"
-                  className="w-full px-4 py-4 text-gray-900 bg-white border-2 border-gray-300 rounded-xl text-lg focus:border-blue-600 focus:ring-4 focus:ring-blue-100 transition"
-                  style={{ color: '#111827', backgroundColor: '#ffffff' }}
+                  className="w-full px-4 py-4 text-white bg-gray-700 border-2 border-gray-600 rounded-xl text-lg focus:border-gray-500 focus:ring-4 focus:ring-gray-500 transition"
                 />
               </div>
 
               <div className="mb-6">
-                <label className="block text-sm font-bold text-gray-900 mb-2">
+                <label className="block text-sm font-bold text-white mb-2">
                   Confirm Password
                 </label>
                 <input
@@ -91,8 +89,7 @@ export default function CreatePage() {
                   value={confirmPassword}
                   onChange={(e) => setConfirmPassword(e.target.value)}
                   placeholder="Confirm password"
-                  className="w-full px-4 py-4 text-gray-900 bg-white border-2 border-gray-300 rounded-xl text-lg focus:border-blue-600 focus:ring-4 focus:ring-blue-100 transition"
-                  style={{ color: '#111827', backgroundColor: '#ffffff' }}
+                  className="w-full px-4 py-4 text-white bg-gray-700 border-2 border-gray-600 rounded-xl text-lg focus:border-gray-500 focus:ring-4 focus:ring-gray-500 transition"
                 />
               </div>
             </>
@@ -105,7 +102,7 @@ export default function CreatePage() {
               setStep(2);
             }}
             disabled={!name.trim() || !passwordValid}
-            className="w-full py-4 bg-blue-600 text-white text-lg font-bold rounded-xl hover:bg-blue-700 active:scale-98 transition disabled:bg-gray-300 disabled:text-gray-500 disabled:cursor-not-allowed shadow-lg"
+            className="w-full py-4 bg-gray-600 text-white text-lg font-bold rounded-xl hover:bg-gray-500 active:scale-98 transition disabled:bg-gray-700 disabled:text-gray-500 disabled:cursor-not-allowed shadow-lg"
           >
             Continue →
           </button>
@@ -119,19 +116,19 @@ export default function CreatePage() {
     const words = mnemonic.split(' ');
     
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-600 via-purple-600 to-indigo-700 p-4">
-        <div className="bg-white rounded-3xl shadow-2xl p-8 w-full max-w-3xl">
+      <div className="min-h-screen flex items-center justify-center bg-gray-900 p-4">
+        <div className="bg-gray-800 rounded-3xl shadow-2xl p-8 w-full max-w-3xl">
           <div className="flex items-center justify-between mb-6">
-            <h1 className="text-3xl font-bold text-gray-900">Secret Recovery Phrase</h1>
-            <button onClick={() => setStep(1)} className="text-blue-600 font-semibold hover:text-blue-700">
+            <h1 className="text-3xl font-bold text-white">Secret Recovery Phrase</h1>
+            <button onClick={() => setStep(1)} className="text-gray-400 font-semibold hover:text-gray-300">
               ← Back
             </button>
           </div>
 
           {/* Warning */}
-          <div className="bg-red-50 border-2 border-red-500 rounded-xl p-4 mb-6">
-            <p className="text-red-900 font-bold mb-2">⚠️ CRITICAL - READ CAREFULLY</p>
-            <ul className="text-red-800 space-y-1 text-sm">
+          <div className="bg-gray-700 border-2 border-gray-600 rounded-xl p-4 mb-6">
+            <p className="text-white font-bold mb-2">⚠️ CRITICAL - READ CAREFULLY</p>
+            <ul className="text-gray-300 space-y-1 text-sm">
               <li>• Write these 24 words on paper and store safely</li>
               <li>• NEVER share with anyone - not even support</li>
               <li>• Anyone with these words can steal your funds</li>
@@ -139,16 +136,16 @@ export default function CreatePage() {
             </ul>
           </div>
 
-          {/* Seed Phrase Grid - Dark Background with White Cards */}
-          <div className="bg-gradient-to-br from-gray-900 to-gray-800 rounded-2xl p-6 mb-6">
+          {/* Seed Phrase Grid */}
+          <div className="bg-gray-700 rounded-2xl p-6 mb-6">
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
               {words.map((word, i) => (
                 <div
                   key={i}
-                  className="bg-white rounded-lg p-3 flex items-center gap-2 shadow-md"
+                  className="bg-gray-600 rounded-lg p-3 flex items-center gap-2 shadow-md"
                 >
-                  <span className="text-gray-500 font-bold text-sm min-w-[28px]">{i + 1}.</span>
-                  <span className="text-gray-900 font-mono font-semibold">{word}</span>
+                  <span className="text-gray-400 font-bold text-sm min-w-[28px]">{i + 1}.</span>
+                  <span className="text-white font-mono font-semibold">{word}</span>
                 </div>
               ))}
             </div>
@@ -161,14 +158,14 @@ export default function CreatePage() {
               { key: 'b', text: 'I understand this is the ONLY way to recover my wallet' },
               { key: 'c', text: 'I will NEVER share my seed phrase with anyone' }
             ].map(({ key, text }) => (
-              <label key={key} className="flex items-start gap-3 p-4 bg-gray-50 rounded-xl cursor-pointer hover:bg-gray-100 transition">
+              <label key={key} className="flex items-start gap-3 p-4 bg-gray-700 rounded-xl cursor-pointer hover:bg-gray-600 transition">
                 <input
                   type="checkbox"
                   checked={confirmChecks[key as keyof typeof confirmChecks]}
                   onChange={(e) => setConfirmChecks(v => ({ ...v, [key]: e.target.checked }))}
-                  className="mt-1 w-5 h-5 text-blue-600 rounded focus:ring-2 focus:ring-blue-500"
+                  className="mt-1 w-5 h-5 text-gray-600 rounded focus:ring-2 focus:ring-gray-500"
                 />
-                <span className="text-gray-900 font-medium">{text}</span>
+                <span className="text-white font-medium">{text}</span>
               </label>
             ))}
           </div>
@@ -180,14 +177,14 @@ export default function CreatePage() {
                 navigator.clipboard.writeText(mnemonic);
                 alert('Copied! But remember to write it down on paper too!');
               }}
-              className="flex-1 py-4 bg-gray-200 text-gray-900 font-bold rounded-xl hover:bg-gray-300 transition"
+              className="flex-1 py-4 bg-gray-600 text-white font-bold rounded-xl hover:bg-gray-500 transition"
             >
               📋 Copy
             </button>
             <button
               onClick={() => setStep(3)}
               disabled={!(confirmChecks.a && confirmChecks.b && confirmChecks.c)}
-              className="flex-1 py-4 bg-blue-600 text-white font-bold rounded-xl hover:bg-blue-700 transition disabled:bg-gray-300 disabled:text-gray-500 disabled:cursor-not-allowed shadow-lg"
+              className="flex-1 py-4 bg-gray-600 text-white font-bold rounded-xl hover:bg-gray-500 transition disabled:bg-gray-700 disabled:text-gray-500 disabled:cursor-not-allowed shadow-lg"
             >
               Continue →
             </button>
@@ -200,14 +197,14 @@ export default function CreatePage() {
   // STEP 3: Confirm and Create
   if (step === 3) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-600 via-purple-600 to-indigo-700 p-4">
-        <div className="bg-white rounded-3xl shadow-2xl p-8 w-full max-w-lg text-center">
-          <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-            <span className="text-4xl">✓</span>
+      <div className="min-h-screen flex items-center justify-center bg-gray-900 p-4">
+        <div className="bg-gray-800 rounded-3xl shadow-2xl p-8 w-full max-w-lg text-center">
+          <div className="w-20 h-20 bg-gray-600 rounded-full flex items-center justify-center mx-auto mb-4">
+            <span className="text-4xl text-white">✓</span>
           </div>
           
-          <h1 className="text-3xl font-bold text-gray-900 mb-4">Ready to Create!</h1>
-          <p className="text-gray-600 mb-8">Your wallet will be created with the seed phrase you saved.</p>
+          <h1 className="text-3xl font-bold text-white mb-4">Ready to Create!</h1>
+          <p className="text-gray-400 mb-8">Your wallet will be created with the seed phrase you saved.</p>
 
           <button
             onClick={async () => {
@@ -259,7 +256,7 @@ export default function CreatePage() {
                 alert('Failed: ' + (error as Error).message);
               }
             }}
-            className="w-full py-4 bg-gradient-to-r from-green-500 to-green-600 text-white text-lg font-bold rounded-xl hover:from-green-600 hover:to-green-700 active:scale-98 transition shadow-lg"
+            className="w-full py-4 bg-gray-600 text-white text-lg font-bold rounded-xl hover:bg-gray-500 active:scale-98 transition shadow-lg"
           >
             ✓ Create Wallet
           </button>

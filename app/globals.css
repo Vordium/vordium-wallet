@@ -2,64 +2,110 @@
 @tailwind components;
 @tailwind utilities;
 
-/* DARK THEME - Clean gray and black backgrounds */
+/* UNIFIED DARK THEME - Professional 3-Color Scheme */
 :root {
-  --bg-primary: #1a1a1a;      /* Dark black */
-  --bg-secondary: #2d2d2d;    /* Dark gray */
-  --bg-tertiary: #404040;     /* Medium gray */
-  --text-primary: #ffffff;    /* White text */
-  --text-secondary: #b3b3b3;  /* Light gray text */
-  --text-muted: #808080;      /* Muted gray text */
-  --border: #404040;          /* Gray borders */
-  --accent: #6b7280;          /* Gray accent */
+  /* Core Colors - Only 3 shades of gray + black */
+  --color-black: #000000;           /* Pure black - deepest backgrounds */
+  --color-very-dark-gray: #1a1a1a;  /* Very dark gray - main backgrounds */
+  --color-dark-gray: #2a2a2a;       /* Dark gray - secondary backgrounds */
+  --color-gray: #3a3a3a;            /* Gray - tertiary backgrounds, borders */
+  
+  /* Text Colors */
+  --color-white: #ffffff;           /* Primary text */
+  --color-light-gray: #d1d5db;     /* Secondary text */
+  --color-muted-gray: #9ca3af;     /* Muted text */
+  
+  /* Interactive States */
+  --color-hover: #404040;           /* Hover state - slightly lighter gray */
+  --color-border: #2a2a2a;         /* Borders */
+  --color-input: #1f1f1f;          /* Input backgrounds */
 }
 
-/* Global dark theme */
-body {
-  background-color: var(--bg-primary);
-  color: var(--text-primary);
+/* Global unified dark theme */
+* {
+  box-sizing: border-box;
 }
 
-/* Force all inputs to have visible text on dark theme */
+html, body {
+  background-color: var(--color-very-dark-gray) !important;
+  color: var(--color-white) !important;
+  margin: 0;
+  padding: 0;
+}
+
+/* Force all inputs to use unified theme */
 input[type="text"],
 input[type="password"],
 input[type="email"],
 textarea,
 select {
-  color: var(--text-primary) !important;
-  background-color: var(--bg-secondary) !important;
-  border: 2px solid var(--border) !important;
+  color: var(--color-white) !important;
+  background-color: var(--color-input) !important;
+  border: 1px solid var(--color-border) !important;
+  border-radius: 8px;
 }
 
 input::placeholder {
-  color: var(--text-muted) !important;
+  color: var(--color-muted-gray) !important;
 }
 
 input:focus {
   outline: none !important;
-  border-color: var(--accent) !important;
-  ring: 2px solid var(--accent) !important;
+  border-color: var(--color-gray) !important;
+  box-shadow: 0 0 0 1px var(--color-gray) !important;
 }
 
-/* Dark theme text colors */
-.text-white { color: var(--text-primary) !important; }
-.text-gray-900 { color: var(--text-primary) !important; }
-.text-gray-700 { color: var(--text-secondary) !important; }
-.text-gray-600 { color: var(--text-secondary) !important; }
-.text-gray-500 { color: var(--text-muted) !important; }
+/* Override ALL Tailwind colors to use unified theme */
+.bg-white { background-color: var(--color-dark-gray) !important; }
+.bg-gray-50 { background-color: var(--color-dark-gray) !important; }
+.bg-gray-100 { background-color: var(--color-gray) !important; }
+.bg-gray-200 { background-color: var(--color-hover) !important; }
+.bg-gray-300 { background-color: var(--color-hover) !important; }
+.bg-gray-400 { background-color: var(--color-hover) !important; }
+.bg-gray-500 { background-color: var(--color-gray) !important; }
+.bg-gray-600 { background-color: var(--color-gray) !important; }
+.bg-gray-700 { background-color: var(--color-dark-gray) !important; }
+.bg-gray-800 { background-color: var(--color-very-dark-gray) !important; }
+.bg-gray-900 { background-color: var(--color-black) !important; }
 
-/* Dark theme backgrounds */
-.bg-white { background-color: var(--bg-secondary) !important; }
-.bg-gray-50 { background-color: var(--bg-tertiary) !important; }
-.bg-gray-100 { background-color: var(--bg-tertiary) !important; }
-.bg-gray-200 { background-color: var(--border) !important; }
+/* Text colors */
+.text-white { color: var(--color-white) !important; }
+.text-gray-100 { color: var(--color-white) !important; }
+.text-gray-200 { color: var(--color-light-gray) !important; }
+.text-gray-300 { color: var(--color-light-gray) !important; }
+.text-gray-400 { color: var(--color-muted-gray) !important; }
+.text-gray-500 { color: var(--color-muted-gray) !important; }
+.text-gray-600 { color: var(--color-light-gray) !important; }
+.text-gray-700 { color: var(--color-light-gray) !important; }
+.text-gray-800 { color: var(--color-white) !important; }
+.text-gray-900 { color: var(--color-white) !important; }
+.text-black { color: var(--color-white) !important; }
 
-/* Never allow light text on dark backgrounds */
-.bg-white .text-white,
-.bg-gray-50 .text-gray-100,
-.bg-gray-100 .text-gray-200 {
-  color: var(--text-primary) !important;
-}
+/* Remove ALL colors - force grayscale */
+.text-blue-600, .text-blue-700, .text-blue-500 { color: var(--color-light-gray) !important; }
+.text-green-600, .text-green-400, .text-green-500 { color: var(--color-light-gray) !important; }
+.text-red-600, .text-red-400, .text-red-500 { color: var(--color-light-gray) !important; }
+.text-purple-600, .text-purple-500 { color: var(--color-light-gray) !important; }
+.text-indigo-600, .text-indigo-500 { color: var(--color-light-gray) !important; }
+
+.bg-blue-600, .bg-blue-700, .bg-blue-500, .bg-blue-50 { background-color: var(--color-gray) !important; }
+.bg-green-600, .bg-green-400, .bg-green-500, .bg-green-50 { background-color: var(--color-gray) !important; }
+.bg-red-600, .bg-red-400, .bg-red-500, .bg-red-50 { background-color: var(--color-gray) !important; }
+.bg-purple-600, .bg-purple-500 { background-color: var(--color-gray) !important; }
+.bg-indigo-600, .bg-indigo-500 { background-color: var(--color-gray) !important; }
+
+/* Borders */
+.border-gray-200 { border-color: var(--color-border) !important; }
+.border-gray-300 { border-color: var(--color-border) !important; }
+.border-gray-600 { border-color: var(--color-border) !important; }
+.border-gray-700 { border-color: var(--color-border) !important; }
+
+/* Hover states */
+.hover\\:bg-gray-50:hover { background-color: var(--color-hover) !important; }
+.hover\\:bg-gray-100:hover { background-color: var(--color-hover) !important; }
+.hover\\:bg-gray-200:hover { background-color: var(--color-hover) !important; }
+.hover\\:bg-gray-600:hover { background-color: var(--color-hover) !important; }
+.hover\\:bg-gray-700:hover { background-color: var(--color-hover) !important; }
 
 :root {
   --foreground-rgb: 0, 0, 0;
