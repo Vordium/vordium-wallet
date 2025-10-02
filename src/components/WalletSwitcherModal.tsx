@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useWalletStore } from '@/store/walletStore';
+import { ArrowLeftIcon } from './icons/GrayIcons';
 
 interface WalletSwitcherModalProps {
   isOpen: boolean;
@@ -57,16 +58,18 @@ export function WalletSwitcherModal({ isOpen, onClose }: WalletSwitcherModalProp
       <div className="bg-gray-800 rounded-3xl max-w-md w-full max-h-[80vh] overflow-hidden shadow-2xl">
         {/* Header */}
         <div className="bg-gray-700 p-6 text-white">
-          <div className="flex items-center justify-between">
-            <h2 className="text-2xl font-bold">My Wallets</h2>
+          <div className="flex items-center gap-4">
             <button 
               onClick={onClose}
               className="w-10 h-10 rounded-full bg-gray-600 hover:bg-gray-500 flex items-center justify-center transition"
             >
-              <span className="text-2xl">×</span>
+              <ArrowLeftIcon className="w-5 h-5 text-white" />
             </button>
+            <div>
+              <h2 className="text-2xl font-bold">My Wallets</h2>
+              <p className="text-gray-300 text-sm mt-1">{wallets.length} wallet{wallets.length !== 1 ? 's' : ''} total</p>
+            </div>
           </div>
-          <p className="text-gray-300 text-sm mt-2">{wallets.length} wallet{wallets.length !== 1 ? 's' : ''} total</p>
         </div>
 
         {/* Wallets List */}

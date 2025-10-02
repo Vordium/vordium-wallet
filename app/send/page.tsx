@@ -4,7 +4,7 @@ import { useState, useEffect, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { isValidAddress, isPositiveNumber } from '@/utils/safety.utils';
 import { useWalletStore } from '@/store/walletStore';
-import { ArrowLeft, QrCode, Search } from 'lucide-react';
+import { ArrowLeftIcon, QRCodeIcon, SearchIcon } from '@/components/icons/GrayIcons';
 import { BalanceService, type TokenBalance } from '@/services/balance.service';
 import { getTrustWalletLogo, NATIVE_LOGOS } from '@/lib/tokenLogos';
 
@@ -93,7 +93,7 @@ function SendPageContent() {
       <div className="min-h-screen bg-gray-900">
         <div className="sticky top-0 bg-gray-800 border-b border-gray-700 px-4 py-4 flex items-center justify-between z-10">
           <button onClick={() => router.back()} className="p-2 hover:bg-gray-700 rounded-lg">
-            <ArrowLeft className="w-5 h-5 text-white" />
+            <ArrowLeftIcon className="w-5 h-5 text-gray-300" />
           </button>
           <h1 className="text-lg font-semibold text-white">Select Asset</h1>
           <div className="w-9" />
@@ -102,7 +102,7 @@ function SendPageContent() {
         <div className="p-4 space-y-4">
           {/* Search */}
           <div className="relative">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+            <SearchIcon className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
             <input
               type="text"
               value={searchQuery}

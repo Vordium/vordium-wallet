@@ -5,7 +5,7 @@ import { ethers } from 'ethers';
 import TronWeb from 'tronweb';
 import { useWalletStore } from '@/store/walletStore';
 import { TokenSearchService, type TokenSearchResult } from '@/services/tokenSearch.service';
-import { SearchIcon, PlusIcon } from './icons/GrayIcons';
+import { SearchIcon, PlusIcon, ArrowLeftIcon } from './icons/GrayIcons';
 import Image from 'next/image';
 
 export function AddTokenModal({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) {
@@ -219,11 +219,11 @@ export function AddTokenModal({ isOpen, onClose }: { isOpen: boolean; onClose: (
       <div className="bg-gray-800 rounded-3xl max-w-lg w-full max-h-[90vh] overflow-hidden shadow-2xl">
         {/* Header */}
         <div className="bg-gray-700 p-6">
-          <div className="flex items-center justify-between">
-            <h2 className="text-2xl font-bold text-white">Add Token</h2>
+          <div className="flex items-center gap-4">
             <button onClick={onClose} className="w-10 h-10 rounded-full bg-gray-600 hover:bg-gray-500 flex items-center justify-center transition">
-              <span className="text-2xl text-white">×</span>
+              <ArrowLeftIcon className="w-5 h-5 text-white" />
             </button>
+            <h2 className="text-2xl font-bold text-white">Add Token</h2>
           </div>
         </div>
 
