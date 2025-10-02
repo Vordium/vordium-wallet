@@ -94,17 +94,21 @@ export function WalletImportModal({ isOpen, onClose, onSuccess }: WalletImportMo
         privateKey: importMethod === 'private' ? privateKey : undefined,
         accounts: [
           {
-            chain: 'EVM',
+            id: `evm-${Date.now()}`,
+            name: 'EVM Account',
+            chain: 'EVM' as const,
             address: '0x' + Math.random().toString(16).substr(2, 40),
             privateKey: '0x' + Math.random().toString(16).substr(2, 64)
           },
           {
-            chain: 'TRON',
+            id: `tron-${Date.now()}`,
+            name: 'TRON Account',
+            chain: 'TRON' as const,
             address: 'T' + Math.random().toString(16).substr(2, 40),
             privateKey: Math.random().toString(16).substr(2, 64)
           }
         ],
-        createdAt: new Date().toISOString()
+        createdAt: Date.now()
       };
 
       addWallet(newWallet);
