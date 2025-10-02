@@ -186,7 +186,7 @@ export function BackupModal({ isOpen, onClose, mnemonic }: BackupModalProps) {
                       onClick={handleNext}
                       className="flex-1 py-3 px-4 bg-gray-500 text-white font-semibold rounded-xl hover:bg-gray-400 transition"
                     >
-                      I've Saved It
+                      I&apos;ve Saved It
                     </button>
                   </div>
                 )}
@@ -198,7 +198,7 @@ export function BackupModal({ isOpen, onClose, mnemonic }: BackupModalProps) {
                 <div className="text-center">
                   <h3 className="font-semibold text-white mb-2">Verify Your Backup</h3>
                   <p className="text-gray-400 text-sm mb-4">
-                    Select the words in the correct order to confirm you've saved them.
+                    Select the words in the correct order to confirm you&apos;ve saved them.
                   </p>
                 </div>
 

@@ -263,7 +263,7 @@ export function NotificationCenter() {
                 <div className="text-center py-8">
                   <BellIcon className="w-12 h-12 text-gray-400 mx-auto mb-4" />
                   <h3 className="text-lg font-semibold text-white mb-2">No notifications</h3>
-                  <p className="text-gray-400">You're all caught up!</p>
+                  <p className="text-gray-400">You&apos;re all caught up!</p>
                 </div>
               ) : (
                 <div className="space-y-3">
