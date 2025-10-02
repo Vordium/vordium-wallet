@@ -13,6 +13,7 @@ export interface TokenBalance {
   decimals: number;
   isNative: boolean;
   icon: string;
+  change24h?: number; // Optional 24h price change percentage
 }
 
 const ERC20_ABI = [
