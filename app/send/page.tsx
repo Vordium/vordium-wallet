@@ -35,14 +35,17 @@ function SendPageContent() {
     if (!evmAccount || !tronAccount) return;
 
     try {
+      console.log('Loading tokens for send page...');
       const allTokens = await BalanceService.getAllTokens(evmAccount.address, tronAccount.address);
-      const available = allTokens.filter(t => parseFloat(t.balance) > 0);
-      setTokens(available);
+      console.log('Loaded tokens:', allTokens);
+      
+      // Show all tokens, but we'll indicate which ones have insufficient balance in the UI
+      setTokens(allTokens);
 
       // Check if token pre-selected from URL
       const tokenSymbol = searchParams.get('token');
       if (tokenSymbol) {
-        const token = available.find(t => t.symbol === tokenSymbol);
+        const token = allTokens.find(t => t.symbol === tokenSymbol);
         if (token) setSelectedToken(token);
       }
     } catch (error) {
@@ -52,11 +55,23 @@ function SendPageContent() {
     }
   }
 
-  const filteredTokens = tokens.filter(
-    t =>
-      t.symbol.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      t.name.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  const filteredTokens = tokens
+    .filter(
+      t =>
+        t.symbol.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        t.name.toLowerCase().includes(searchQuery.toLowerCase())
+    )
+    .sort((a, b) => {
+      // Sort by balance (tokens with balance first)
+      const aHasBalance = parseFloat(a.balance) > 0;
+      const bHasBalance = parseFloat(b.balance) > 0;
+      
+      if (aHasBalance && !bHasBalance) return -1;
+      if (!aHasBalance && bHasBalance) return 1;
+      
+      // If both have balance or both don't, sort by USD value descending
+      return parseFloat(b.usdValue) - parseFloat(a.usdValue);
+    });
 
   function validate() {
     if (!selectedToken) return 'Select a token';
@@ -127,14 +142,26 @@ function SendPageContent() {
 
           {/* Token List */}
           <div className="space-y-1">
+            {filteredTokens.length > 0 && (
+              <div className="px-2 py-1">
+                <div className="text-xs font-medium text-gray-400 uppercase tracking-wide">
+                  Available Tokens ({filteredTokens.filter(t => parseFloat(t.balance) > 0).length} with balance)
+                </div>
+              </div>
+            )}
               {filteredTokens.map((token) => {
                 const logoUrl = token.icon || `https://via.placeholder.com/48/6B7280/FFFFFF?text=${token.symbol.charAt(0)}`;
+                const hasBalance = parseFloat(token.balance) > 0;
+                const balanceNum = parseFloat(token.balance);
+                const usdValueNum = parseFloat(token.usdValue);
                 
                 return (
                   <button
                     key={`${token.chain}-${token.symbol}-${token.address || 'native'}`}
                     onClick={() => setSelectedToken(token)}
-                    className="w-full flex items-center gap-3 p-4 hover:bg-gray-700 hover:shadow-lg hover:shadow-gray-700/50 rounded-2xl transition-all duration-200"
+                    className={`w-full flex items-center gap-3 p-4 hover:bg-gray-700 hover:shadow-lg hover:shadow-gray-700/50 rounded-2xl transition-all duration-200 ${
+                      !hasBalance ? 'opacity-60' : ''
+                    }`}
                   >
                     <div className="relative w-12 h-12 flex-shrink-0">
                       <img
@@ -161,12 +188,15 @@ function SendPageContent() {
                     </div>
 
                     <div className="text-right">
-                      <div className="font-semibold text-white">
-                        {parseFloat(token.balance).toFixed(4)}
+                      <div className={`font-semibold ${hasBalance ? 'text-white' : 'text-gray-500'}`}>
+                        {balanceNum.toFixed(4)}
                       </div>
-                      <div className="text-sm text-gray-400">
-                        ${parseFloat(token.usdValue).toFixed(2)}
+                      <div className={`text-sm ${hasBalance ? 'text-gray-400' : 'text-gray-600'}`}>
+                        ${usdValueNum.toFixed(2)}
                       </div>
+                      {!hasBalance && (
+                        <div className="text-xs text-gray-600 mt-0.5">No balance</div>
+                      )}
                     </div>
                   </button>
                 );
