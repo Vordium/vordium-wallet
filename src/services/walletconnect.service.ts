@@ -3,6 +3,8 @@
 import { EthereumProvider } from '@walletconnect/ethereum-provider';
 import { WalletConnectModal } from '@walletconnect/modal';
 
+type EthereumProviderType = InstanceType<typeof EthereumProvider>;
+
 export interface WalletConnectConfig {
   projectId: string;
   chains: number[];
@@ -26,7 +28,7 @@ export interface DAppSession {
 
 export class WalletConnectService {
   private static instance: WalletConnectService;
-  private provider: EthereumProvider | null = null;
+  private provider: EthereumProviderType | null = null;
   private modal: WalletConnectModal | null = null;
   private sessions: DAppSession[] = [];
 
@@ -204,7 +206,7 @@ export class WalletConnectService {
     return this.sessions;
   }
 
-  getProvider(): EthereumProvider | null {
+  getProvider(): EthereumProviderType | null {
     return this.provider;
   }
 
