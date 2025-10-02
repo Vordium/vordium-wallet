@@ -81,8 +81,8 @@ function SendPageContent() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-white flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-4 border-blue-600 border-t-transparent"></div>
+      <div className="min-h-screen bg-gray-900 flex items-center justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-4 border-gray-600 border-t-transparent"></div>
       </div>
     );
   }
@@ -90,12 +90,12 @@ function SendPageContent() {
   // Token Selection View
   if (!selectedToken) {
     return (
-      <div className="min-h-screen bg-white">
-        <div className="sticky top-0 bg-white border-b border-gray-100 px-4 py-4 flex items-center justify-between z-10">
-          <button onClick={() => router.back()} className="p-2 hover:bg-gray-50 rounded-lg">
-            <ArrowLeft className="w-5 h-5" />
+      <div className="min-h-screen bg-gray-900">
+        <div className="sticky top-0 bg-gray-800 border-b border-gray-700 px-4 py-4 flex items-center justify-between z-10">
+          <button onClick={() => router.back()} className="p-2 hover:bg-gray-700 rounded-lg">
+            <ArrowLeft className="w-5 h-5 text-white" />
           </button>
-          <h1 className="text-lg font-semibold">Select Asset</h1>
+          <h1 className="text-lg font-semibold text-white">Select Asset</h1>
           <div className="w-9" />
         </div>
 
@@ -107,8 +107,8 @@ function SendPageContent() {
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="🔍 Search token..."
-              className="w-full border border-gray-300 rounded-2xl pl-10 pr-4 py-4 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              placeholder="Search token..."
+              className="w-full border border-gray-600 bg-gray-700 text-white rounded-2xl pl-10 pr-4 py-4 focus:outline-none focus:ring-2 focus:ring-gray-500"
             />
           </div>
 
@@ -121,20 +121,20 @@ function SendPageContent() {
                 <button
                   key={`${token.chain}-${token.symbol}-${token.address || 'native'}`}
                   onClick={() => setSelectedToken(token)}
-                  className="w-full flex items-center gap-3 p-4 hover:bg-gray-50 rounded-2xl transition"
+                  className="w-full flex items-center gap-3 p-4 hover:bg-gray-700 rounded-2xl transition"
                 >
-                  <div className="w-12 h-12 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white font-bold text-xl">
-                    {token.icon || token.symbol.charAt(0)}
+                  <div className="w-12 h-12 rounded-full bg-gray-600 flex items-center justify-center text-white font-bold text-xl">
+                    {token.symbol.charAt(0)}
                   </div>
 
                   <div className="flex-1 text-left">
-                    <div className="font-semibold text-gray-900">{token.symbol}</div>
-                    <div className="text-sm text-gray-500">{token.name} • {token.chain}</div>
+                    <div className="font-semibold text-white">{token.symbol}</div>
+                    <div className="text-sm text-gray-400">{token.name} • {token.chain}</div>
                   </div>
 
                   <div className="text-right">
-                    <div className="font-semibold text-gray-900">{parseFloat(token.balance).toFixed(4)}</div>
-                    <div className="text-sm text-gray-500">${token.usdValue}</div>
+                    <div className="font-semibold text-white">{parseFloat(token.balance).toFixed(4)}</div>
+                    <div className="text-sm text-gray-400">${token.usdValue}</div>
                   </div>
                 </button>
               );
