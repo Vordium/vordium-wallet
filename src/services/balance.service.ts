@@ -36,6 +36,33 @@ export class BalanceService {
   private static ethProvider: ethers.JsonRpcProvider | null = null;
   private static tronWeb: any | null = null;
   private static priceCache: Map<string, { price: number; timestamp: number }> = new Map();
+  
+  // Token logo mapping using CoinGecko assets (free API)
+  private static readonly TOKEN_LOGOS: { [key: string]: string } = {
+    'ETH': 'https://assets.coingecko.com/coins/images/279/large/ethereum.png',
+    'TRX': 'https://assets.coingecko.com/coins/images/1094/large/tron-logo.png',
+    'USDT': 'https://assets.coingecko.com/coins/images/325/large/Tether.png',
+    'USDC': 'https://assets.coingecko.com/coins/images/6319/large/USD_Coin_icon.png',
+    'DAI': 'https://assets.coingecko.com/coins/images/9956/large/Badge_Dai.png',
+    'WETH': 'https://assets.coingecko.com/coins/images/2518/large/weth.png',
+    'UNI': 'https://assets.coingecko.com/coins/images/12504/large/uni.jpg',
+    'LINK': 'https://assets.coingecko.com/coins/images/877/large/chainlink-new-logo.png',
+    'AAVE': 'https://assets.coingecko.com/coins/images/12645/large/AAVE.png',
+    'CRV': 'https://assets.coingecko.com/coins/images/12124/large/Curve.png',
+    'MKR': 'https://assets.coingecko.com/coins/images/1364/large/Mark_Maker.png',
+    'SNX': 'https://assets.coingecko.com/coins/images/3406/large/SNX.png',
+    'COMP': 'https://assets.coingecko.com/coins/images/10775/large/COMP.png',
+    'YFI': 'https://assets.coingecko.com/coins/images/11849/large/yearn.jpg',
+    'SUSHI': 'https://assets.coingecko.com/coins/images/12271/large/512x512_Logo_no_chop.png',
+    '1INCH': 'https://assets.coingecko.com/coins/images/13469/large/1inch-token.png',
+    'BAT': 'https://assets.coingecko.com/coins/images/677/large/basic-attention-token.png',
+    'ZRX': 'https://assets.coingecko.com/coins/images/863/large/0x.png',
+    'LRC': 'https://assets.coingecko.com/coins/images/913/large/LRC.png',
+    'JST': 'https://assets.coingecko.com/coins/images/11455/large/JUST.jpg',
+    'SUN': 'https://assets.coingecko.com/coins/images/12885/large/sun-token.png',
+    'BTT': 'https://assets.coingecko.com/coins/images/7595/large/BTT_Token_Icon.png',
+    'WIN': 'https://assets.coingecko.com/coins/images/8804/large/wink_logo.png'
+  };
 
   private static getEthProvider() {
     if (!this.ethProvider) {
@@ -97,7 +124,7 @@ export class BalanceService {
             address: token.address,
             decimals: token.decimals,
             isNative: false,
-            icon: '💲',
+            icon: this.getTokenLogo(token.symbol, token.address),
           });
         }
       } catch (error) {
@@ -129,7 +156,7 @@ export class BalanceService {
             address: token.address,
             decimals: token.decimals,
             isNative: false,
-            icon: '💲',
+            icon: this.getTokenLogo(token.symbol, token.address),
           });
         }
       } catch (error) {
@@ -173,7 +200,7 @@ export class BalanceService {
           chain: 'Ethereum',
           decimals: 18,
           isNative: true,
-          icon: '⚡',
+          icon: this.getTokenLogo('ETH'),
         },
         {
           symbol: 'TRX',
@@ -183,7 +210,7 @@ export class BalanceService {
           chain: 'Tron',
           decimals: 6,
           isNative: true,
-          icon: '🔺',
+          icon: this.getTokenLogo('TRX'),
         },
         ...ethTokens,
         ...tronTokens,
@@ -214,6 +241,12 @@ export class BalanceService {
 
           const usdValue = await this.getUsdValue(customToken.symbol, balance);
 
+          // Try to get logo from CoinGecko or use predefined logos
+          let tokenLogo = customToken.logo;
+          if (!tokenLogo || !tokenLogo.startsWith('http')) {
+            tokenLogo = this.getTokenLogo(customToken.symbol, customToken.address);
+          }
+
           allTokens.push({
             symbol: customToken.symbol,
             name: customToken.name,
@@ -223,7 +256,7 @@ export class BalanceService {
             address: customToken.address,
             decimals: customToken.decimals,
             isNative: customToken.isNative || false,
-            icon: customToken.logo || `https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/${customToken.chain.toLowerCase()}/assets/${customToken.address}/logo.png`,
+            icon: tokenLogo,
           });
         } catch (error) {
           console.error(`Failed to load custom token ${customToken.symbol}:`, error);
@@ -280,5 +313,40 @@ export class BalanceService {
       return sum + parseFloat(token.usdValue || '0');
     }, 0);
     return total.toFixed(2);
+  }
+
+  // Get token logo from CoinGecko assets or fallback
+  static getTokenLogo(symbol: string, address?: string): string {
+    // First check our predefined logos
+    if (this.TOKEN_LOGOS[symbol.toUpperCase()]) {
+      return this.TOKEN_LOGOS[symbol.toUpperCase()];
+    }
+
+    // Fallback to a generic token icon
+    return `https://via.placeholder.com/64/6B7280/FFFFFF?text=${symbol.charAt(0)}`;
+  }
+
+  // Fetch token info from CoinGecko API (for dynamic logos)
+  static async fetchTokenInfo(contractAddress: string, platform: string = 'ethereum'): Promise<{ logo?: string; name?: string } | null> {
+    try {
+      const response = await fetch(
+        `https://api.coingecko.com/api/v3/coins/${platform}/contract/${contractAddress}`,
+        { 
+          method: 'GET',
+          headers: { 'Accept': 'application/json' }
+        }
+      );
+
+      if (!response.ok) return null;
+
+      const data = await response.json();
+      return {
+        logo: data.image?.large || data.image?.small,
+        name: data.name
+      };
+    } catch (error) {
+      console.error('Failed to fetch token info from CoinGecko:', error);
+      return null;
+    }
   }
 }

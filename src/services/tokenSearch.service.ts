@@ -20,7 +20,7 @@ export const POPULAR_TOKENS: TokenSearchResult[] = [
     address: '0xdAC17F958D2ee523a2206206994597C13D831ec7',
     chain: 'Ethereum',
     decimals: 6,
-    logo: 'https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/0xdAC17F958D2ee523a2206206994597C13D831ec7/logo.png',
+    logo: 'https://assets.coingecko.com/coins/images/325/large/Tether.png',
     verified: true
   },
   {
@@ -29,7 +29,7 @@ export const POPULAR_TOKENS: TokenSearchResult[] = [
     address: '0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48',
     chain: 'Ethereum',
     decimals: 6,
-    logo: 'https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48/logo.png',
+    logo: 'https://assets.coingecko.com/coins/images/6319/large/USD_Coin_icon.png',
     verified: true
   },
   {
@@ -38,7 +38,7 @@ export const POPULAR_TOKENS: TokenSearchResult[] = [
     address: '0x6B175474E89094C44Da98b954EedeAC495271d0F',
     chain: 'Ethereum',
     decimals: 18,
-    logo: 'https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/0x6B175474E89094C44Da98b954EedeAC495271d0F/logo.png',
+    logo: 'https://assets.coingecko.com/coins/images/9956/large/Badge_Dai.png',
     verified: true
   },
   {
@@ -47,7 +47,7 @@ export const POPULAR_TOKENS: TokenSearchResult[] = [
     address: '0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2',
     chain: 'Ethereum',
     decimals: 18,
-    logo: 'https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2/logo.png',
+    logo: 'https://assets.coingecko.com/coins/images/2518/large/weth.png',
     verified: true
   },
   {
@@ -56,7 +56,7 @@ export const POPULAR_TOKENS: TokenSearchResult[] = [
     address: '0x1f9840a85d5aF5bf1D1762F925BDADdC4201F984',
     chain: 'Ethereum',
     decimals: 18,
-    logo: 'https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/0x1f9840a85d5aF5bf1D1762F925BDADdC4201F984/logo.png',
+    logo: 'https://assets.coingecko.com/coins/images/12504/large/uni.jpg',
     verified: true
   },
   {
@@ -65,7 +65,7 @@ export const POPULAR_TOKENS: TokenSearchResult[] = [
     address: '0x514910771AF9Ca656af840dff83E8264EcF986CA',
     chain: 'Ethereum',
     decimals: 18,
-    logo: 'https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/0x514910771AF9Ca656af840dff83E8264EcF986CA/logo.png',
+    logo: 'https://assets.coingecko.com/coins/images/877/large/chainlink-new-logo.png',
     verified: true
   },
   {
@@ -256,7 +256,7 @@ export const POPULAR_TOKENS: TokenSearchResult[] = [
     address: 'native',
     chain: 'Tron',
     decimals: 6,
-    logo: 'https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/tron/info/logo.png',
+    logo: 'https://assets.coingecko.com/coins/images/1094/large/tron-logo.png',
     verified: true
   },
   {
@@ -265,7 +265,7 @@ export const POPULAR_TOKENS: TokenSearchResult[] = [
     address: 'native',
     chain: 'Ethereum',
     decimals: 18,
-    logo: 'https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/info/logo.png',
+    logo: 'https://assets.coingecko.com/coins/images/279/large/ethereum.png',
     verified: true
   }
 ];
