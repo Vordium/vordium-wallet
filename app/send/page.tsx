@@ -8,6 +8,7 @@ import { ArrowLeftIcon, QRCodeIcon, SearchIcon } from '@/components/icons/GrayIc
 import { BalanceService, type TokenBalance } from '@/services/balance.service';
 import { TokenRowSkeleton, FormInputSkeleton } from '@/components/ui/Skeleton';
 import { getTrustWalletLogo, NATIVE_LOGOS } from '@/lib/tokenLogos';
+import { SecureTransactionModal } from '@/components/SecureTransactionModal';
 
 function SendPageContent() {
   const router = useRouter();
@@ -21,6 +22,7 @@ function SendPageContent() {
   const [amount, setAmount] = useState('');
   const [error, setError] = useState('');
   const [showReview, setShowReview] = useState(false);
+  const [showSecureModal, setShowSecureModal] = useState(false);
   const [loading, setLoading] = useState(true);
 
   const evmAccount = accounts.find(a => a.chain === 'EVM');
@@ -86,12 +88,23 @@ function SendPageContent() {
   function onReview() {
     const e = validate();
     setError(e);
-    if (!e) setShowReview(true);
+    if (!e) {
+      // Check if secure transactions are enabled
+      const securitySettings = localStorage.getItem('vordium-security-settings');
+      const secureTransaction = securitySettings ? JSON.parse(securitySettings).secureTransaction : true;
+      
+      if (secureTransaction) {
+        setShowSecureModal(true);
+      } else {
+        setShowReview(true);
+      }
+    }
   }
 
   function onConfirmSend() {
     alert('Transaction signing will be implemented. This requires password prompt and blockchain interaction.');
     setShowReview(false);
+    setShowSecureModal(false);
     router.push('/dashboard');
   }
 
@@ -372,6 +385,27 @@ function SendPageContent() {
             </div>
           </div>
         </div>
+      )}
+
+      {/* Secure Transaction Modal */}
+      {selectedToken && (
+        <SecureTransactionModal
+          isOpen={showSecureModal}
+          onClose={() => setShowSecureModal(false)}
+          onConfirm={() => {
+            setShowSecureModal(false);
+            setShowReview(true);
+          }}
+          transaction={{
+            from: selectedToken.chain === 'Ethereum' ? evmAccount?.address || '' : tronAccount?.address || '',
+            to: to,
+            amount: amount,
+            token: selectedToken.symbol,
+            chain: selectedToken.chain,
+            gasFee: '~$5.00', // Placeholder
+            total: `$${(parseFloat(amount) * parseFloat(selectedToken.usdValue) + 5).toFixed(2)}`
+          }}
+        />
       )}
     </div>
   );

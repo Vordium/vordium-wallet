@@ -5,6 +5,7 @@ import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/Button';
 import { ArrowLeftIcon, ShieldIcon, WalletIcon, BellIcon, GlobeIcon, LockIcon, KeyIcon, EyeIcon, EyeOffIcon, CheckIcon, AlertTriangleIcon } from '@/components/icons/GrayIcons';
 import { useWalletStore } from '@/store/walletStore';
+import { BackupModal } from '@/components/BackupModal';
 
 interface SecuritySettings {
   pinEnabled: boolean;
@@ -40,6 +41,7 @@ export default function SettingsPage() {
   const [pinError, setPinError] = useState('');
   const [showPin, setShowPin] = useState(false);
   const [showConfirmPin, setShowConfirmPin] = useState(false);
+  const [showBackupModal, setShowBackupModal] = useState(false);
 
   const [security, setSecurity] = useState<SecuritySettings>({
     pinEnabled: false,
@@ -373,7 +375,7 @@ export default function SettingsPage() {
                 icon={<KeyIcon className="w-5 h-5 text-gray-300" />}
                 title="Backup Recovery Phrase"
                 subtitle="Export your seed phrase"
-                onPress={() => {/* Backup flow */}}
+                onPress={() => setShowBackupModal(true)}
               />
               
               <SettingItem
@@ -507,6 +509,13 @@ export default function SettingsPage() {
           </div>
         </div>
       )}
+
+      {/* Backup Modal */}
+      <BackupModal
+        isOpen={showBackupModal}
+        onClose={() => setShowBackupModal(false)}
+        mnemonic={wallets[0]?.mnemonic}
+      />
     </div>
   );
 }
