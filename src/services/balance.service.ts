@@ -317,13 +317,18 @@ export class BalanceService {
 
   // Get token logo from CoinGecko assets or fallback
   static getTokenLogo(symbol: string, address?: string): string {
+    const upperSymbol = symbol.toUpperCase();
+    
     // First check our predefined logos
-    if (this.TOKEN_LOGOS[symbol.toUpperCase()]) {
-      return this.TOKEN_LOGOS[symbol.toUpperCase()];
+    if (this.TOKEN_LOGOS[upperSymbol]) {
+      console.log(`Found logo for ${symbol}: ${this.TOKEN_LOGOS[upperSymbol]}`);
+      return this.TOKEN_LOGOS[upperSymbol];
     }
 
     // Fallback to a generic token icon
-    return `https://via.placeholder.com/64/6B7280/FFFFFF?text=${symbol.charAt(0)}`;
+    const fallbackUrl = `https://via.placeholder.com/64/6B7280/FFFFFF?text=${symbol.charAt(0)}`;
+    console.log(`Using fallback logo for ${symbol}: ${fallbackUrl}`);
+    return fallbackUrl;
   }
 
   // Fetch token info from CoinGecko API (for dynamic logos)

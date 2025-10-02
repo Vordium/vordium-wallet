@@ -208,12 +208,8 @@ export default function DashboardPage() {
         ) : (
           <div className="space-y-1">
             {tokens.map((token) => {
-              // Use token's icon property if available, otherwise fallback to Trust Wallet or native logos
-              const logoUrl = token.icon && token.icon.startsWith('http') 
-                ? token.icon 
-                : token.isNative
-                  ? NATIVE_LOGOS[token.symbol]
-                  : getTrustWalletLogo(token.chain, token.address || '');
+              // Use token's icon property directly from BalanceService (which now uses CoinGecko)
+              const logoUrl = token.icon || `https://via.placeholder.com/48/6B7280/FFFFFF?text=${token.symbol.charAt(0)}`;
               
               return (
                 <TokenRow
@@ -272,11 +268,17 @@ function TokenRow({ token, logoUrl, onClick }: { token: TokenBalance; logoUrl: s
             alt={token.symbol}
             width={48}
             height={48}
-            className="w-full h-full rounded-full"
-            onError={() => setLogoError(true)}
+            className="w-full h-full rounded-full object-cover"
+            onError={() => {
+              console.log(`Failed to load logo for ${token.symbol}: ${logoUrl}`);
+              setLogoError(true);
+            }}
+            onLoad={() => {
+              console.log(`Successfully loaded logo for ${token.symbol}: ${logoUrl}`);
+            }}
           />
         ) : (
-          <div className="w-full h-full rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white font-bold text-xl">
+          <div className="w-full h-full rounded-full bg-gradient-to-br from-gray-600 to-gray-800 flex items-center justify-center text-white font-bold text-xl">
             {token.symbol.charAt(0)}
           </div>
         )}
