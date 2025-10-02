@@ -10,6 +10,7 @@ export interface WalletAccount {
   chain: ChainType;
   index?: number;
   publicKey?: string;
+  privateKey?: string;
   derivationPath?: string;
 }
 
