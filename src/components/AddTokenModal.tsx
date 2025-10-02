@@ -6,6 +6,7 @@ import TronWeb from 'tronweb';
 import { useWalletStore } from '@/store/walletStore';
 import { TokenSearchService, type TokenSearchResult } from '@/services/tokenSearch.service';
 import { SearchIcon, PlusIcon, ArrowLeftIcon } from './icons/GrayIcons';
+import { ModalSkeleton, FormInputSkeleton } from './ui/Skeleton';
 import Image from 'next/image';
 
 export function AddTokenModal({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) {
@@ -249,10 +250,23 @@ export function AddTokenModal({ isOpen, onClose }: { isOpen: boolean; onClose: (
             </div>
           </div>
 
-          {/* Search Results */}
-          {searchResults.length > 0 && (
-            <div className="mb-6 space-y-2">
-              {searchResults.map((token, index) => (
+              {/* Search Results */}
+              {searching && searchQuery ? (
+                <div className="mb-6 space-y-2">
+                  {[1, 2, 3].map(i => (
+                    <div key={i} className="w-full flex items-center gap-3 p-4 bg-gray-700 rounded-xl">
+                      <div className="w-10 h-10 rounded-full bg-gray-600 animate-pulse"></div>
+                      <div className="flex-1 space-y-2">
+                        <div className="h-4 bg-gray-600 rounded animate-pulse w-20"></div>
+                        <div className="h-3 bg-gray-600 rounded animate-pulse w-32"></div>
+                      </div>
+                      <div className="w-16 h-6 bg-gray-600 rounded-full animate-pulse"></div>
+                    </div>
+                  ))}
+                </div>
+              ) : searchResults.length > 0 ? (
+                <div className="mb-6 space-y-2">
+                  {searchResults.map((token, index) => (
                     <button
                       key={index}
                       onClick={() => handleAddToken(token)}
@@ -271,9 +285,9 @@ export function AddTokenModal({ isOpen, onClose }: { isOpen: boolean; onClose: (
                         {token.chain}
                       </div>
                     </button>
-              ))}
-            </div>
-          )}
+                  ))}
+                </div>
+              ) : null}
 
           {/* Custom Token */}
           <div className="border-t-2 border-gray-200 dark:border-gray-600 pt-6">

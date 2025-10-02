@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useWalletStore } from '@/store/walletStore';
 import { ArrowLeftIcon } from './icons/GrayIcons';
+import { WalletCardSkeleton } from './ui/Skeleton';
 
 interface WalletSwitcherModalProps {
   isOpen: boolean;

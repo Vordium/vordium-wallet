@@ -6,6 +6,7 @@ import { isValidAddress, isPositiveNumber } from '@/utils/safety.utils';
 import { useWalletStore } from '@/store/walletStore';
 import { ArrowLeftIcon, QRCodeIcon, SearchIcon } from '@/components/icons/GrayIcons';
 import { BalanceService, type TokenBalance } from '@/services/balance.service';
+import { TokenRowSkeleton, FormInputSkeleton } from '@/components/ui/Skeleton';
 import { getTrustWalletLogo, NATIVE_LOGOS } from '@/lib/tokenLogos';
 
 function SendPageContent() {
@@ -81,8 +82,20 @@ function SendPageContent() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-900 flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-4 border-gray-600 border-t-transparent"></div>
+      <div className="min-h-screen bg-gray-900">
+        <div className="sticky top-0 bg-gray-800 border-b border-gray-700 px-4 py-4 flex items-center justify-between z-10">
+          <div className="w-9 h-9 bg-gray-600 rounded-lg animate-pulse"></div>
+          <div className="h-6 w-24 bg-gray-600 rounded animate-pulse"></div>
+          <div className="w-9"></div>
+        </div>
+        <div className="p-4 space-y-4">
+          <div className="h-12 w-full bg-gray-700 rounded-xl animate-pulse"></div>
+          <div className="space-y-1">
+            {[1, 2, 3, 4, 5].map(i => (
+              <TokenRowSkeleton key={i} />
+            ))}
+          </div>
+        </div>
       </div>
     );
   }

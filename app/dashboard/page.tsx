@@ -9,6 +9,7 @@ import { AddTokenModal } from '@/components/AddTokenModal';
 import { WalletSwitcherModal } from '@/components/WalletSwitcherModal';
 import { BottomNavigation } from '@/components/BottomNavigation';
 import { BalanceService, type TokenBalance } from '@/services/balance.service';
+import { PageSkeleton, BalanceCardSkeleton, TokenRowSkeleton } from '@/components/ui/Skeleton';
 import { getTrustWalletLogo, NATIVE_LOGOS } from '@/lib/tokenLogos';
 import { 
   SettingsIcon, 
@@ -132,7 +133,11 @@ export default function DashboardPage() {
           {/* Total Balance */}
           <div className="text-center py-6">
             <div className="text-5xl font-bold mb-2 text-white">
-              ${loading ? '...' : totalBalance}
+              {loading ? (
+                <div className="animate-pulse bg-gray-700 rounded h-12 w-32 mx-auto"></div>
+              ) : (
+                `$${totalBalance}`
+              )}
             </div>
             <div className="text-lg text-gray-300">
               {isPositive ? '+' : ''}${change24h.value} ({change24h.percent}%)
@@ -196,8 +201,8 @@ export default function DashboardPage() {
 
         {loading ? (
           <div className="space-y-1">
-            {[1, 2, 3].map(i => (
-              <div key={i} className="bg-gray-700 rounded-2xl h-20 animate-pulse" />
+            {[1, 2, 3, 4, 5].map(i => (
+              <TokenRowSkeleton key={i} />
             ))}
           </div>
         ) : tokens.length === 0 ? (
