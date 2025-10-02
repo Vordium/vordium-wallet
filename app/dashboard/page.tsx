@@ -50,7 +50,18 @@ export default function DashboardPage() {
     if (evmAccount && tronAccount) {
       loadWalletData();
       const interval = setInterval(() => loadWalletData(true), 30000);
-      return () => clearInterval(interval);
+      
+      // Listen for token added events
+      const handleTokenAdded = () => {
+        loadWalletData();
+      };
+
+      window.addEventListener('tokenAdded', handleTokenAdded);
+      
+      return () => {
+        clearInterval(interval);
+        window.removeEventListener('tokenAdded', handleTokenAdded);
+      };
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [router, evmAccount, tronAccount]);

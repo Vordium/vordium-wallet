@@ -14,6 +14,7 @@ export function AddTokenModal({ isOpen, onClose }: { isOpen: boolean; onClose: (
   const [searchResults, setSearchResults] = useState<TokenSearchResult[]>([]);
   const [customAddress, setCustomAddress] = useState('');
   const [selectedChain, setSelectedChain] = useState<'Ethereum' | 'Tron'>('Ethereum');
+  const [successMessage, setSuccessMessage] = useState('');
   
   const addToken = useWalletStore(state => state.addToken);
   const accounts = useWalletStore(state => state.accounts);
@@ -40,27 +41,36 @@ export function AddTokenModal({ isOpen, onClose }: { isOpen: boolean; onClose: (
       )?.address;
       
       if (!userAddress) {
-        alert('No account found for this chain');
+        setSuccessMessage('No account found for this chain');
+        setTimeout(() => setSuccessMessage(''), 3000);
         return;
       }
 
       // Fetch balance
       let balance = '0';
       
-      if (token.chain === 'Ethereum') {
-        const provider = new ethers.JsonRpcProvider(process.env.NEXT_PUBLIC_ETHEREUM_RPC || 'https://eth.llamarpc.com');
-        const contract = new ethers.Contract(
-          token.address,
-          ['function balanceOf(address) view returns (uint256)'],
-          provider
-        );
-        const bal = await contract.balanceOf(userAddress);
-        balance = ethers.formatUnits(bal, token.decimals);
-      } else {
-        const tronWeb = new TronWeb({ fullHost: 'https://api.trongrid.io' });
-        const contract = await tronWeb.contract().at(token.address);
-        const bal = await contract.balanceOf(userAddress).call();
-        balance = (bal / Math.pow(10, token.decimals)).toString();
+      if (token.chain === 'Ethereum' && token.address !== 'native') {
+        try {
+          const provider = new ethers.JsonRpcProvider(process.env.NEXT_PUBLIC_ETHEREUM_RPC || 'https://eth.llamarpc.com');
+          const contract = new ethers.Contract(
+            token.address,
+            ['function balanceOf(address) view returns (uint256)'],
+            provider
+          );
+          const bal = await contract.balanceOf(userAddress);
+          balance = ethers.formatUnits(bal, token.decimals);
+        } catch {
+          balance = '0';
+        }
+      } else if (token.chain === 'Tron' && token.address !== 'native') {
+        try {
+          const tronWeb = new TronWeb({ fullHost: 'https://api.trongrid.io' });
+          const contract = await tronWeb.contract().at(token.address);
+          const bal = await contract.balanceOf(userAddress).call();
+          balance = (bal / Math.pow(10, token.decimals)).toString();
+        } catch {
+          balance = '0';
+        }
       }
 
       // Add to store
@@ -76,14 +86,16 @@ export function AddTokenModal({ isOpen, onClose }: { isOpen: boolean; onClose: (
         usdValue: '0'
       });
 
-      alert(`${token.symbol} added successfully!`);
-      onClose();
-      
-      // Refresh page to show new token
-      window.location.reload();
+      setSuccessMessage(`${token.symbol} added successfully!`);
+      setTimeout(() => {
+        setSuccessMessage('');
+        onClose();
+        // Trigger a custom event to refresh dashboard
+        window.dispatchEvent(new CustomEvent('tokenAdded'));
+      }, 1500);
       
     } catch (error) {
-      alert('Failed to add token: ' + (error as Error).message);
+      setSuccessMessage('Failed to add token: ' + (error as Error).message);
     } finally {
       setSearching(false);
     }
@@ -92,7 +104,8 @@ export function AddTokenModal({ isOpen, onClose }: { isOpen: boolean; onClose: (
   // Add custom token by address
   async function handleAddCustomToken() {
     if (!customAddress) {
-      alert('Please enter a contract address');
+      setSuccessMessage('Please enter a contract address');
+      setTimeout(() => setSuccessMessage(''), 3000);
       return;
     }
 
@@ -104,7 +117,8 @@ export function AddTokenModal({ isOpen, onClose }: { isOpen: boolean; onClose: (
       )?.address;
 
       if (!userAddress) {
-        alert('No account found');
+        setSuccessMessage('No account found');
+        setTimeout(() => setSuccessMessage(''), 3000);
         return;
       }
 
@@ -183,12 +197,16 @@ export function AddTokenModal({ isOpen, onClose }: { isOpen: boolean; onClose: (
         usdValue: '0'
       });
 
-      alert(`${tokenInfo.symbol} added!`);
-      onClose();
-      window.location.reload();
+      setSuccessMessage(`${tokenInfo.symbol} added successfully!`);
+      setTimeout(() => {
+        setSuccessMessage('');
+        onClose();
+        // Trigger a custom event to refresh dashboard
+        window.dispatchEvent(new CustomEvent('tokenAdded'));
+      }, 1500);
 
     } catch (error) {
-      alert('Failed: ' + (error as Error).message);
+      setSuccessMessage('Failed: ' + (error as Error).message);
     } finally {
       setSearching(false);
     }
@@ -210,6 +228,13 @@ export function AddTokenModal({ isOpen, onClose }: { isOpen: boolean; onClose: (
         </div>
 
         <div className="p-6 overflow-y-auto max-h-[calc(90vh-120px)]">
+          {/* Success Message */}
+          {successMessage && (
+            <div className="mb-4 p-4 bg-green-50 dark:bg-green-900 border border-green-200 dark:border-green-700 rounded-xl">
+              <p className="text-green-800 dark:text-green-200 font-medium">{successMessage}</p>
+            </div>
+          )}
+
           {/* Search Bar */}
           <div className="mb-6">
             <div className="relative">

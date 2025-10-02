@@ -142,6 +142,18 @@ export class BalanceService {
 
   static async getAllTokens(ethAddress: string, tronAddress: string): Promise<TokenBalance[]> {
     try {
+      // Get custom tokens from localStorage
+      const getCustomTokens = () => {
+        try {
+          const stored = localStorage.getItem('vordium-tokens');
+          return stored ? JSON.parse(stored) : [];
+        } catch {
+          return [];
+        }
+      };
+
+      const customTokens = getCustomTokens();
+
       const [ethBalance, trxBalance, ethTokens, tronTokens] = await Promise.all([
         this.getEthBalance(ethAddress),
         this.getTrxBalance(tronAddress),
@@ -176,6 +188,47 @@ export class BalanceService {
         ...ethTokens,
         ...tronTokens,
       ];
+
+      // Add custom tokens with updated balances
+      for (const customToken of customTokens) {
+        // Skip if already exists in default tokens
+        if (allTokens.some(t => t.symbol === customToken.symbol && t.chain === customToken.chain)) {
+          continue;
+        }
+
+        try {
+          let balance = '0';
+          const address = customToken.chain === 'Ethereum' ? ethAddress : tronAddress;
+
+          if (customToken.chain === 'Ethereum' && customToken.address !== 'native') {
+            const provider = new ethers.JsonRpcProvider(process.env.NEXT_PUBLIC_ETHEREUM_RPC || 'https://eth.llamarpc.com');
+            const contract = new ethers.Contract(customToken.address, ERC20_ABI, provider);
+            const bal = await contract.balanceOf(address);
+            balance = ethers.formatUnits(bal, customToken.decimals);
+          } else if (customToken.chain === 'Tron' && customToken.address !== 'native') {
+            const tronWeb = new TronWeb({ fullHost: 'https://api.trongrid.io' });
+            const contract = await tronWeb.contract().at(customToken.address);
+            const bal = await contract.balanceOf(address).call();
+            balance = (bal / Math.pow(10, customToken.decimals)).toString();
+          }
+
+          const usdValue = await this.getUsdValue(customToken.symbol, balance);
+
+          allTokens.push({
+            symbol: customToken.symbol,
+            name: customToken.name,
+            balance,
+            usdValue,
+            chain: customToken.chain,
+            address: customToken.address,
+            decimals: customToken.decimals,
+            isNative: customToken.isNative || false,
+            icon: customToken.logo || '🪙',
+          });
+        } catch (error) {
+          console.error(`Failed to load custom token ${customToken.symbol}:`, error);
+        }
+      }
 
       return allTokens;
     } catch (error) {
