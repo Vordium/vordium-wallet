@@ -31,10 +31,6 @@ function AlertsPageContent() {
   const evmAccount = accounts.find(a => a.chain === 'EVM');
   const tronAccount = accounts.find(a => a.chain === 'TRON');
 
-  useEffect(() => {
-    loadData();
-  }, [evmAccount, tronAccount, loadData]);
-
   const loadData = useCallback(async () => {
     if (!evmAccount || !tronAccount) return;
     
@@ -56,6 +52,10 @@ function AlertsPageContent() {
       setLoading(false);
     }
   }, [evmAccount, tronAccount]);
+
+  useEffect(() => {
+    loadData();
+  }, [loadData]);
 
   const createAlert = (alert: Omit<PriceAlert, 'id' | 'createdAt'>) => {
     const newAlert: PriceAlert = {
