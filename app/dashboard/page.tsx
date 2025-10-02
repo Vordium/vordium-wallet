@@ -26,7 +26,9 @@ import {
   RefreshIcon,
   FilterIcon,
   TrendingUpIcon,
-  LockIcon
+  LockIcon,
+  EyeIcon,
+  GlobeIcon
 } from '@/components/icons/GrayIcons';
 import Image from 'next/image';
 

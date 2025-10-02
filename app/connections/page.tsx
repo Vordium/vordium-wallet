@@ -2,6 +2,7 @@
 
 import { useState, useEffect, Suspense } from 'react';
 import { useRouter } from 'next/navigation';
+import Image from 'next/image';
 import { ArrowLeftIcon, PlusIcon, ExternalLinkIcon, XIcon, GlobeIcon } from '@/components/icons/GrayIcons';
 import { WalletConnectService, type DAppSession } from '@/services/walletconnect.service';
 import { PageSkeleton } from '@/components/ui/Skeleton';
@@ -150,9 +151,11 @@ function ConnectionsPageContent() {
                 <div className="flex items-center gap-3">
                   <div className="w-12 h-12 rounded-full bg-gray-700 flex items-center justify-center">
                     {session.peer.metadata.icons[0] ? (
-                      <img
+                      <Image
                         src={session.peer.metadata.icons[0]}
                         alt={session.peer.metadata.name}
+                        width={32}
+                        height={32}
                         className="w-8 h-8 rounded-full"
                         onError={(e) => {
                           const target = e.target as HTMLImageElement;

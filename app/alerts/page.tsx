@@ -1,7 +1,8 @@
 'use client';
 
-import { useState, useEffect, Suspense } from 'react';
+import { useState, useEffect, useCallback, Suspense } from 'react';
 import { useRouter } from 'next/navigation';
+import Image from 'next/image';
 import { ArrowLeftIcon, PlusIcon, BellIcon, TrendingUpIcon, TrendingDownIcon, XIcon, EditIcon } from '@/components/icons/GrayIcons';
 import { useWalletStore } from '@/store/walletStore';
 import { BalanceService, type TokenBalance } from '@/services/balance.service';
@@ -32,9 +33,9 @@ function AlertsPageContent() {
 
   useEffect(() => {
     loadData();
-  }, [evmAccount, tronAccount]);
+  }, [evmAccount, tronAccount, loadData]);
 
-  const loadData = async () => {
+  const loadData = useCallback(async () => {
     if (!evmAccount || !tronAccount) return;
     
     setLoading(true);
@@ -54,7 +55,7 @@ function AlertsPageContent() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [evmAccount, tronAccount]);
 
   const createAlert = (alert: Omit<PriceAlert, 'id' | 'createdAt'>) => {
     const newAlert: PriceAlert = {
@@ -191,9 +192,11 @@ function AlertsPageContent() {
                   }`}
                 >
                   <div className="flex items-center gap-3">
-                    <img
+                    <Image
                       src={alert.token.icon}
                       alt={alert.token.symbol}
+                      width={48}
+                      height={48}
                       className="w-12 h-12 rounded-full"
                       onError={(e) => {
                         const target = e.target as HTMLImageElement;
@@ -456,9 +459,11 @@ function EditAlertModal({
         </div>
 
         <div className="flex items-center gap-3 mb-6">
-          <img
+          <Image
             src={alert.token.icon}
             alt={alert.token.symbol}
+            width={48}
+            height={48}
             className="w-12 h-12 rounded-full"
             onError={(e) => {
               const target = e.target as HTMLImageElement;
