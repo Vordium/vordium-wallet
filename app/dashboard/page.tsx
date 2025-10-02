@@ -264,7 +264,7 @@ function TokenRow({ token, logoUrl, onClick }: { token: TokenBalance; logoUrl: s
   return (
     <button
       onClick={onClick}
-      className="w-full flex items-center gap-3 py-3 px-2 hover:bg-gray-700 rounded-2xl transition active:scale-98"
+      className="w-full flex items-center gap-3 py-3 px-2 hover:bg-gray-700 hover:shadow-lg hover:shadow-gray-700/50 rounded-2xl transition-all duration-200 active:scale-98"
     >
       <div className="relative w-12 h-12 flex-shrink-0">
         {!logoError && logoUrl ? (

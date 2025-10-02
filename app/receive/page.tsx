@@ -122,21 +122,45 @@ function ReceivePageContent() {
 
           <div className="space-y-1">
             {filteredTokens.map((token) => {
-              const logoUrl = token.isNative ? NATIVE_LOGOS[token.symbol] : getTrustWalletLogo(token.chain, token.address || '');
+              const logoUrl = token.icon || `https://via.placeholder.com/48/6B7280/FFFFFF?text=${token.symbol.charAt(0)}`;
 
               return (
                 <button
                   key={`${token.chain}-${token.symbol}-${token.address || 'native'}`}
                   onClick={() => setSelectedToken(token)}
-                  className="w-full flex items-center gap-3 p-4 hover:bg-gray-50 rounded-2xl transition"
+                  className="w-full flex items-center gap-3 p-4 hover:bg-gray-700 hover:shadow-lg hover:shadow-gray-700/50 rounded-2xl transition-all duration-200"
                 >
-                  <div className="w-12 h-12 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white font-bold text-xl">
-                    {token.icon || token.symbol.charAt(0)}
+                  <div className="relative w-12 h-12 flex-shrink-0">
+                    <img
+                      src={logoUrl}
+                      alt={token.symbol}
+                      className="w-full h-full rounded-full object-cover"
+                      onError={(e) => {
+                        e.currentTarget.src = `https://via.placeholder.com/48/6B7280/FFFFFF?text=${token.symbol.charAt(0)}`;
+                      }}
+                    />
+                    {!token.isNative && (
+                      <div className="absolute -bottom-1 -right-1 w-5 h-5 rounded-full bg-gray-800 border-2 border-gray-900 flex items-center justify-center text-xs">
+                        <span className="text-gray-300">{token.chain === 'Ethereum' ? 'E' : 'T'}</span>
+                      </div>
+                    )}
                   </div>
 
-                  <div className="flex-1 text-left">
-                    <div className="font-semibold text-gray-900">{token.symbol}</div>
-                    <div className="text-sm text-gray-500">{token.chain}</div>
+                  <div className="flex-1 text-left min-w-0">
+                    <div className="font-semibold text-white truncate">{token.symbol}</div>
+                    <div className="text-sm text-gray-400 truncate">{token.name}</div>
+                    {!token.isNative && (
+                      <div className="text-xs text-gray-500 mt-0.5">{token.chain}</div>
+                    )}
+                  </div>
+
+                  <div className="text-right">
+                    <div className="font-semibold text-white">
+                      {parseFloat(token.balance).toFixed(4)}
+                    </div>
+                    <div className="text-sm text-gray-400">
+                      ${parseFloat(token.usdValue).toFixed(2)}
+                    </div>
                   </div>
                 </button>
               );

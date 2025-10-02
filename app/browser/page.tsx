@@ -26,7 +26,7 @@ const TRENDING_DAPPS: DApp[] = [
     description: 'Next-generation decentralized exchange with advanced trading features',
     category: 'DEX',
     url: 'https://aster.exchange',
-    logo: 'https://via.placeholder.com/64/6B7280/FFFFFF?text=AD',
+    logo: 'https://assets.coingecko.com/coins/images/32964/large/aster.png',
     trending: true,
     verified: true,
     tvl: '$125M',
@@ -38,7 +38,7 @@ const TRENDING_DAPPS: DApp[] = [
     description: 'High-performance perpetual futures trading platform',
     category: 'Derivatives',
     url: 'https://hyperliquid.xyz',
-    logo: 'https://via.placeholder.com/64/6B7280/FFFFFF?text=HL',
+    logo: 'https://assets.coingecko.com/coins/images/38236/large/hype-logo-200-200.png',
     trending: true,
     verified: true,
     tvl: '$890M',
@@ -50,7 +50,7 @@ const TRENDING_DAPPS: DApp[] = [
     description: 'The largest decentralized trading protocol',
     category: 'DEX',
     url: 'https://app.uniswap.org',
-    logo: 'https://via.placeholder.com/64/6B7280/FFFFFF?text=UNI',
+    logo: 'https://assets.coingecko.com/coins/images/12504/large/uni.jpg',
     trending: true,
     verified: true,
     tvl: '$4.2B',
@@ -62,7 +62,7 @@ const TRENDING_DAPPS: DApp[] = [
     description: 'Decentralized lending and borrowing protocol',
     category: 'Lending',
     url: 'https://app.aave.com',
-    logo: 'https://via.placeholder.com/64/6B7280/FFFFFF?text=AA',
+    logo: 'https://assets.coingecko.com/coins/images/12645/large/AAVE.png',
     trending: false,
     verified: true,
     tvl: '$12.5B',
@@ -74,7 +74,7 @@ const TRENDING_DAPPS: DApp[] = [
     description: 'Algorithmic money markets protocol',
     category: 'Lending',
     url: 'https://app.compound.finance',
-    logo: 'https://via.placeholder.com/64/6B7280/FFFFFF?text=CO',
+    logo: 'https://assets.coingecko.com/coins/images/10775/large/COMP.png',
     trending: false,
     verified: true,
     tvl: '$2.8B',
@@ -86,7 +86,7 @@ const TRENDING_DAPPS: DApp[] = [
     description: 'Decentralized exchange for stablecoins',
     category: 'DEX',
     url: 'https://curve.fi',
-    logo: 'https://via.placeholder.com/64/6B7280/FFFFFF?text=CRV',
+    logo: 'https://assets.coingecko.com/coins/images/12124/large/Curve.png',
     trending: false,
     verified: true,
     tvl: '$3.1B',
@@ -98,7 +98,7 @@ const TRENDING_DAPPS: DApp[] = [
     description: 'Liquid staking solution for Ethereum',
     category: 'Staking',
     url: 'https://lido.fi',
-    logo: 'https://via.placeholder.com/64/6B7280/FFFFFF?text=LDO',
+    logo: 'https://assets.coingecko.com/coins/images/13573/large/Lido_DAO.png',
     trending: true,
     verified: true,
     tvl: '$32.1B',
@@ -110,7 +110,7 @@ const TRENDING_DAPPS: DApp[] = [
     description: 'Decentralized stablecoin protocol',
     category: 'Stablecoin',
     url: 'https://makerdao.com',
-    logo: 'https://via.placeholder.com/64/6B7280/FFFFFF?text=MKR',
+    logo: 'https://assets.coingecko.com/coins/images/1364/large/Mark_Maker.png',
     trending: false,
     verified: true,
     tvl: '$8.7B',
@@ -122,7 +122,7 @@ const TRENDING_DAPPS: DApp[] = [
     description: 'Decentralized synthetic assets protocol',
     category: 'Derivatives',
     url: 'https://synthetix.io',
-    logo: 'https://via.placeholder.com/64/6B7280/FFFFFF?text=SNX',
+    logo: 'https://assets.coingecko.com/coins/images/3406/large/SNX.png',
     trending: false,
     verified: true,
     tvl: '$1.2B',
@@ -134,7 +134,7 @@ const TRENDING_DAPPS: DApp[] = [
     description: 'Yield optimization protocol',
     category: 'Yield',
     url: 'https://yearn.finance',
-    logo: 'https://via.placeholder.com/64/6B7280/FFFFFF?text=YFI',
+    logo: 'https://assets.coingecko.com/coins/images/11849/large/yearn.jpg',
     trending: false,
     verified: true,
     tvl: '$650M',
@@ -268,7 +268,7 @@ function DAppCard({ dapp, featured = false }: { dapp: DApp; featured?: boolean }
   return (
     <button
       onClick={handleOpen}
-      className={`w-full text-left p-4 rounded-xl border transition hover:bg-gray-700 ${
+      className={`w-full text-left p-4 rounded-xl border transition-all duration-200 hover:bg-gray-700 hover:shadow-lg hover:shadow-gray-700/50 ${
         featured 
           ? 'bg-gray-800 border-gray-600 shadow-lg' 
           : 'bg-gray-800 border-gray-700'
@@ -282,7 +282,10 @@ function DAppCard({ dapp, featured = false }: { dapp: DApp; featured?: boolean }
             alt={dapp.name}
             width={48}
             height={48}
-            className="w-12 h-12 rounded-xl bg-gray-600"
+            className="w-12 h-12 rounded-xl bg-gray-600 object-cover"
+            onError={(e) => {
+              e.currentTarget.src = `https://via.placeholder.com/48/6B7280/FFFFFF?text=${dapp.name.charAt(0)}`;
+            }}
           />
           {dapp.verified && (
             <div className="absolute -top-1 -right-1 w-5 h-5 bg-blue-500 rounded-full flex items-center justify-center text-xs">

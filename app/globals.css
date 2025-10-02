@@ -100,12 +100,35 @@ input:focus {
 .border-gray-600 { border-color: var(--color-border) !important; }
 .border-gray-700 { border-color: var(--color-border) !important; }
 
-/* Hover states */
-.hover\\:bg-gray-50:hover { background-color: var(--color-hover) !important; }
-.hover\\:bg-gray-100:hover { background-color: var(--color-hover) !important; }
-.hover\\:bg-gray-200:hover { background-color: var(--color-hover) !important; }
-.hover\\:bg-gray-600:hover { background-color: var(--color-hover) !important; }
-.hover\\:bg-gray-700:hover { background-color: var(--color-hover) !important; }
+/* Hover states with glowing effect */
+.hover\\:bg-gray-50:hover { 
+  background-color: var(--color-hover) !important; 
+  box-shadow: 0 4px 12px rgba(64, 64, 64, 0.3) !important;
+}
+.hover\\:bg-gray-100:hover { 
+  background-color: var(--color-hover) !important; 
+  box-shadow: 0 4px 12px rgba(64, 64, 64, 0.3) !important;
+}
+.hover\\:bg-gray-200:hover { 
+  background-color: var(--color-hover) !important; 
+  box-shadow: 0 4px 12px rgba(64, 64, 64, 0.3) !important;
+}
+.hover\\:bg-gray-600:hover { 
+  background-color: var(--color-hover) !important; 
+  box-shadow: 0 4px 12px rgba(64, 64, 64, 0.3) !important;
+}
+.hover\\:bg-gray-700:hover { 
+  background-color: var(--color-hover) !important; 
+  box-shadow: 0 4px 12px rgba(64, 64, 64, 0.3) !important;
+}
+
+/* Enhanced glowing hover effects for interactive elements */
+button:hover, 
+.hover\\:shadow-lg:hover {
+  box-shadow: 0 8px 25px rgba(64, 64, 64, 0.4) !important;
+  transform: translateY(-1px);
+  transition: all 0.2s ease-in-out;
+}
 
 :root {
   --foreground-rgb: 0, 0, 0;
