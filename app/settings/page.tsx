@@ -52,7 +52,7 @@ export default function SettingsPage() {
             <div>
               <h2 className="text-sm font-semibold text-gray-300 mb-3">Danger Zone</h2>
               <Button 
-                variant="destructive" 
+                variant="danger" 
                 onClick={handleResetWallet}
                 className={showResetConfirm ? 'bg-gray-600 hover:bg-gray-500 text-white' : ''}
               >

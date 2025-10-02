@@ -19,10 +19,10 @@ const sizeClasses: Record<ButtonSize, string> = {
 };
 
 const variantClasses: Record<ButtonVariant, string> = {
-  primary: 'bg-blue-600 text-white hover:bg-blue-700 active:scale-95 disabled:bg-gray-200 disabled:text-gray-500',
-  secondary: 'bg-white text-gray-900 border-2 border-gray-300 hover:bg-gray-50 active:scale-95 disabled:bg-gray-100 disabled:text-gray-400',
-  danger: 'bg-red-600 text-white hover:bg-red-700 active:scale-95 disabled:bg-gray-200 disabled:text-gray-500',
-  ghost: 'bg-transparent text-gray-700 hover:bg-gray-100 active:scale-95 disabled:text-gray-400',
+  primary: 'bg-gray-600 text-white hover:bg-gray-500 active:scale-95 disabled:bg-gray-700 disabled:text-gray-500',
+  secondary: 'bg-gray-700 text-white border-2 border-gray-600 hover:bg-gray-600 active:scale-95 disabled:bg-gray-800 disabled:text-gray-500',
+  danger: 'bg-gray-600 text-white hover:bg-gray-500 active:scale-95 disabled:bg-gray-700 disabled:text-gray-500',
+  ghost: 'bg-transparent text-gray-300 hover:bg-gray-700 active:scale-95 disabled:text-gray-500',
 };
 
 export function Button({
