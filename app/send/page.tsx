@@ -156,12 +156,12 @@ function SendPageContent() {
   const logoUrl = selectedToken.isNative ? NATIVE_LOGOS[selectedToken.symbol] : getTrustWalletLogo(selectedToken.chain, selectedToken.address || '');
 
   return (
-    <div className="min-h-screen bg-white">
-      <div className="sticky top-0 bg-white border-b border-gray-100 px-4 py-4 flex items-center justify-between z-10">
-        <button onClick={() => setSelectedToken(null)} className="p-2 hover:bg-gray-50 rounded-lg">
-          <ArrowLeft className="w-5 h-5" />
+    <div className="min-h-screen bg-gray-900">
+      <div className="sticky top-0 bg-gray-800 border-b border-gray-700 px-4 py-4 flex items-center justify-between z-10">
+        <button onClick={() => setSelectedToken(null)} className="p-2 hover:bg-gray-700 rounded-lg">
+          <ArrowLeftIcon className="w-5 h-5 text-gray-300" />
         </button>
-        <h1 className="text-lg font-semibold">Send {selectedToken.symbol}</h1>
+        <h1 className="text-lg font-semibold text-white">Send {selectedToken.symbol}</h1>
         <div className="w-9" />
       </div>
 
@@ -191,7 +191,7 @@ function SendPageContent() {
               className="w-full border border-gray-300 rounded-2xl p-4 pr-12 focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
             <button className="absolute right-3 top-1/2 -translate-y-1/2 p-1">
-              <QrCode className="w-5 h-5 text-gray-500" />
+              <QRCodeIcon className="w-5 h-5 text-gray-500" />
             </button>
           </div>
         </div>

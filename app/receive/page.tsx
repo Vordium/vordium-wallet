@@ -136,12 +136,12 @@ function ReceivePageContent() {
 
   // Receive View
   return (
-    <div className="min-h-screen bg-white">
-      <div className="sticky top-0 bg-white border-b border-gray-100 px-4 py-4 flex items-center justify-between z-10">
-        <button onClick={() => setSelectedToken(null)} className="p-2 hover:bg-gray-50 rounded-lg">
-          <ArrowLeft className="w-5 h-5" />
+    <div className="min-h-screen bg-gray-900">
+      <div className="sticky top-0 bg-gray-800 border-b border-gray-700 px-4 py-4 flex items-center justify-between z-10">
+        <button onClick={() => setSelectedToken(null)} className="p-2 hover:bg-gray-700 rounded-lg">
+          <ArrowLeftIcon className="w-5 h-5 text-gray-300" />
         </button>
-        <h1 className="text-lg font-semibold">Receive {selectedToken.symbol}</h1>
+        <h1 className="text-lg font-semibold text-white">Receive {selectedToken.symbol}</h1>
         <div className="w-9" />
       </div>
 
