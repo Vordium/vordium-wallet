@@ -223,7 +223,7 @@ export class BalanceService {
             address: customToken.address,
             decimals: customToken.decimals,
             isNative: customToken.isNative || false,
-            icon: customToken.logo || '🪙',
+            icon: customToken.logo || `https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/${customToken.chain.toLowerCase()}/assets/${customToken.address}/logo.png`,
           });
         } catch (error) {
           console.error(`Failed to load custom token ${customToken.symbol}:`, error);
