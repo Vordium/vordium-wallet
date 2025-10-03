@@ -5,7 +5,7 @@ import QRCode from 'react-qr-code';
 
 interface ReceiveCardProps {
   address: string;
-  network: 'EVM' | 'TRON';
+  network: 'EVM' | 'TRON' | 'SOLANA' | 'BITCOIN';
 }
 
 export function ReceiveCard({ address, network }: ReceiveCardProps) {

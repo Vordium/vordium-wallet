@@ -7,7 +7,7 @@ interface Network {
   id: string;
   name: string;
   icon: string;
-  chainType: 'EVM' | 'TRON';
+  chainType: 'EVM' | 'TRON' | 'SOLANA' | 'BITCOIN';
 }
 
 const NETWORKS: Network[] = [
@@ -16,11 +16,13 @@ const NETWORKS: Network[] = [
   { id: 'bsc', name: 'BSC', icon: '🟡', chainType: 'EVM' },
   { id: 'arbitrum', name: 'Arbitrum', icon: '🔵', chainType: 'EVM' },
   { id: 'tron', name: 'TRON', icon: '🔺', chainType: 'TRON' },
+  { id: 'solana', name: 'Solana', icon: '🟣', chainType: 'SOLANA' },
+  { id: 'bitcoin', name: 'Bitcoin', icon: '🟠', chainType: 'BITCOIN' },
 ];
 
 interface NetworkSelectorProps {
   selected: string;
-  onSelect: (chainType: 'EVM' | 'TRON') => void;
+  onSelect: (chainType: 'EVM' | 'TRON' | 'SOLANA' | 'BITCOIN') => void;
   onClose: () => void;
 }
 

@@ -169,7 +169,9 @@ Anyone with access to these keys can control your wallet.`;
                   {[
                     { id: 'all', label: 'All Chains' },
                     { id: 'evm', label: 'EVM' },
-                    { id: 'tron', label: 'TRON' }
+                    { id: 'tron', label: 'TRON' },
+                    { id: 'solana', label: 'Solana' },
+                    { id: 'bitcoin', label: 'Bitcoin' }
                   ].map(chain => (
                     <button
                       key={chain.id}

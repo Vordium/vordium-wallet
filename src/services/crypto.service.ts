@@ -9,7 +9,7 @@ import TronWeb from 'tronweb';
 const EVM_PATH = "m/44'/60'/0'/0"; // EIP-44 standard
 const TRON_PATH = "m/44'/195'/0'/0"; // TRON standard
 
-export type ChainType = 'EVM' | 'TRON';
+export type ChainType = 'EVM' | 'TRON' | 'SOLANA' | 'BITCOIN';
 
 export interface DerivedAccount {
   address: string;
