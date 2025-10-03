@@ -193,7 +193,7 @@ export class BalanceService {
         allBalances.push(...tronTokens.map(token => ({
           symbol: token.symbol,
           name: token.name,
-          address: token.address,
+          address: token.address || '',
           chain: 'tron',
           decimals: token.decimals,
           balance: token.balance,
@@ -212,7 +212,7 @@ export class BalanceService {
         allBalances.push(...bitcoinTokens.map(token => ({
           symbol: token.symbol,
           name: token.name,
-          address: token.address,
+          address: token.address || '',
           chain: 'bitcoin',
           decimals: token.decimals,
           balance: token.balance,
