@@ -4,6 +4,7 @@ import { HDKey } from '@scure/bip32';
 import { ethers } from 'ethers';
 import TronWeb from 'tronweb';
 import * as bitcoin from 'bitcoinjs-lib';
+import { ECPair } from 'bitcoinjs-lib';
 import { PublicKey } from '@solana/web3.js';
 // Using WebCrypto PBKDF2 instead of argon2-browser to avoid WASM in Next.js build
 
@@ -178,8 +179,8 @@ export class CryptoService {
       // Convert hex string to Buffer
       const privateKeyBuffer = Buffer.from(privateKey, 'hex');
       
-      // Create key pair
-      const keyPair = bitcoin.ECPair.fromPrivateKey(privateKeyBuffer);
+      // Create key pair using the imported ECPair
+      const keyPair = ECPair.fromPrivateKey(privateKeyBuffer);
       
       // Generate P2PKH address (legacy format)
       const { address } = bitcoin.payments.p2pkh({ 
