@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
 
-export type ChainType = 'EVM' | 'TRON';
+export type ChainType = 'EVM' | 'TRON' | 'SOLANA' | 'BITCOIN';
 
 export interface WalletAccount {
   id: string;
@@ -26,7 +26,7 @@ export interface Token {
   symbol: string;
   name: string;
   address: string;
-  chain: 'Ethereum' | 'Tron';
+  chain: 'Ethereum' | 'Tron' | 'Solana' | 'Bitcoin';
   decimals: number;
   balance: string;
   logo: string;

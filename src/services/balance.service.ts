@@ -2,6 +2,7 @@
 
 import { ethers } from 'ethers';
 import TronWeb from 'tronweb';
+import { tokenService } from './token.service';
 
 export interface TokenBalance {
   symbol: string;
@@ -168,6 +169,31 @@ export class BalanceService {
     return tokens;
   }
 
+  // New method using comprehensive token service
+  static async getAllTokensMultiChain(addresses: { [chain: string]: string }): Promise<TokenBalance[]> {
+    try {
+      const allBalances = await tokenService.getTokenBalances(addresses.ethereum || addresses.eth || '');
+      
+      // Convert to our TokenBalance format
+      return allBalances.map(balance => ({
+        symbol: balance.symbol,
+        name: balance.name,
+        balance: balance.balance,
+        usdValue: balance.value_usd?.toString() || '0',
+        chain: this.mapChainName(balance.chain),
+        address: balance.address,
+        decimals: balance.decimals,
+        isNative: balance.isNative,
+        icon: balance.logo || this.getTokenLogo(balance.symbol, balance.address),
+        change24h: balance.change24h,
+      }));
+    } catch (error) {
+      console.error('Failed to load multi-chain tokens:', error);
+      // Fallback to original method
+      return this.getAllTokens(addresses.ethereum || addresses.eth || '', addresses.tron || '');
+    }
+  }
+
   static async getAllTokens(ethAddress: string, tronAddress: string): Promise<TokenBalance[]> {
     try {
       // Get custom tokens from localStorage
@@ -330,6 +356,22 @@ export class BalanceService {
     const fallbackUrl = `https://via.placeholder.com/64/6B7280/FFFFFF?text=${symbol.charAt(0)}`;
     console.log(`Using fallback logo for ${symbol}: ${fallbackUrl}`);
     return fallbackUrl;
+  }
+
+  // Map chain names to our format
+  private static mapChainName(chain: string): 'Ethereum' | 'Tron' | 'Solana' | 'Bitcoin' {
+    const chainMap: Record<string, 'Ethereum' | 'Tron' | 'Solana' | 'Bitcoin'> = {
+      'ethereum': 'Ethereum',
+      'eth': 'Ethereum',
+      'polygon': 'Ethereum', // Treat as EVM
+      'bsc': 'Ethereum', // Treat as EVM
+      'arbitrum': 'Ethereum', // Treat as EVM
+      'tron': 'Tron',
+      'solana': 'Solana',
+      'bitcoin': 'Bitcoin',
+      'btc': 'Bitcoin',
+    };
+    return chainMap[chain.toLowerCase()] || 'Ethereum';
   }
 
   // Fetch token info from CoinGecko API (for dynamic logos)
