@@ -9,7 +9,7 @@ export interface TokenBalance {
   name: string;
   balance: string;
   usdValue: string;
-  chain: 'Ethereum' | 'Tron';
+  chain: 'Ethereum' | 'Tron' | 'Solana' | 'Bitcoin';
   address?: string;
   decimals: number;
   isNative: boolean;
@@ -180,7 +180,7 @@ export class BalanceService {
         name: balance.name,
         balance: balance.balance,
         usdValue: balance.value_usd?.toString() || '0',
-        chain: this.mapChainName(balance.chain),
+        chain: this.mapChainName(balance.chain) as 'Ethereum' | 'Tron' | 'Solana' | 'Bitcoin',
         address: balance.address,
         decimals: balance.decimals,
         isNative: balance.isNative,
