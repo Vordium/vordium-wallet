@@ -86,27 +86,27 @@ export class WalletConnectService {
       console.log('WalletConnect connected:', session);
       // Convert session to our DAppSession format
       const dappSession: DAppSession = {
-        topic: session.topic,
-        peer: session.peer,
-        namespaces: session.namespaces,
-        expiry: session.expiry
+        topic: (session as any).topic || '',
+        peer: (session as any).peer || { metadata: { name: 'Unknown DApp', description: '', url: '', icons: [] } },
+        namespaces: (session as any).namespaces || {},
+        expiry: (session as any).expiry || Date.now() + 86400000 // 24 hours from now
       };
       this.addSession(dappSession);
     });
 
     this.provider.on('disconnect', (session) => {
       console.log('WalletConnect disconnected:', session);
-      this.removeSession(session.topic);
+      this.removeSession((session as any).topic || '');
     });
 
     this.provider.on('session_update', (session) => {
       console.log('WalletConnect session updated:', session);
       // Convert session to our DAppSession format
       const dappSession: DAppSession = {
-        topic: session.topic,
-        peer: session.peer,
-        namespaces: session.namespaces,
-        expiry: session.expiry
+        topic: (session as any).topic || '',
+        peer: (session as any).peer || { metadata: { name: 'Unknown DApp', description: '', url: '', icons: [] } },
+        namespaces: (session as any).namespaces || {},
+        expiry: (session as any).expiry || Date.now() + 86400000 // 24 hours from now
       };
       this.updateSession(dappSession);
     });
