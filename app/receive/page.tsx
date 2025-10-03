@@ -22,17 +22,25 @@ function ReceivePageContent() {
 
   const evmAccount = accounts.find(a => a.chain === 'EVM');
   const tronAccount = accounts.find(a => a.chain === 'TRON');
+  const bitcoinAccount = accounts.find(a => a.chain === 'BITCOIN');
+  const solanaAccount = accounts.find(a => a.chain === 'SOLANA');
 
   useEffect(() => {
     loadTokens();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [evmAccount, tronAccount]);
+  }, [evmAccount, tronAccount, bitcoinAccount, solanaAccount]);
 
   async function loadTokens() {
-    if (!evmAccount || !tronAccount) return;
+    if (!evmAccount || !tronAccount || !bitcoinAccount || !solanaAccount) return;
 
     try {
-      const allTokens = await BalanceService.getAllTokens(evmAccount.address, tronAccount.address);
+      const addresses = {
+        ethereum: evmAccount.address,
+        tron: tronAccount.address,
+        bitcoin: bitcoinAccount.address,
+        solana: solanaAccount.address,
+      };
+      const allTokens = await BalanceService.getAllTokensMultiChain(addresses);
       setTokens(allTokens);
 
       const tokenSymbol = searchParams.get('token');
