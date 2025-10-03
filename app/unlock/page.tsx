@@ -5,6 +5,8 @@ import { useRouter } from 'next/navigation';
 import { Eye, EyeOff } from 'lucide-react';
 import { CryptoService } from '@/services/crypto.service';
 import { useWalletStore } from '@/store/walletStore';
+import { BiometricAuth } from '@/components/BiometricAuth';
+import { biometricService } from '@/services/biometric.service';
 
 export default function UnlockPage() {
   const router = useRouter();
@@ -13,6 +15,8 @@ export default function UnlockPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [authMethod, setAuthMethod] = useState<'biometric' | 'password'>('biometric');
+  const [biometricEnrolled, setBiometricEnrolled] = useState(false);
 
   useEffect(() => {
     const vault = localStorage.getItem('vordium_vault');
@@ -22,8 +26,41 @@ export default function UnlockPage() {
       router.replace('/');
     } else if (unlocked) {
       router.replace('/dashboard');
+    } else {
+      // Check if biometric is enrolled
+      checkBiometricStatus();
     }
   }, [router]);
+
+  const checkBiometricStatus = async () => {
+    try {
+      const enrolled = await biometricService.isBiometricEnrolled();
+      setBiometricEnrolled(enrolled);
+      if (!enrolled) {
+        setAuthMethod('password');
+      }
+    } catch (err) {
+      console.error('Failed to check biometric status:', err);
+      setAuthMethod('password');
+    }
+  };
+
+  const handleBiometricSuccess = async () => {
+    // For biometric auth, we need to get the password from secure storage
+    // In a real implementation, this would be stored securely
+    const storedPassword = localStorage.getItem('vordium_password');
+    if (storedPassword) {
+      setPassword(storedPassword);
+      await handleUnlock();
+    } else {
+      setError('Password not found. Please use password authentication.');
+      setAuthMethod('password');
+    }
+  };
+
+  const handleBiometricFallback = () => {
+    setAuthMethod('password');
+  };
 
   async function handleUnlock() {
     if (!password) {
@@ -76,38 +113,74 @@ export default function UnlockPage() {
           <p className="text-gray-400 mt-1">Unlock your wallet to continue</p>
         </div>
 
-        {/* Password Input */}
-        <div className="space-y-2">
-          <label className="text-sm font-medium text-white">Password</label>
-          <div className="relative">
-            <input
-              type={showPassword ? 'text' : 'password'}
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              onKeyPress={(e) => e.key === 'Enter' && handleUnlock()}
-              placeholder="Enter your password"
-              className="w-full border border-gray-600 bg-gray-700 text-white rounded-lg p-4 pr-12 focus:outline-none focus:ring-2 focus:ring-gray-500"
-              autoFocus
-            />
+        {/* Authentication Method Toggle */}
+        {biometricEnrolled && (
+          <div className="flex bg-gray-700 rounded-lg p-1">
             <button
-              type="button"
-              onClick={() => setShowPassword(!showPassword)}
-              className="absolute right-3 top-1/2 -translate-y-1/2 p-1 text-gray-400 hover:text-gray-300"
+              onClick={() => setAuthMethod('biometric')}
+              className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition ${
+                authMethod === 'biometric'
+                  ? 'bg-gray-600 text-white'
+                  : 'text-gray-400 hover:text-white'
+              }`}
             >
-              {showPassword ? '🙈' : '👁️'}
+              Biometric
+            </button>
+            <button
+              onClick={() => setAuthMethod('password')}
+              className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition ${
+                authMethod === 'password'
+                  ? 'bg-gray-600 text-white'
+                  : 'text-gray-400 hover:text-white'
+              }`}
+            >
+              Password
             </button>
           </div>
-          {error && <p className="text-sm text-gray-400">{error}</p>}
-        </div>
+        )}
 
-        {/* Unlock Button */}
-        <button
-          onClick={handleUnlock}
-          disabled={loading}
-          className="w-full h-14 bg-gray-600 hover:bg-gray-500 disabled:opacity-50 text-white rounded-xl font-semibold transition transform hover:scale-[1.02] active:scale-[0.98]"
-        >
-          {loading ? 'Unlocking...' : 'Unlock Wallet'}
-        </button>
+        {/* Biometric Authentication */}
+        {authMethod === 'biometric' && biometricEnrolled ? (
+          <BiometricAuth
+            onSuccess={handleBiometricSuccess}
+            onFallback={handleBiometricFallback}
+          />
+        ) : (
+          <>
+            {/* Password Input */}
+            <div className="space-y-2">
+              <label className="text-sm font-medium text-white">Password</label>
+              <div className="relative">
+                <input
+                  type={showPassword ? 'text' : 'password'}
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  onKeyPress={(e) => e.key === 'Enter' && handleUnlock()}
+                  placeholder="Enter your password"
+                  className="w-full border border-gray-600 bg-gray-700 text-white rounded-lg p-4 pr-12 focus:outline-none focus:ring-2 focus:ring-gray-500"
+                  autoFocus
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 p-1 text-gray-400 hover:text-gray-300"
+                >
+                  {showPassword ? '🙈' : '👁️'}
+                </button>
+              </div>
+              {error && <p className="text-sm text-gray-400">{error}</p>}
+            </div>
+
+            {/* Unlock Button */}
+            <button
+              onClick={handleUnlock}
+              disabled={loading}
+              className="w-full h-14 bg-gray-600 hover:bg-gray-500 disabled:opacity-50 text-white rounded-xl font-semibold transition transform hover:scale-[1.02] active:scale-[0.98]"
+            >
+              {loading ? 'Unlocking...' : 'Unlock Wallet'}
+            </button>
+          </>
+        )}
 
         {/* Reset Warning */}
         <div className="text-center">

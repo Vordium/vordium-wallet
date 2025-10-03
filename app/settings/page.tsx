@@ -7,6 +7,8 @@ import { ArrowLeftIcon, ShieldIcon, WalletIcon, BellIcon, GlobeIcon, LockIcon, K
 import { useWalletStore } from '@/store/walletStore';
 import { BackupModal } from '@/components/BackupModal';
 import { PrivateKeyExportModal } from '@/components/PrivateKeyExportModal';
+import { BiometricSetupModal } from '@/components/BiometricSetupModal';
+import { biometricService } from '@/services/biometric.service';
 
 interface SecuritySettings {
   pinEnabled: boolean;
@@ -44,6 +46,8 @@ export default function SettingsPage() {
   const [showConfirmPin, setShowConfirmPin] = useState(false);
   const [showBackupModal, setShowBackupModal] = useState(false);
   const [showPrivateKeyModal, setShowPrivateKeyModal] = useState(false);
+  const [showBiometricSetup, setShowBiometricSetup] = useState(false);
+  const [biometricEnrolled, setBiometricEnrolled] = useState(false);
 
   const [security, setSecurity] = useState<SecuritySettings>({
     pinEnabled: false,
@@ -77,7 +81,19 @@ export default function SettingsPage() {
     if (savedSecurity) setSecurity(JSON.parse(savedSecurity));
     if (savedPrivacy) setPrivacy(JSON.parse(savedPrivacy));
     if (savedDisplay) setDisplay(JSON.parse(savedDisplay));
+
+    // Check biometric enrollment status
+    checkBiometricStatus();
   }, []);
+
+  const checkBiometricStatus = async () => {
+    try {
+      const enrolled = await biometricService.isBiometricEnrolled();
+      setBiometricEnrolled(enrolled);
+    } catch (err) {
+      console.error('Failed to check biometric status:', err);
+    }
+  };
 
   const saveSettings = (type: 'security' | 'privacy' | 'display', data: any) => {
     localStorage.setItem(`vordium-${type}-settings`, JSON.stringify(data));
@@ -122,6 +138,16 @@ export default function SettingsPage() {
       evm: evmAccount?.privateKey,
       tron: tronAccount?.privateKey
     };
+  };
+
+  const handleBiometricSetup = () => {
+    setShowBiometricSetup(true);
+  };
+
+  const handleBiometricSuccess = () => {
+    setSecurity(prev => ({ ...prev, biometricEnabled: true }));
+    saveSettings('security', { ...security, biometricEnabled: true });
+    setBiometricEnrolled(true);
   };
 
   const toggleSetting = (type: 'security' | 'privacy' | 'display', key: string) => {
@@ -237,6 +263,14 @@ export default function SettingsPage() {
                 subtitle={security.pinEnabled ? "PIN is enabled" : "Add an extra layer of security"}
                 value={security.pinEnabled}
                 onPress={() => setShowPinSetup(true)}
+              />
+              
+              <SettingItem
+                icon={<ShieldIcon className="w-5 h-5 text-gray-300" />}
+                title="Biometric Authentication"
+                subtitle={biometricEnrolled ? "Fingerprint/Face ID enabled" : "Use biometric authentication"}
+                value={biometricEnrolled}
+                onPress={handleBiometricSetup}
               />
               
               <SettingItem
@@ -577,6 +611,13 @@ export default function SettingsPage() {
         isOpen={showPrivateKeyModal}
         onClose={() => setShowPrivateKeyModal(false)}
         privateKeys={getPrivateKeys()}
+      />
+
+      {/* Biometric Setup Modal */}
+      <BiometricSetupModal
+        isOpen={showBiometricSetup}
+        onClose={() => setShowBiometricSetup(false)}
+        onSuccess={handleBiometricSuccess}
       />
     </div>
   );
