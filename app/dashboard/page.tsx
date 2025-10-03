@@ -12,6 +12,7 @@ import { WalletImportModal } from '@/components/WalletImportModal';
 import { BalanceService, type TokenBalance } from '@/services/balance.service';
 import { NotificationCenter, useNotifications } from '@/components/NotificationSystem';
 import { PageSkeleton, BalanceCardSkeleton, TokenRowSkeleton } from '@/components/ui/Skeleton';
+import { APITestComponent } from '@/components/APITestComponent';
 import { getTrustWalletLogo, NATIVE_LOGOS } from '@/lib/tokenLogos';
 import { 
   SettingsIcon, 
@@ -168,6 +169,9 @@ export default function DashboardPage() {
 
       {/* Main Card Container */}
       <div className="p-4">
+        {/* API Test Component */}
+        <APITestComponent />
+        
         <div className="bg-gray-800 rounded-2xl shadow-lg p-6 mb-6">
           {/* Total Balance */}
           <div className="text-center py-6">
