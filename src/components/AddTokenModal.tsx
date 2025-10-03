@@ -5,6 +5,7 @@ import { ethers } from 'ethers';
 import TronWeb from 'tronweb';
 import { useWalletStore } from '@/store/walletStore';
 import { TokenSearchService, type TokenSearchResult } from '@/services/tokenSearch.service';
+import { EnhancedTokenSearchService, type EnhancedTokenSearchResult } from '@/services/enhancedTokenSearch.service';
 import { SearchIcon, PlusIcon, ArrowLeftIcon } from './icons/GrayIcons';
 import { ModalSkeleton, FormInputSkeleton } from './ui/Skeleton';
 import Image from 'next/image';
@@ -12,7 +13,7 @@ import Image from 'next/image';
 export function AddTokenModal({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) {
   const [searchQuery, setSearchQuery] = useState('');
   const [searching, setSearching] = useState(false);
-  const [searchResults, setSearchResults] = useState<TokenSearchResult[]>([]);
+  const [searchResults, setSearchResults] = useState<EnhancedTokenSearchResult[]>([]);
   const [customAddress, setCustomAddress] = useState('');
   const [selectedChain, setSelectedChain] = useState<'Ethereum' | 'Tron' | 'Solana' | 'Bitcoin'>('Ethereum');
   const [successMessage, setSuccessMessage] = useState('');
@@ -20,19 +21,38 @@ export function AddTokenModal({ isOpen, onClose }: { isOpen: boolean; onClose: (
   const addToken = useWalletStore(state => state.addToken);
   const accounts = useWalletStore(state => state.accounts);
 
-  // Search tokens using comprehensive service
+  // Search tokens using enhanced service with live API data
   useEffect(() => {
     if (searchQuery.length < 2) {
       setSearchResults([]);
       return;
     }
 
-    const results = TokenSearchService.searchTokens(searchQuery, selectedChain);
-    setSearchResults(results);
+    setSearching(true);
+    EnhancedTokenSearchService.searchTokens(searchQuery, selectedChain)
+      .then(results => {
+        setSearchResults(results);
+        setSearching(false);
+      })
+      .catch(error => {
+        console.error('Error searching tokens:', error);
+        // Fallback to static search
+        const staticResults = TokenSearchService.searchTokens(searchQuery, selectedChain);
+        setSearchResults(staticResults.map(result => ({
+          symbol: result.symbol,
+          name: result.name,
+          address: result.address,
+          chain: result.chain,
+          decimals: result.decimals,
+          logo: result.logo,
+          verified: result.verified,
+        })));
+        setSearching(false);
+      });
   }, [searchQuery, selectedChain]);
 
   // Add token from search
-  async function handleAddToken(token: TokenSearchResult) {
+  async function handleAddToken(token: EnhancedTokenSearchResult) {
     try {
       setSearching(true);
       

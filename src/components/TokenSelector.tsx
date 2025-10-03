@@ -5,6 +5,7 @@ import { SearchIcon, ArrowLeftIcon } from './icons/GrayIcons';
 import { type TokenBalance } from '@/services/balance.service';
 import { FormInputSkeleton } from './ui/Skeleton';
 import { TokenSearchService, type TokenSearchResult } from '@/services/tokenSearch.service';
+import { EnhancedTokenSearchService, type EnhancedTokenSearchResult } from '@/services/enhancedTokenSearch.service';
 
 interface TokenSelectorProps {
   isOpen: boolean;
@@ -25,7 +26,7 @@ export function TokenSelector({
 }: TokenSelectorProps) {
   const [searchQuery, setSearchQuery] = useState('');
   const [filteredTokens, setFilteredTokens] = useState<TokenBalance[]>([]);
-  const [searchResults, setSearchResults] = useState<TokenSearchResult[]>([]);
+  const [searchResults, setSearchResults] = useState<EnhancedTokenSearchResult[]>([]);
   const [isSearching, setIsSearching] = useState(false);
 
   useEffect(() => {
@@ -37,12 +38,29 @@ export function TokenSelector({
         token.name.toLowerCase().includes(searchQuery.toLowerCase())
       );
       
-      // Get search results from TokenSearchService
-      const popularResults = TokenSearchService.searchTokens(searchQuery);
-      
-      setSearchResults(popularResults);
-      setFilteredTokens(dashboardFiltered);
-      setIsSearching(false);
+      // Get search results from Enhanced TokenSearchService
+      EnhancedTokenSearchService.searchTokens(searchQuery)
+        .then(popularResults => {
+          setSearchResults(popularResults);
+          setFilteredTokens(dashboardFiltered);
+          setIsSearching(false);
+        })
+        .catch(error => {
+          console.error('Error searching tokens:', error);
+          // Fallback to static search
+          const staticResults = TokenSearchService.searchTokens(searchQuery);
+          setSearchResults(staticResults.map(result => ({
+            symbol: result.symbol,
+            name: result.name,
+            address: result.address,
+            chain: result.chain,
+            decimals: result.decimals,
+            logo: result.logo,
+            verified: result.verified,
+          })));
+          setFilteredTokens(dashboardFiltered);
+          setIsSearching(false);
+        });
     } else {
       setFilteredTokens(tokens);
       setSearchResults([]);
@@ -54,8 +72,8 @@ export function TokenSelector({
     onClose();
   };
 
-  const handleSelectSearchResult = (searchResult: TokenSearchResult) => {
-    // Convert TokenSearchResult to TokenBalance format
+  const handleSelectSearchResult = (searchResult: EnhancedTokenSearchResult) => {
+    // Convert EnhancedTokenSearchResult to TokenBalance format
     const tokenBalance: TokenBalance = {
       symbol: searchResult.symbol,
       name: searchResult.name,
