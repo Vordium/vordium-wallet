@@ -179,11 +179,18 @@ export const useWalletStore = create<WalletState>()(
       
       // Token management
       addToken: (token) => {
+        console.log('Store addToken called with:', token);
         const tokens = get().getTokens();
+        console.log('Current tokens in store:', tokens);
         const exists = tokens.some(t => t.address === token.address && t.chain === token.chain);
+        console.log('Token exists:', exists);
         if (!exists) {
           const newTokens = [...tokens, token];
+          console.log('Adding token, new tokens:', newTokens);
           localStorage.setItem('vordium-tokens', JSON.stringify(newTokens));
+          console.log('Token added to localStorage');
+        } else {
+          console.log('Token already exists, not adding');
         }
       },
       removeToken: (tokenAddress, chain) => {

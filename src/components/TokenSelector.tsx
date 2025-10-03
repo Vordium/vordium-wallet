@@ -38,16 +38,33 @@ export function TokenSelector({
         token.name.toLowerCase().includes(searchQuery.toLowerCase())
       );
       
-      // Get search results from Enhanced TokenSearchService
+      // Try Enhanced TokenSearchService first, fallback to static search
       EnhancedTokenSearchService.searchTokens(searchQuery)
         .then(popularResults => {
-          setSearchResults(popularResults);
+          console.log('Enhanced search results:', popularResults);
+          if (popularResults && popularResults.length > 0) {
+            setSearchResults(popularResults);
+          } else {
+            // Fallback to static search if no results
+            console.log('No enhanced results, using static search');
+            const staticResults = TokenSearchService.searchTokens(searchQuery);
+            setSearchResults(staticResults.map(result => ({
+              symbol: result.symbol,
+              name: result.name,
+              address: result.address,
+              chain: result.chain,
+              decimals: result.decimals,
+              logo: result.logo,
+              verified: result.verified,
+            })));
+          }
           setFilteredTokens(dashboardFiltered);
           setIsSearching(false);
         })
         .catch(error => {
           console.error('Error searching tokens:', error);
           // Fallback to static search
+          console.log('Enhanced search failed, using static search');
           const staticResults = TokenSearchService.searchTokens(searchQuery);
           setSearchResults(staticResults.map(result => ({
             symbol: result.symbol,

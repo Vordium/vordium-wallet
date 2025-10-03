@@ -253,9 +253,11 @@ export class BalanceService {
       
       // Load balances for custom tokens
       const customTokenBalances = await this.loadCustomTokenBalances(customTokens, addresses);
+      console.log('Custom tokens loaded:', customTokenBalances);
       
       // Combine live tokens and custom tokens, avoiding duplicates
       const combinedTokens: TokenBalance[] = [...liveTokens];
+      console.log('Live tokens:', liveTokens);
       
       for (const customToken of customTokenBalances) {
         // Skip if already exists in live tokens
@@ -264,10 +266,14 @@ export class BalanceService {
           t.chain === customToken.chain && 
           (t.address || '') === (customToken.address || '')
         )) {
+          console.log('Adding custom token to combined tokens:', customToken);
           combinedTokens.push(customToken);
+        } else {
+          console.log('Custom token already exists in live tokens:', customToken);
         }
       }
       
+      console.log('Final combined tokens:', combinedTokens);
       return combinedTokens;
     } catch (error) {
       console.error('Failed to load multi-chain tokens:', error);

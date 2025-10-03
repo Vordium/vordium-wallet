@@ -31,11 +31,28 @@ export function AddTokenModal({ isOpen, onClose }: { isOpen: boolean; onClose: (
     setSearching(true);
     EnhancedTokenSearchService.searchTokens(searchQuery, selectedChain)
       .then(results => {
-        setSearchResults(results);
+        console.log('AddTokenModal enhanced search results:', results);
+        if (results && results.length > 0) {
+          setSearchResults(results);
+        } else {
+          // Fallback to static search if no results
+          console.log('No enhanced results, using static search');
+          const staticResults = TokenSearchService.searchTokens(searchQuery, selectedChain);
+          setSearchResults(staticResults.map(result => ({
+            symbol: result.symbol,
+            name: result.name,
+            address: result.address,
+            chain: result.chain,
+            decimals: result.decimals,
+            logo: result.logo,
+            verified: result.verified,
+          })));
+        }
         setSearching(false);
       })
       .catch(error => {
         console.error('Error searching tokens:', error);
+        console.log('Enhanced search failed, using static search');
         // Fallback to static search
         const staticResults = TokenSearchService.searchTokens(searchQuery, selectedChain);
         setSearchResults(staticResults.map(result => ({
