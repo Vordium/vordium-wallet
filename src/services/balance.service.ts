@@ -2,7 +2,7 @@
 
 import { ethers } from 'ethers';
 import TronWeb from 'tronweb';
-import { tokenService } from './token.service';
+import { tokenService, type TokenBalance as TokenServiceBalance } from './token.service';
 
 export interface TokenBalance {
   symbol: string;
@@ -172,7 +172,7 @@ export class BalanceService {
   // New method using comprehensive token service
   static async getAllTokensMultiChain(addresses: { [chain: string]: string }): Promise<TokenBalance[]> {
     try {
-      const allBalances = await tokenService.getTokenBalances(addresses.ethereum || addresses.eth || '');
+      const allBalances: TokenServiceBalance[] = await tokenService.getTokenBalances(addresses.ethereum || addresses.eth || '');
       
       // Convert to our TokenBalance format
       return allBalances.map(balance => ({
