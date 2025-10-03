@@ -212,11 +212,8 @@ export class WalletConnectService {
     }
 
     try {
-      if (sessionTopic) {
-        await this.provider.disconnect({ topic: sessionTopic });
-      } else {
-        await this.provider.disconnect();
-      }
+      // WalletConnect v2 disconnect method doesn't accept parameters
+      await this.provider.disconnect();
     } catch (error) {
       console.error('Failed to disconnect:', error);
       throw error;
