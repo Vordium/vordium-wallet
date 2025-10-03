@@ -265,7 +265,8 @@ export class WalletConnectService {
 
     try {
       const chainId = await this.provider.request({ method: 'eth_chainId' });
-      return parseInt(chainId as string, 16);
+      const chainIdString = typeof chainId === 'string' ? chainId : String(chainId);
+      return parseInt(chainIdString, 16);
     } catch (error) {
       console.error('Failed to get chain ID:', error);
       return 1; // Default to Ethereum mainnet
