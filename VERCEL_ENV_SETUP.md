@@ -4,10 +4,12 @@
 
 Add these environment variables in your Vercel dashboard:
 
+> **⚠️ Important**: For client-side components (like token search), environment variables must be prefixed with `NEXT_PUBLIC_` to be accessible in the browser. The configuration supports both prefixed and non-prefixed versions for maximum compatibility.
+
 ### 1. **Moralis API** (For EVM token data, logos, and prices)
 ```
-MORALIS_API_KEY=your_moralis_api_key_here
-MORALIS_API_URL=https://deep-index.moralis.io/api/v2
+NEXT_PUBLIC_MORALIS_API_KEY=your_moralis_api_key_here
+NEXT_PUBLIC_MORALIS_API_URL=https://deep-index.moralis.io/api/v2
 ```
 
 **How to get Moralis API Key:**
@@ -19,8 +21,8 @@ MORALIS_API_URL=https://deep-index.moralis.io/api/v2
 
 ### 2. **Helius API** (For Solana blockchain data)
 ```
-HELIUS_API_KEY=your_helius_api_key_here
-HELIUS_API_URL=https://api.helius.xyz/v0
+NEXT_PUBLIC_HELIUS_API_KEY=your_helius_api_key_here
+NEXT_PUBLIC_HELIUS_API_URL=https://api.helius.xyz/v0
 ```
 
 **How to get Helius API Key:**
@@ -32,8 +34,8 @@ HELIUS_API_URL=https://api.helius.xyz/v0
 
 ### 3. **CoinGecko API** (For additional token data and prices)
 ```
-COINGECKO_API_KEY=your_coingecko_api_key_here
-COINGECKO_API_URL=https://api.coingecko.com/api/v3
+NEXT_PUBLIC_COINGECKO_API_KEY=your_coingecko_api_key_here
+NEXT_PUBLIC_COINGECKO_API_URL=https://api.coingecko.com/api/v3
 ```
 
 **How to get CoinGecko API Key:**
@@ -45,7 +47,7 @@ COINGECKO_API_URL=https://api.coingecko.com/api/v3
 
 ### 4. **WalletConnect** (For DApp connections)
 ```
-WALLETCONNECT_PROJECT_ID=your_walletconnect_project_id_here
+NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID=your_walletconnect_project_id_here
 ```
 
 **How to get WalletConnect Project ID:**

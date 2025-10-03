@@ -6,28 +6,28 @@
 export const API_CONFIG = {
   // Moralis API - For token data, logos, and live prices
   MORALIS: {
-    API_KEY: process.env.MORALIS_API_KEY || '',
-    API_URL: process.env.MORALIS_API_URL || 'https://deep-index.moralis.io/api/v2',
-    ENABLED: !!process.env.MORALIS_API_KEY,
+    API_KEY: process.env.NEXT_PUBLIC_MORALIS_API_KEY || process.env.MORALIS_API_KEY || '',
+    API_URL: process.env.NEXT_PUBLIC_MORALIS_API_URL || process.env.MORALIS_API_URL || 'https://deep-index.moralis.io/api/v2',
+    ENABLED: !!(process.env.NEXT_PUBLIC_MORALIS_API_KEY || process.env.MORALIS_API_KEY),
   },
   
   // Helius API - For Solana blockchain data
   HELIUS: {
-    API_KEY: process.env.HELIUS_API_KEY || '',
-    API_URL: process.env.HELIUS_API_URL || 'https://api.helius.xyz/v0',
-    ENABLED: !!process.env.HELIUS_API_KEY,
+    API_KEY: process.env.NEXT_PUBLIC_HELIUS_API_KEY || process.env.HELIUS_API_KEY || '',
+    API_URL: process.env.NEXT_PUBLIC_HELIUS_API_URL || process.env.HELIUS_API_URL || 'https://api.helius.xyz/v0',
+    ENABLED: !!(process.env.NEXT_PUBLIC_HELIUS_API_KEY || process.env.HELIUS_API_KEY),
   },
   
   // CoinGecko API - For additional token data and prices
   COINGECKO: {
-    API_KEY: process.env.COINGECKO_API_KEY || '',
-    API_URL: process.env.COINGECKO_API_URL || 'https://api.coingecko.com/api/v3',
-    ENABLED: !!process.env.COINGECKO_API_KEY,
+    API_KEY: process.env.NEXT_PUBLIC_COINGECKO_API_KEY || process.env.COINGECKO_API_KEY || '',
+    API_URL: process.env.NEXT_PUBLIC_COINGECKO_API_URL || process.env.COINGECKO_API_URL || 'https://api.coingecko.com/api/v3',
+    ENABLED: !!(process.env.NEXT_PUBLIC_COINGECKO_API_KEY || process.env.COINGECKO_API_KEY),
   },
   
   // WalletConnect Configuration
   WALLETCONNECT: {
-    PROJECT_ID: process.env.WALLETCONNECT_PROJECT_ID || '',
+    PROJECT_ID: process.env.NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID || process.env.WALLETCONNECT_PROJECT_ID || '',
   },
   
   // App Configuration
