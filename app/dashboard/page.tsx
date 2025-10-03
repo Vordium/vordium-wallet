@@ -45,6 +45,7 @@ export default function DashboardPage() {
   const [showWalletModal, setShowWalletModal] = useState(false);
   const [showImportWallet, setShowImportWallet] = useState(false);
   const [mounted, setMounted] = useState(false);
+  const [activeTab, setActiveTab] = useState<'tokens' | 'nfts' | 'portfolio'>('tokens');
 
   const evmAccount = accounts.find(a => a.chain === 'EVM');
   const tronAccount = accounts.find(a => a.chain === 'TRON');
@@ -172,7 +173,7 @@ export default function DashboardPage() {
           </div>
 
         {/* Action Buttons */}
-          <div className="grid grid-cols-4 gap-3">
+          <div className="grid grid-cols-3 gap-3">
             <button
               onClick={() => router.push('/send')}
               className="flex flex-col items-center gap-2 py-4 bg-gray-700 rounded-2xl hover:bg-gray-600 active:scale-95 transition border border-gray-600"
@@ -198,58 +199,51 @@ export default function DashboardPage() {
             </button>
             
             <button
-              onClick={() => router.push('/portfolio')}
-              className="flex flex-col items-center gap-2 py-4 bg-gray-700 rounded-2xl hover:bg-gray-600 active:scale-95 transition border border-gray-600"
-            >
-              <TrendingUpIcon className="w-6 h-6 text-gray-300" />
-              <span className="text-sm font-semibold text-gray-300">Portfolio</span>
-            </button>
-            
-            <button
-              onClick={() => router.push('/defi')}
-              className="flex flex-col items-center gap-2 py-4 bg-gray-700 rounded-2xl hover:bg-gray-600 active:scale-95 transition border border-gray-600"
-            >
-              <LockIcon className="w-6 h-6 text-gray-300" />
-              <span className="text-sm font-semibold text-gray-300">DeFi</span>
-            </button>
-            
-            <button
-              onClick={() => router.push('/nfts')}
-              className="flex flex-col items-center gap-2 py-4 bg-gray-700 rounded-2xl hover:bg-gray-600 active:scale-95 transition border border-gray-600"
-            >
-              <EyeIcon className="w-6 h-6 text-gray-300" />
-              <span className="text-sm font-semibold text-gray-300">NFTs</span>
-            </button>
-            
-            <button
               onClick={() => router.push('/swap')}
               className="flex flex-col items-center gap-2 py-4 bg-gray-700 rounded-2xl hover:bg-gray-600 active:scale-95 transition border border-gray-600"
             >
               <SwapIcon className="w-6 h-6 text-gray-300" />
               <span className="text-sm font-semibold text-gray-300">Swap</span>
             </button>
-            <button
-              onClick={() => router.push('/alerts')}
-              className="flex flex-col items-center gap-2 py-4 bg-gray-700 rounded-2xl hover:bg-gray-600 active:scale-95 transition border border-gray-600"
-            >
-              <BellIcon className="w-6 h-6 text-gray-300" />
-              <span className="text-sm font-semibold text-gray-300">Alerts</span>
-            </button>
-            <button
-              onClick={() => router.push('/connections')}
-              className="flex flex-col items-center gap-2 py-4 bg-gray-700 rounded-2xl hover:bg-gray-600 active:scale-95 transition border border-gray-600"
-            >
-              <GlobeIcon className="w-6 h-6 text-gray-300" />
-              <span className="text-sm font-semibold text-gray-300">DApps</span>
-            </button>
           </div>
         </div>
       </div>
 
-      {/* Tokens Section */}
+      {/* Tabs Section */}
       <div className="px-4">
         <div className="flex items-center justify-between mb-4">
-          <h2 className="text-2xl font-bold text-white">Tokens</h2>
+          <div className="flex space-x-1 bg-gray-800 rounded-lg p-1">
+            <button
+              onClick={() => setActiveTab('tokens')}
+              className={`px-4 py-2 rounded-md text-sm font-medium transition ${
+                activeTab === 'tokens'
+                  ? 'bg-gray-700 text-white'
+                  : 'text-gray-400 hover:text-white'
+              }`}
+            >
+              Tokens
+            </button>
+            <button
+              onClick={() => setActiveTab('nfts')}
+              className={`px-4 py-2 rounded-md text-sm font-medium transition ${
+                activeTab === 'nfts'
+                  ? 'bg-gray-700 text-white'
+                  : 'text-gray-400 hover:text-white'
+              }`}
+            >
+              NFTs
+            </button>
+            <button
+              onClick={() => setActiveTab('portfolio')}
+              className={`px-4 py-2 rounded-md text-sm font-medium transition ${
+                activeTab === 'portfolio'
+                  ? 'bg-gray-700 text-white'
+                  : 'text-gray-400 hover:text-white'
+              }`}
+            >
+              Portfolio
+            </button>
+          </div>
           <div className="flex gap-2">
             <button
               onClick={() => loadWalletData()}
@@ -264,43 +258,95 @@ export default function DashboardPage() {
           </div>
         </div>
 
-        {loading ? (
-          <div className="space-y-1">
-            {[1, 2, 3, 4, 5].map(i => (
-              <TokenRowSkeleton key={i} />
-            ))}
-          </div>
-        ) : tokens.length === 0 ? (
+        {/* Tab Content */}
+        {activeTab === 'tokens' && (
+          <>
+            {loading ? (
+              <div className="space-y-1">
+                {[1, 2, 3, 4, 5].map(i => (
+                  <TokenRowSkeleton key={i} />
+                ))}
+              </div>
+            ) : tokens.length === 0 ? (
+              <div className="text-center py-12 text-gray-400">
+                <p className="text-lg">No tokens found</p>
+                <p className="text-sm mt-2">Receive crypto to get started</p>
+              </div>
+            ) : (
+              <div className="space-y-1">
+                {tokens.map((token) => {
+                  // Use token's icon property directly from BalanceService (which now uses CoinGecko)
+                  const logoUrl = token.icon || `https://via.placeholder.com/48/6B7280/FFFFFF?text=${token.symbol.charAt(0)}`;
+                  
+                  return (
+                    <TokenRow
+                      key={`${token.chain}-${token.symbol}-${token.address || 'native'}`}
+                      token={token}
+                      logoUrl={logoUrl}
+                      onClick={() => router.push(`/token/${token.chain.toLowerCase()}/${token.address || 'native'}/${token.symbol}`)}
+                    />
+                  );
+                })}
+              </div>
+            )}
+
+            {/* Add Token */}
+            <button
+              onClick={() => setShowAddToken(true)}
+              className="w-full mt-4 py-4 border-2 border-dashed border-gray-600 rounded-2xl text-gray-400 font-semibold hover:bg-gray-700 hover:text-gray-300 transition flex items-center justify-center gap-2"
+            >
+              <PlusIcon className="w-5 h-5" />
+              Add Token
+            </button>
+          </>
+        )}
+
+        {activeTab === 'nfts' && (
           <div className="text-center py-12 text-gray-400">
-            <p className="text-lg">No tokens found</p>
-            <p className="text-sm mt-2">Receive crypto to get started</p>
-          </div>
-        ) : (
-          <div className="space-y-1">
-            {tokens.map((token) => {
-              // Use token's icon property directly from BalanceService (which now uses CoinGecko)
-              const logoUrl = token.icon || `https://via.placeholder.com/48/6B7280/FFFFFF?text=${token.symbol.charAt(0)}`;
-              
-              return (
-                <TokenRow
-                  key={`${token.chain}-${token.symbol}-${token.address || 'native'}`}
-                  token={token}
-                  logoUrl={logoUrl}
-                  onClick={() => router.push(`/token/${token.chain.toLowerCase()}/${token.address || 'native'}/${token.symbol}`)}
-                />
-              );
-            })}
+            <EyeIcon className="w-16 h-16 mx-auto mb-4 text-gray-600" />
+            <p className="text-lg">No NFTs found</p>
+            <p className="text-sm mt-2">Your NFT collection will appear here</p>
           </div>
         )}
 
-        {/* Add Token */}
-        <button
-          onClick={() => setShowAddToken(true)}
-          className="w-full mt-4 py-4 border-2 border-dashed border-gray-600 rounded-2xl text-gray-400 font-semibold hover:bg-gray-700 hover:text-gray-300 transition flex items-center justify-center gap-2"
-        >
-          <PlusIcon className="w-5 h-5" />
-          Add Token
-        </button>
+        {activeTab === 'portfolio' && (
+          <div className="space-y-4">
+            {/* Portfolio Overview */}
+            <div className="bg-gray-800 rounded-2xl p-6">
+              <h3 className="text-lg font-semibold text-white mb-4">Portfolio Overview</h3>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <p className="text-sm text-gray-400">Total Value</p>
+                  <p className="text-2xl font-bold text-white">${totalBalance}</p>
+                </div>
+                <div>
+                  <p className="text-sm text-gray-400">24h Change</p>
+                  <p className={`text-2xl font-bold ${isPositive ? 'text-green-400' : 'text-red-400'}`}>
+                    {isPositive ? '+' : ''}${change24h.value}
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            {/* Price Alerts */}
+            <div className="bg-gray-800 rounded-2xl p-6">
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="text-lg font-semibold text-white">Price Alerts</h3>
+                <button
+                  onClick={() => router.push('/alerts')}
+                  className="text-blue-400 hover:text-blue-300 text-sm font-medium"
+                >
+                  Manage
+                </button>
+              </div>
+              <div className="text-center py-8 text-gray-400">
+                <BellIcon className="w-12 h-12 mx-auto mb-2 text-gray-600" />
+                <p className="text-sm">No price alerts set</p>
+                <p className="text-xs mt-1">Set alerts to track price movements</p>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Modals */}

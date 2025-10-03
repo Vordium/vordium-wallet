@@ -34,7 +34,7 @@ interface DisplaySettings {
 export default function SettingsPage() {
   const router = useRouter();
   const { wallets, accounts } = useWalletStore();
-  const [activeTab, setActiveTab] = useState<'security' | 'privacy' | 'display' | 'advanced'>('security');
+  const [activeTab, setActiveTab] = useState<'security' | 'privacy' | 'display' | 'advanced' | 'dapps'>('security');
   const [showResetConfirm, setShowResetConfirm] = useState(false);
   const [showPinSetup, setShowPinSetup] = useState(false);
   const [pin, setPin] = useState('');
@@ -205,6 +205,7 @@ export default function SettingsPage() {
             { id: 'security', label: 'Security', icon: <ShieldIcon className="w-4 h-4" /> },
             { id: 'privacy', label: 'Privacy', icon: <LockIcon className="w-4 h-4" /> },
             { id: 'display', label: 'Display', icon: <GlobeIcon className="w-4 h-4" /> },
+            { id: 'dapps', label: 'DApps', icon: <GlobeIcon className="w-4 h-4" /> },
             { id: 'advanced', label: 'Advanced', icon: <KeyIcon className="w-4 h-4" /> },
           ].map(tab => (
             <button
@@ -366,6 +367,48 @@ export default function SettingsPage() {
                 subtitle="Get notified of price changes"
                 value={display.priceAlerts}
                 onToggle={() => toggleSetting('display', 'priceAlerts')}
+              />
+            </div>
+          </div>
+        )}
+
+        {activeTab === 'dapps' && (
+          <div className="space-y-4">
+            <div className="bg-gray-800 rounded-xl p-4">
+              <h2 className="text-lg font-semibold text-white mb-4">DApp Connections</h2>
+              
+              <SettingItem
+                icon={<GlobeIcon className="w-5 h-5 text-gray-300" />}
+                title="Connected DApps"
+                subtitle="Manage your DApp connections"
+                onPress={() => router.push('/connections')}
+              />
+              
+              <SettingItem
+                icon={<BellIcon className="w-5 h-5 text-gray-300" />}
+                title="DApp Notifications"
+                subtitle="Get notified about DApp activities"
+                value={true}
+                onToggle={() => {}}
+              />
+            </div>
+
+            <div className="bg-gray-800 rounded-xl p-4">
+              <h2 className="text-lg font-semibold text-white mb-4">Browser Settings</h2>
+              
+              <SettingItem
+                icon={<GlobeIcon className="w-5 h-5 text-gray-300" />}
+                title="Open Browser"
+                subtitle="Access the in-wallet browser"
+                onPress={() => router.push('/browser')}
+              />
+              
+              <SettingItem
+                icon={<ShieldIcon className="w-5 h-5 text-gray-300" />}
+                title="Security Warnings"
+                subtitle="Show warnings for suspicious sites"
+                value={security.dappSecurity}
+                onToggle={() => toggleSetting('security', 'dappSecurity')}
               />
             </div>
           </div>

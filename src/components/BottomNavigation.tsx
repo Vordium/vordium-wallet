@@ -1,7 +1,7 @@
 'use client';
 
 import { useRouter, usePathname } from 'next/navigation';
-import { HomeIcon, BrowserIcon } from './icons/GrayIcons';
+import { HomeIcon, BrowserIcon, LockIcon } from './icons/GrayIcons';
 
 export function BottomNavigation() {
   const router = useRouter();
@@ -15,7 +15,7 @@ export function BottomNavigation() {
         {/* Home Button */}
         <button
           onClick={() => router.push('/dashboard')}
-          className={`flex flex-col items-center gap-1 py-3 px-6 rounded-lg transition ${
+          className={`flex flex-col items-center gap-1 py-3 px-4 rounded-lg transition ${
             isActive('/dashboard')
               ? 'bg-gray-700 text-white'
               : 'text-gray-400 hover:text-white hover:bg-gray-700'
@@ -25,10 +25,23 @@ export function BottomNavigation() {
           <span className="text-xs font-medium">Home</span>
         </button>
 
+        {/* DeFi Button */}
+        <button
+          onClick={() => router.push('/defi')}
+          className={`flex flex-col items-center gap-1 py-3 px-4 rounded-lg transition ${
+            isActive('/defi')
+              ? 'bg-gray-700 text-white'
+              : 'text-gray-400 hover:text-white hover:bg-gray-700'
+          }`}
+        >
+          <LockIcon className="w-6 h-6" />
+          <span className="text-xs font-medium">DeFi</span>
+        </button>
+
         {/* Browser Button */}
         <button
           onClick={() => router.push('/browser')}
-          className={`flex flex-col items-center gap-1 py-3 px-6 rounded-lg transition ${
+          className={`flex flex-col items-center gap-1 py-3 px-4 rounded-lg transition ${
             isActive('/browser')
               ? 'bg-gray-700 text-white'
               : 'text-gray-400 hover:text-white hover:bg-gray-700'
