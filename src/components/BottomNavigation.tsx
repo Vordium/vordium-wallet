@@ -38,22 +38,33 @@ export function BottomNavigation() {
           <span className="text-xs font-medium">Trending</span>
         </button>
 
-        {/* Swap Button - Center with Animation */}
+        {/* Swap Button - Center with Enhanced Animation */}
         <button
           onClick={() => router.push('/swap')}
-          className={`relative flex flex-col items-center gap-1 py-2 px-3 rounded-full transition-all duration-300 ${
+          className={`group relative flex items-center justify-center w-14 h-14 rounded-full transition-all duration-300 transform -translate-y-2 ${
             isActive('/swap')
-              ? 'bg-blue-600 text-white shadow-lg shadow-blue-600/50'
-              : 'bg-gray-700 text-gray-300 hover:bg-blue-600 hover:text-white hover:shadow-lg hover:shadow-blue-600/50'
+              ? 'bg-blue-600 text-white shadow-2xl shadow-blue-600/60 scale-110'
+              : 'bg-gray-700 text-gray-300 hover:bg-blue-600 hover:text-white hover:shadow-2xl hover:shadow-blue-600/60 hover:scale-110 hover:-translate-y-3'
           }`}
         >
-          <div className={`relative ${isActive('/swap') ? 'animate-pulse' : ''}`}>
-            <SwapIcon className="w-6 h-6" />
+          <div className={`relative z-10 ${isActive('/swap') ? 'animate-pulse' : ''}`}>
+            <SwapIcon className="w-7 h-7" />
             {isActive('/swap') && (
-              <div className="absolute inset-0 rounded-full bg-blue-400 opacity-20 animate-ping"></div>
+              <div className="absolute inset-0 rounded-full bg-blue-400 opacity-30 animate-ping"></div>
             )}
           </div>
-          <span className="text-xs font-medium">Swap</span>
+          {/* Enhanced glow effect */}
+          <div className={`absolute inset-0 rounded-full transition-all duration-300 ${
+            isActive('/swap')
+              ? 'bg-blue-400 opacity-20 animate-pulse'
+              : 'bg-blue-400 opacity-0 group-hover:opacity-20'
+          }`}></div>
+          {/* Additional outer glow */}
+          <div className={`absolute -inset-1 rounded-full transition-all duration-300 ${
+            isActive('/swap')
+              ? 'bg-blue-500 opacity-10 animate-pulse'
+              : 'bg-blue-500 opacity-0 group-hover:opacity-10'
+          }`}></div>
         </button>
 
         {/* DeFi Button */}
