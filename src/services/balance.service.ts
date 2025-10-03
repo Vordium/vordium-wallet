@@ -172,10 +172,11 @@ export class BalanceService {
   // New method using comprehensive token service
   static async getAllTokensMultiChain(addresses: { [chain: string]: string }): Promise<TokenBalance[]> {
     try {
+      // Get live token balances from APIs
       const allBalances: TokenServiceBalance[] = await tokenService.getTokenBalances(addresses.ethereum || addresses.eth || '');
       
       // Convert to our TokenBalance format
-      return allBalances.map(balance => ({
+      const liveTokens = allBalances.map(balance => ({
         symbol: balance.symbol,
         name: balance.name,
         balance: balance.balance,
@@ -187,11 +188,106 @@ export class BalanceService {
         logo: balance.logo || this.getTokenLogo(balance.symbol, balance.address),
         change24h: balance.change24h,
       }));
+
+      // Get custom tokens from localStorage
+      const getCustomTokens = () => {
+        try {
+          const stored = localStorage.getItem('vordium-tokens');
+          return stored ? JSON.parse(stored) : [];
+        } catch {
+          return [];
+        }
+      };
+
+      const customTokens = getCustomTokens();
+      
+      // Load balances for custom tokens
+      const customTokenBalances = await this.loadCustomTokenBalances(customTokens, addresses);
+      
+      // Combine live tokens and custom tokens, avoiding duplicates
+      const combinedTokens = [...liveTokens];
+      
+      for (const customToken of customTokenBalances) {
+        // Skip if already exists in live tokens
+        if (!combinedTokens.some(t => t.symbol === customToken.symbol && t.chain === customToken.chain && t.address === customToken.address)) {
+          combinedTokens.push(customToken);
+        }
+      }
+      
+      return combinedTokens;
     } catch (error) {
       console.error('Failed to load multi-chain tokens:', error);
       // Fallback to original method
       return this.getAllTokens(addresses.ethereum || addresses.eth || '', addresses.tron || '');
     }
+  }
+
+  // Load custom tokens with their balances
+  private static async loadCustomTokenBalances(customTokens: any[], addresses: { [chain: string]: string }): Promise<TokenBalance[]> {
+    const customTokenBalances: TokenBalance[] = [];
+
+    for (const customToken of customTokens) {
+      try {
+        let balance = '0';
+        let address = '';
+
+        // Get the appropriate address for the chain
+        switch (customToken.chain) {
+          case 'Ethereum':
+            address = addresses.ethereum || addresses.eth || '';
+            break;
+          case 'Tron':
+            address = addresses.tron || '';
+            break;
+          case 'Solana':
+            address = addresses.solana || '';
+            break;
+          case 'Bitcoin':
+            address = addresses.bitcoin || '';
+            break;
+        }
+
+        if (!address) continue;
+
+        // Load balance based on chain
+        if (customToken.chain === 'Ethereum' && customToken.address !== 'native') {
+          const provider = new ethers.JsonRpcProvider(process.env.NEXT_PUBLIC_ETHEREUM_RPC || 'https://eth.llamarpc.com');
+          const contract = new ethers.Contract(customToken.address, ERC20_ABI, provider);
+          const bal = await contract.balanceOf(address);
+          balance = ethers.formatUnits(bal, customToken.decimals);
+        } else if (customToken.chain === 'Tron' && customToken.address !== 'native') {
+          const tronWeb = new TronWeb({ fullHost: 'https://api.trongrid.io' });
+          const contract = await tronWeb.contract().at(customToken.address);
+          const bal = await contract.balanceOf(address).call();
+          balance = (bal / Math.pow(10, customToken.decimals)).toString();
+        }
+        // For Solana and Bitcoin, we'll use 0 balance for now since we don't have the full implementation
+
+        const usdValue = await this.getUsdValue(customToken.symbol, balance);
+
+        // Try to get logo from CoinGecko or use predefined logos
+        let tokenLogo = customToken.logo;
+        if (!tokenLogo || !tokenLogo.startsWith('http')) {
+          tokenLogo = this.getTokenLogo(customToken.symbol, customToken.address);
+        }
+
+        customTokenBalances.push({
+          symbol: customToken.symbol,
+          name: customToken.name,
+          balance,
+          usdValue,
+          chain: customToken.chain,
+          address: customToken.address,
+          decimals: customToken.decimals,
+          isNative: customToken.isNative || false,
+          logo: tokenLogo,
+        });
+      } catch (error) {
+        console.error(`Failed to load custom token ${customToken.symbol}:`, error);
+      }
+    }
+
+    return customTokenBalances;
   }
 
   static async getAllTokens(ethAddress: string, tronAddress: string): Promise<TokenBalance[]> {
