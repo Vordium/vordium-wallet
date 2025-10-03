@@ -205,7 +205,7 @@ export class BalanceService {
       const customTokenBalances = await this.loadCustomTokenBalances(customTokens, addresses);
       
       // Combine live tokens and custom tokens, avoiding duplicates
-      const combinedTokens = [...liveTokens];
+      const combinedTokens: TokenBalance[] = [...liveTokens];
       
       for (const customToken of customTokenBalances) {
         // Skip if already exists in live tokens
