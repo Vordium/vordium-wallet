@@ -126,7 +126,7 @@ export class BalanceService {
             address: token.address,
             decimals: token.decimals,
             isNative: false,
-            icon: this.getTokenLogo(token.symbol, token.address),
+            logo: this.getTokenLogo(token.symbol, token.address),
           });
         }
       } catch (error) {
@@ -158,7 +158,7 @@ export class BalanceService {
             address: token.address,
             decimals: token.decimals,
             isNative: false,
-            icon: this.getTokenLogo(token.symbol, token.address),
+            logo: this.getTokenLogo(token.symbol, token.address),
           });
         }
       } catch (error) {
@@ -227,7 +227,7 @@ export class BalanceService {
           chain: 'Ethereum',
           decimals: 18,
           isNative: true,
-          icon: this.getTokenLogo('ETH'),
+          logo: this.getTokenLogo('ETH'),
         },
         {
           symbol: 'TRX',
@@ -237,7 +237,7 @@ export class BalanceService {
           chain: 'Tron',
           decimals: 6,
           isNative: true,
-          icon: this.getTokenLogo('TRX'),
+          logo: this.getTokenLogo('TRX'),
         },
         ...ethTokens,
         ...tronTokens,
@@ -283,7 +283,7 @@ export class BalanceService {
             address: customToken.address,
             decimals: customToken.decimals,
             isNative: customToken.isNative || false,
-            icon: tokenLogo,
+            logo: tokenLogo,
           });
         } catch (error) {
           console.error(`Failed to load custom token ${customToken.symbol}:`, error);
