@@ -4,7 +4,7 @@ export interface TokenSearchResult {
   symbol: string;
   name: string;
   address: string;
-  chain: 'Ethereum' | 'Tron';
+  chain: 'Ethereum' | 'Tron' | 'Solana' | 'Bitcoin';
   decimals: number;
   logo: string;
   balance?: string;
@@ -267,12 +267,70 @@ export const POPULAR_TOKENS: TokenSearchResult[] = [
     decimals: 18,
     logo: 'https://assets.coingecko.com/coins/images/279/large/ethereum.png',
     verified: true
+  },
+  
+  // Solana Tokens
+  {
+    symbol: 'SOL',
+    name: 'Solana',
+    address: 'native',
+    chain: 'Solana',
+    decimals: 9,
+    logo: 'https://assets.coingecko.com/coins/images/4128/large/solana.png',
+    verified: true
+  },
+  {
+    symbol: 'USDC',
+    name: 'USD Coin',
+    address: 'EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v',
+    chain: 'Solana',
+    decimals: 6,
+    logo: 'https://assets.coingecko.com/coins/images/6319/large/USD_Coin_icon.png',
+    verified: true
+  },
+  {
+    symbol: 'USDT',
+    name: 'Tether USD',
+    address: 'Es9vMFrzaCERmJfrF4H2FYD4KCoNkY11McCe8BenwNYB',
+    chain: 'Solana',
+    decimals: 6,
+    logo: 'https://assets.coingecko.com/coins/images/325/large/Tether.png',
+    verified: true
+  },
+  {
+    symbol: 'RAY',
+    name: 'Raydium',
+    address: '4k3Dyjzvzp8eMZWUXbBCjEvwSkkk59S5iCNLY3QrkX6R',
+    chain: 'Solana',
+    decimals: 6,
+    logo: 'https://assets.coingecko.com/coins/images/13928/large/PSigc4ie_400x400.jpg',
+    verified: true
+  },
+  {
+    symbol: 'SRM',
+    name: 'Serum',
+    address: 'SRMuApVNdxXokk5GT7XD5cUUgXMBCoAz2LHeuAoKWRt',
+    chain: 'Solana',
+    decimals: 6,
+    logo: 'https://assets.coingecko.com/coins/images/11970/large/serum-logo.png',
+    verified: true
+  },
+  
+  // Bitcoin
+  {
+    symbol: 'BTC',
+    name: 'Bitcoin',
+    address: 'native',
+    chain: 'Bitcoin',
+    decimals: 8,
+    logo: 'https://assets.coingecko.com/coins/images/1/large/bitcoin.png',
+    verified: true
   }
 ];
 
 export class TokenSearchService {
   // Search tokens by query
-  static searchTokens(query: string, chain?: 'Ethereum' | 'Tron'): TokenSearchResult[] {
+  static searchTokens(query: string, chain?: 'Ethereum' | 'Tron' | 'Solana' | 'Bitcoin'): TokenSearchResult[] {
     if (!query || query.length < 2) return [];
 
     const lowerQuery = query.toLowerCase();
