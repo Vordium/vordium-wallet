@@ -242,7 +242,7 @@ function SwapPageContent() {
             >
               {fromToken ? (
                 <>
-                  <img src={fromToken.icon} alt={fromToken.symbol} className="w-6 h-6 rounded-full" />
+                  <img src={fromToken.logo} alt={fromToken.symbol} className="w-6 h-6 rounded-full" />
                   <span className="font-semibold">{fromToken.symbol}</span>
                 </>
               ) : (
@@ -292,7 +292,7 @@ function SwapPageContent() {
             >
               {toToken ? (
                 <>
-                  <img src={toToken.icon} alt={toToken.symbol} className="w-6 h-6 rounded-full" />
+                  <img src={toToken.logo} alt={toToken.symbol} className="w-6 h-6 rounded-full" />
                   <span className="font-semibold">{toToken.symbol}</span>
                 </>
               ) : (

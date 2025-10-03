@@ -201,7 +201,7 @@ function AlertsPageContent() {
                 >
                   <div className="flex items-center gap-3">
                     <Image
-                      src={alert.token.icon}
+                      src={alert.token.logo}
                       alt={alert.token.symbol}
                       width={48}
                       height={48}
@@ -468,7 +468,7 @@ function EditAlertModal({
 
         <div className="flex items-center gap-3 mb-6">
           <Image
-            src={alert.token.icon}
+            src={alert.token.logo}
             alt={alert.token.symbol}
             width={48}
             height={48}

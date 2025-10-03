@@ -171,7 +171,7 @@ function SendPageContent() {
               </div>
             )}
               {filteredTokens.map((token) => {
-                const logoUrl = token.icon || `https://via.placeholder.com/48/6B7280/FFFFFF?text=${token.symbol.charAt(0)}`;
+                const logoUrl = token.logo || `https://via.placeholder.com/48/6B7280/FFFFFF?text=${token.symbol.charAt(0)}`;
                 const hasBalance = parseFloat(token.balance) > 0;
                 const balanceNum = parseFloat(token.balance);
                 const usdValueNum = parseFloat(token.usdValue);
@@ -254,7 +254,7 @@ function SendPageContent() {
           <div className="flex items-center gap-3">
             <div className="relative w-12 h-12 flex-shrink-0">
               <img
-                src={selectedToken.icon || `https://via.placeholder.com/48/6B7280/FFFFFF?text=${selectedToken.symbol.charAt(0)}`}
+                src={selectedToken.logo || `https://via.placeholder.com/48/6B7280/FFFFFF?text=${selectedToken.symbol.charAt(0)}`}
                 alt={selectedToken.symbol}
                 className="w-full h-full rounded-full object-cover"
                 onError={(e) => {
