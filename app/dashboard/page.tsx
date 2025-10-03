@@ -197,14 +197,6 @@ export default function DashboardPage() {
               <FilterIcon className="w-6 h-6 text-gray-300" />
               <span className="text-sm font-semibold text-gray-300">History</span>
             </button>
-            
-            <button
-              onClick={() => router.push('/swap')}
-              className="flex flex-col items-center gap-2 py-4 bg-gray-700 rounded-2xl hover:bg-gray-600 active:scale-95 transition border border-gray-600"
-            >
-              <SwapIcon className="w-6 h-6 text-gray-300" />
-              <span className="text-sm font-semibold text-gray-300">Swap</span>
-            </button>
           </div>
         </div>
       </div>
