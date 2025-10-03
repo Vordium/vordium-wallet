@@ -87,11 +87,15 @@ Keep this backup safe and secure!`;
       const seed = await CryptoService.mnemonicToSeed(mnemonicStr);
       const evm = await CryptoService.deriveAccount(seed, 'EVM', 0);
       const tron = await CryptoService.deriveAccount(seed, 'TRON', 0);
+      const bitcoin = await CryptoService.deriveAccount(seed, 'BITCOIN', 0);
+      const solana = await CryptoService.deriveAccount(seed, 'SOLANA', 0);
       
       // Store in Zustand
       const store = useWalletStore.getState();
       store.addAccount({ id: 'evm-0', name: 'Ethereum Account 1', address: evm.address, chain: 'EVM' });
       store.addAccount({ id: 'tron-0', name: 'TRON Account 1', address: tron.address, chain: 'TRON' });
+      store.addAccount({ id: 'bitcoin-0', name: 'Bitcoin Account 1', address: bitcoin.address, chain: 'BITCOIN' });
+      store.addAccount({ id: 'solana-0', name: 'Solana Account 1', address: solana.address, chain: 'SOLANA' });
       store.selectAccount('evm-0');
       
       // Mark as unlocked

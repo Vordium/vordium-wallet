@@ -14,7 +14,7 @@ export function AddTokenModal({ isOpen, onClose }: { isOpen: boolean; onClose: (
   const [searching, setSearching] = useState(false);
   const [searchResults, setSearchResults] = useState<TokenSearchResult[]>([]);
   const [customAddress, setCustomAddress] = useState('');
-  const [selectedChain, setSelectedChain] = useState<'Ethereum' | 'Tron'>('Ethereum');
+  const [selectedChain, setSelectedChain] = useState<'Ethereum' | 'Tron' | 'Solana' | 'Bitcoin'>('Ethereum');
   const [successMessage, setSuccessMessage] = useState('');
   
   const addToken = useWalletStore(state => state.addToken);
@@ -37,8 +37,14 @@ export function AddTokenModal({ isOpen, onClose }: { isOpen: boolean; onClose: (
       setSearching(true);
       
       // Get user address
+      const chainMap: Record<string, string> = {
+        'Ethereum': 'EVM',
+        'Tron': 'TRON',
+        'Solana': 'SOLANA',
+        'Bitcoin': 'BITCOIN'
+      };
       const userAddress = accounts.find(a => 
-        a.chain === (token.chain === 'Ethereum' ? 'EVM' : 'TRON')
+        a.chain === chainMap[token.chain]
       )?.address;
       
       if (!userAddress) {
@@ -113,8 +119,14 @@ export function AddTokenModal({ isOpen, onClose }: { isOpen: boolean; onClose: (
     try {
       setSearching(true);
       
+      const chainMap: Record<string, string> = {
+        'Ethereum': 'EVM',
+        'Tron': 'TRON',
+        'Solana': 'SOLANA',
+        'Bitcoin': 'BITCOIN'
+      };
       const userAddress = accounts.find(a => 
-        a.chain === (selectedChain === 'Ethereum' ? 'EVM' : 'TRON')
+        a.chain === chainMap[selectedChain]
       )?.address;
 
       if (!userAddress) {
@@ -294,10 +306,10 @@ export function AddTokenModal({ isOpen, onClose }: { isOpen: boolean; onClose: (
             <h3 className="font-bold text-gray-900 dark:text-white mb-4">Add Custom Token</h3>
             
             {/* Chain Selector */}
-            <div className="flex gap-2 mb-4">
+            <div className="grid grid-cols-2 gap-2 mb-4">
               <button
                 onClick={() => setSelectedChain('Ethereum')}
-                className={`flex-1 py-3 rounded-xl font-bold transition ${
+                className={`py-3 rounded-xl font-bold transition ${
                   selectedChain === 'Ethereum'
                     ? 'bg-gray-600 text-white'
                     : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
@@ -307,13 +319,33 @@ export function AddTokenModal({ isOpen, onClose }: { isOpen: boolean; onClose: (
               </button>
               <button
                 onClick={() => setSelectedChain('Tron')}
-                className={`flex-1 py-3 rounded-xl font-bold transition ${
+                className={`py-3 rounded-xl font-bold transition ${
                   selectedChain === 'Tron'
                     ? 'bg-gray-600 text-white'
                     : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
                 }`}
               >
                 TRON
+              </button>
+              <button
+                onClick={() => setSelectedChain('Solana')}
+                className={`py-3 rounded-xl font-bold transition ${
+                  selectedChain === 'Solana'
+                    ? 'bg-gray-600 text-white'
+                    : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
+                }`}
+              >
+                Solana
+              </button>
+              <button
+                onClick={() => setSelectedChain('Bitcoin')}
+                className={`py-3 rounded-xl font-bold transition ${
+                  selectedChain === 'Bitcoin'
+                    ? 'bg-gray-600 text-white'
+                    : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
+                }`}
+              >
+                Bitcoin
               </button>
             </div>
 
@@ -322,7 +354,12 @@ export function AddTokenModal({ isOpen, onClose }: { isOpen: boolean; onClose: (
               type="text"
               value={customAddress}
               onChange={(e) => setCustomAddress(e.target.value)}
-              placeholder={selectedChain === 'Ethereum' ? '0x...' : 'T...'}
+              placeholder={
+                selectedChain === 'Ethereum' ? '0x...' :
+                selectedChain === 'Tron' ? 'T...' :
+                selectedChain === 'Solana' ? 'So...' :
+                '1...'
+              }
               className="w-full px-4 py-4 text-gray-900 dark:text-white bg-gray-50 dark:bg-gray-700 border-2 border-gray-300 dark:border-gray-600 rounded-xl font-mono text-sm mb-4 focus:border-gray-500 dark:focus:border-gray-500 focus:ring-4 focus:ring-gray-200 dark:focus:ring-gray-500"
             />
 

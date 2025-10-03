@@ -49,6 +49,8 @@ export default function DashboardPage() {
 
   const evmAccount = accounts.find(a => a.chain === 'EVM');
   const tronAccount = accounts.find(a => a.chain === 'TRON');
+  const bitcoinAccount = accounts.find(a => a.chain === 'BITCOIN');
+  const solanaAccount = accounts.find(a => a.chain === 'SOLANA');
 
   useEffect(() => {
     setMounted(true);
@@ -75,16 +77,24 @@ export default function DashboardPage() {
       };
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [router, evmAccount, tronAccount]);
+  }, [router, evmAccount, tronAccount, bitcoinAccount, solanaAccount]);
 
   async function loadWalletData(silent = false) {
-    if (!evmAccount || !tronAccount) return;
+    if (!evmAccount || !tronAccount || !bitcoinAccount || !solanaAccount) return;
     
     if (!silent) setLoading(true);
     setRefreshing(true);
 
     try {
-      const allTokens = await BalanceService.getAllTokens(evmAccount.address, tronAccount.address);
+      // Use multi-chain token service
+      const addresses = {
+        ethereum: evmAccount.address,
+        tron: tronAccount.address,
+        bitcoin: bitcoinAccount.address,
+        solana: solanaAccount.address,
+      };
+      
+      const allTokens = await BalanceService.getAllTokensMultiChain(addresses);
       setTokens(allTokens);
       
       const total = await BalanceService.getTotalBalance(allTokens);
@@ -114,7 +124,7 @@ export default function DashboardPage() {
     }
   }
 
-  if (!mounted || !evmAccount || !tronAccount) {
+  if (!mounted || !evmAccount || !tronAccount || !bitcoinAccount || !solanaAccount) {
     return (
       <div className="min-h-screen bg-white flex items-center justify-center">
         <div className="animate-spin rounded-full h-12 w-12 border-4 border-blue-600 border-t-transparent"></div>

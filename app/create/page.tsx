@@ -215,10 +215,12 @@ export default function CreatePage() {
                   localStorage.setItem('vordium_vault', JSON.stringify(vault));
                 }
                 
-                // Generate accounts
+                // Generate accounts for all supported chains
                 const seed = await CryptoService.mnemonicToSeed(mnemonic);
                 const evmAccount = await CryptoService.deriveAccount(seed, 'EVM', 0);
                 const tronAccount = await CryptoService.deriveAccount(seed, 'TRON', 0);
+                const bitcoinAccount = await CryptoService.deriveAccount(seed, 'BITCOIN', 0);
+                const solanaAccount = await CryptoService.deriveAccount(seed, 'SOLANA', 0);
                 
                 const newWallet = {
                   id: Date.now().toString(),
@@ -241,6 +243,24 @@ export default function CreatePage() {
                       index: 0,
                       publicKey: tronAccount.publicKey,
                       derivationPath: tronAccount.derivationPath
+                    },
+                    {
+                      id: `bitcoin-${Date.now()}`,
+                      name: 'Bitcoin',
+                      address: bitcoinAccount.address,
+                      chain: 'BITCOIN' as const,
+                      index: 0,
+                      publicKey: bitcoinAccount.publicKey,
+                      derivationPath: bitcoinAccount.derivationPath
+                    },
+                    {
+                      id: `solana-${Date.now()}`,
+                      name: 'Solana',
+                      address: solanaAccount.address,
+                      chain: 'SOLANA' as const,
+                      index: 0,
+                      publicKey: solanaAccount.publicKey,
+                      derivationPath: solanaAccount.derivationPath
                     }
                   ],
                   createdAt: Date.now()

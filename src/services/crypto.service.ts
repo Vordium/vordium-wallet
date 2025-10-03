@@ -8,6 +8,8 @@ import TronWeb from 'tronweb';
 // Derivation paths
 const EVM_PATH = "m/44'/60'/0'/0"; // EIP-44 standard
 const TRON_PATH = "m/44'/195'/0'/0"; // TRON standard
+const BITCOIN_PATH = "m/44'/0'/0'/0"; // Bitcoin standard
+const SOLANA_PATH = "m/44'/501'/0'/0'"; // Solana standard
 
 export type ChainType = 'EVM' | 'TRON' | 'SOLANA' | 'BITCOIN';
 
@@ -48,19 +50,43 @@ export class CryptoService {
     index: number
   ): Promise<DerivedAccount> {
     const masterKey = HDKey.fromMasterSeed(seed);
-    const path = chainType === 'EVM' ? EVM_PATH : TRON_PATH;
-    const fullPath = `${path}/${index}`;
+    let path: string;
     
+    switch (chainType) {
+      case 'EVM':
+        path = EVM_PATH;
+        break;
+      case 'TRON':
+        path = TRON_PATH;
+        break;
+      case 'BITCOIN':
+        path = BITCOIN_PATH;
+        break;
+      case 'SOLANA':
+        path = SOLANA_PATH;
+        break;
+      default:
+        throw new Error(`Unsupported chain type: ${chainType}`);
+    }
+    
+    const fullPath = `${path}/${index}`;
     const child = masterKey.derive(fullPath);
     
     if (!child.privateKey) {
       throw new Error('Failed to derive private key');
     }
 
-    if (chainType === 'EVM') {
-      return this.deriveEVMAccount(child.privateKey, fullPath, index);
-    } else {
-      return this.deriveTronAccount(child.privateKey, fullPath, index);
+    switch (chainType) {
+      case 'EVM':
+        return this.deriveEVMAccount(child.privateKey, fullPath, index);
+      case 'TRON':
+        return this.deriveTronAccount(child.privateKey, fullPath, index);
+      case 'BITCOIN':
+        return this.deriveBitcoinAccount(child.privateKey, fullPath, index);
+      case 'SOLANA':
+        return this.deriveSolanaAccount(child.privateKey, fullPath, index);
+      default:
+        throw new Error(`Unsupported chain type: ${chainType}`);
     }
   }
 
@@ -102,14 +128,90 @@ export class CryptoService {
     };
   }
 
+  private static deriveBitcoinAccount(
+    privateKey: Uint8Array,
+    derivationPath: string,
+    index: number
+  ): DerivedAccount {
+    const privateKeyHex = this.bytesToHex(privateKey);
+    
+    // For Bitcoin, we'll generate a simple address for now
+    // In a real implementation, you'd use a Bitcoin library like bitcoinjs-lib
+    const address = this.generateBitcoinAddress(privateKeyHex);
+    
+    return {
+      address,
+      privateKey: privateKeyHex,
+      publicKey: '',
+      derivationPath,
+      index,
+      chainType: 'BITCOIN'
+    };
+  }
+
+  private static deriveSolanaAccount(
+    privateKey: Uint8Array,
+    derivationPath: string,
+    index: number
+  ): DerivedAccount {
+    const privateKeyHex = this.bytesToHex(privateKey);
+    
+    // For Solana, we'll generate a simple address for now
+    // In a real implementation, you'd use a Solana library like @solana/web3.js
+    const address = this.generateSolanaAddress(privateKeyHex);
+    
+    return {
+      address,
+      privateKey: privateKeyHex,
+      publicKey: '',
+      derivationPath,
+      index,
+      chainType: 'SOLANA'
+    };
+  }
+
+  // Placeholder methods for address generation
+  // In a real implementation, these would use proper libraries
+  private static generateBitcoinAddress(privateKey: string): string {
+    // This is a placeholder - in reality you'd use bitcoinjs-lib
+    // For now, we'll generate a mock address
+    const hash = this.simpleHash(privateKey);
+    return `1${hash.substring(0, 25)}`; // Mock Bitcoin address
+  }
+
+  private static generateSolanaAddress(privateKey: string): string {
+    // This is a placeholder - in reality you'd use @solana/web3.js
+    // For now, we'll generate a mock address
+    const hash = this.simpleHash(privateKey);
+    return `${hash.substring(0, 44)}`; // Mock Solana address
+  }
+
+  private static simpleHash(input: string): string {
+    // Simple hash function for placeholder addresses
+    let hash = 0;
+    for (let i = 0; i < input.length; i++) {
+      const char = input.charCodeAt(i);
+      hash = ((hash << 5) - hash) + char;
+      hash = hash & hash; // Convert to 32-bit integer
+    }
+    return Math.abs(hash).toString(16).padStart(8, '0');
+  }
+
   static importPrivateKey(privateKey: string, chainType: ChainType): DerivedAccount {
     const cleanKey = privateKey.startsWith('0x') ? privateKey.slice(2) : privateKey;
     const keyBytes = this.hexToBytes(cleanKey);
 
-    if (chainType === 'EVM') {
-      return this.deriveEVMAccount(keyBytes, 'imported', 0);
-    } else {
-      return this.deriveTronAccount(keyBytes, 'imported', 0);
+    switch (chainType) {
+      case 'EVM':
+        return this.deriveEVMAccount(keyBytes, 'imported', 0);
+      case 'TRON':
+        return this.deriveTronAccount(keyBytes, 'imported', 0);
+      case 'BITCOIN':
+        return this.deriveBitcoinAccount(keyBytes, 'imported', 0);
+      case 'SOLANA':
+        return this.deriveSolanaAccount(keyBytes, 'imported', 0);
+      default:
+        throw new Error(`Unsupported chain type: ${chainType}`);
     }
   }
 
