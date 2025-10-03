@@ -209,7 +209,11 @@ export class BalanceService {
       
       for (const customToken of customTokenBalances) {
         // Skip if already exists in live tokens
-        if (!combinedTokens.some(t => t.symbol === customToken.symbol && t.chain === customToken.chain && t.address === customToken.address)) {
+        if (!combinedTokens.some(t => 
+          t.symbol === customToken.symbol && 
+          t.chain === customToken.chain && 
+          (t.address || '') === (customToken.address || '')
+        )) {
           combinedTokens.push(customToken);
         }
       }
