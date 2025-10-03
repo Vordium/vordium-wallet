@@ -152,7 +152,7 @@ export class TokenService {
             decimals: 8,
             balance: bitcoinBalance.balance.toString(),
             balance_formatted: bitcoinBalance.balance_formatted,
-            price: bitcoinPrice,
+            price: bitcoinPrice ?? undefined,
             value_usd: bitcoinPrice ? (bitcoinBalance.balance / 100000000) * bitcoinPrice : undefined,
             isNative: true,
           });
