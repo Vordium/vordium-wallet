@@ -3,7 +3,7 @@
 import { EthereumProvider } from '@walletconnect/ethereum-provider';
 import { WalletConnectModal } from '@walletconnect/modal';
 
-type EthereumProviderType = InstanceType<typeof EthereumProvider>;
+type EthereumProviderType = Awaited<ReturnType<typeof EthereumProvider.init>>;
 
 export interface WalletConnectConfig {
   projectId: string;
