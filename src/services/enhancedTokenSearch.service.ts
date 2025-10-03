@@ -92,13 +92,16 @@ export class EnhancedTokenSearchService {
         for (const coin of data.coins.slice(0, 10)) { // Limit to 10 results
           const chainType = this.mapCoinGeckoToChain(coin.id);
           if (!chain || chainType === chain) {
+            // Get the best available logo
+            const logo = coin.large || coin.small || coin.thumb || coin.image || '';
+            
             results.push({
               symbol: coin.symbol?.toUpperCase() || '',
               name: coin.name || '',
               address: coin.id || '',
               chain: chainType,
               decimals: 18, // Default for most tokens
-              logo: coin.thumb || coin.large || coin.small || '',
+              logo: logo,
               verified: true,
               price: coin.market_cap_rank ? undefined : undefined, // Will be fetched separately
             });

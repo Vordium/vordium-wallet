@@ -13,7 +13,7 @@ export interface TokenBalance {
   address?: string;
   decimals: number;
   isNative: boolean;
-  icon: string;
+  logo: string;
   change24h?: number; // Optional 24h price change percentage
 }
 
@@ -184,7 +184,7 @@ export class BalanceService {
         address: balance.address,
         decimals: balance.decimals,
         isNative: balance.isNative,
-        icon: balance.logo || this.getTokenLogo(balance.symbol, balance.address),
+        logo: balance.logo || this.getTokenLogo(balance.symbol, balance.address),
         change24h: balance.change24h,
       }));
     } catch (error) {

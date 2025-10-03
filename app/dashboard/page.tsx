@@ -278,7 +278,7 @@ export default function DashboardPage() {
               <div className="space-y-1">
                 {tokens.map((token) => {
                   // Use token's icon property directly from BalanceService (which now uses CoinGecko)
-                  const logoUrl = token.icon || `https://via.placeholder.com/48/6B7280/FFFFFF?text=${token.symbol.charAt(0)}`;
+                  const logoUrl = token.logo || `https://via.placeholder.com/48/6B7280/FFFFFF?text=${token.symbol.charAt(0)}`;
                   
                   return (
                     <TokenRow
