@@ -8,7 +8,7 @@ type EthereumProviderType = Awaited<ReturnType<typeof EthereumProvider.init>>;
 export interface WalletConnectConfig {
   projectId: string;
   chains: number[];
-  optionalChains: number[];
+  optionalChains: [number, ...number[]]; // At least one element required
   rpcMap: Record<number, string>;
 }
 
@@ -50,6 +50,12 @@ export class WalletConnectService {
         optionalChains: config.optionalChains,
         rpcMap: config.rpcMap,
         showQrModal: false, // We'll handle QR code ourselves
+        metadata: {
+          name: 'Vordium Wallet',
+          description: 'Multi-chain non-custodial wallet',
+          url: 'https://vordium-wallet.vercel.app',
+          icons: ['https://vordium-wallet.vercel.app/favicon.ico']
+        }
       });
 
       // Initialize Modal
@@ -275,7 +281,7 @@ export class WalletConnectService {
 export const DEFAULT_WALLETCONNECT_CONFIG: WalletConnectConfig = {
   projectId: 'your-project-id', // Replace with your WalletConnect Project ID
   chains: [1], // Ethereum mainnet
-  optionalChains: [137, 56, 42161, 10], // Polygon, BSC, Arbitrum, Optimism
+  optionalChains: [137, 56, 42161, 10] as [number, ...number[]], // Polygon, BSC, Arbitrum, Optimism
   rpcMap: {
     1: 'https://eth-mainnet.g.alchemy.com/v2/demo',
     137: 'https://polygon-rpc.com',
