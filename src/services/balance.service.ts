@@ -281,7 +281,7 @@ export class BalanceService {
           balance,
           usdValue,
           chain: customToken.chain,
-          address: customToken.address,
+          address: customToken.address || '',
           decimals: customToken.decimals,
           isNative: customToken.isNative || false,
           logo: tokenLogo,
