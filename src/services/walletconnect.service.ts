@@ -122,12 +122,13 @@ export class WalletConnectService {
     if (!this.provider) return;
 
     try {
-      const sessions = this.provider.session?.values || [];
+      // Access sessions safely with type assertion
+      const sessions = (this.provider as any).session?.values || [];
       this.sessions = Array.from(sessions).map((session: any) => ({
-        topic: session.topic,
-        peer: session.peer,
-        namespaces: session.namespaces,
-        expiry: session.expiry,
+        topic: session.topic || '',
+        peer: session.peer || { metadata: { name: 'Unknown DApp', description: '', url: '', icons: [] } },
+        namespaces: session.namespaces || {},
+        expiry: session.expiry || Date.now() + 86400000,
       }));
     } catch (error) {
       console.error('Failed to load sessions:', error);
