@@ -77,18 +77,36 @@ export class CryptoService {
       throw new Error('Failed to derive private key');
     }
 
+    console.log(`Deriving ${chainType} account with path: ${fullPath}`);
+    
+    let account: DerivedAccount;
     switch (chainType) {
       case 'EVM':
-        return this.deriveEVMAccount(child.privateKey, fullPath, index);
+        account = this.deriveEVMAccount(child.privateKey, fullPath, index);
+        break;
       case 'TRON':
-        return this.deriveTronAccount(child.privateKey, fullPath, index);
+        account = this.deriveTronAccount(child.privateKey, fullPath, index);
+        break;
       case 'BITCOIN':
-        return this.deriveBitcoinAccount(child.privateKey, fullPath, index);
+        account = this.deriveBitcoinAccount(child.privateKey, fullPath, index);
+        break;
       case 'SOLANA':
-        return this.deriveSolanaAccount(child.privateKey, fullPath, index);
+        account = this.deriveSolanaAccount(child.privateKey, fullPath, index);
+        break;
       default:
         throw new Error(`Unsupported chain type: ${chainType}`);
     }
+    
+    console.log(`Generated ${chainType} account:`, {
+      address: account.address,
+      addressLength: account.address.length,
+      startsWith0x: account.address.startsWith('0x'),
+      startsWith1: account.address.startsWith('1'),
+      startsWithT: account.address.startsWith('T'),
+      chainType: account.chainType
+    });
+    
+    return account;
   }
 
   private static deriveEVMAccount(
@@ -187,12 +205,15 @@ export class CryptoService {
       const checksum = this.simpleHash(addressHash).substring(0, 8);
       const address = `1${addressHash}${checksum}`.substring(0, 34); // Bitcoin addresses are typically 26-35 characters
       
+      console.log('Generated Bitcoin address:', address, 'Length:', address.length);
       return address;
     } catch (error) {
       console.error('Error generating Bitcoin address:', error);
       // Fallback to a deterministic address based on private key
       const hash = this.simpleHash(privateKey);
-      return `1${hash.substring(0, 25)}`;
+      const fallbackAddress = `1${hash.substring(0, 25)}`;
+      console.log('Fallback Bitcoin address:', fallbackAddress, 'Length:', fallbackAddress.length);
+      return fallbackAddress;
     }
   }
 
@@ -205,13 +226,17 @@ export class CryptoService {
       
       // Create public key from private key
       const publicKey = new PublicKey(privateKeyBytes);
+      const address = publicKey.toString();
       
-      return publicKey.toString();
+      console.log('Generated Solana address:', address, 'Length:', address.length);
+      return address;
     } catch (error) {
       console.error('Error generating Solana address:', error);
       // Fallback to a deterministic address based on private key
       const hash = this.simpleHash(privateKey);
-      return `${hash.substring(0, 44)}`;
+      const fallbackAddress = `${hash.substring(0, 44)}`;
+      console.log('Fallback Solana address:', fallbackAddress, 'Length:', fallbackAddress.length);
+      return fallbackAddress;
     }
   }
 
