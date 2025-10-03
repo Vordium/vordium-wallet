@@ -84,7 +84,14 @@ export class WalletConnectService {
 
     this.provider.on('connect', (session) => {
       console.log('WalletConnect connected:', session);
-      this.addSession(session as DAppSession);
+      // Convert session to our DAppSession format
+      const dappSession: DAppSession = {
+        topic: session.topic,
+        peer: session.peer,
+        namespaces: session.namespaces,
+        expiry: session.expiry
+      };
+      this.addSession(dappSession);
     });
 
     this.provider.on('disconnect', (session) => {
@@ -94,7 +101,14 @@ export class WalletConnectService {
 
     this.provider.on('session_update', (session) => {
       console.log('WalletConnect session updated:', session);
-      this.updateSession(session as DAppSession);
+      // Convert session to our DAppSession format
+      const dappSession: DAppSession = {
+        topic: session.topic,
+        peer: session.peer,
+        namespaces: session.namespaces,
+        expiry: session.expiry
+      };
+      this.updateSession(dappSession);
     });
 
     this.provider.on('display_uri', (uri) => {
