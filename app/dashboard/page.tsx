@@ -95,6 +95,7 @@ export default function DashboardPage() {
       };
       
       const allTokens = await BalanceService.getAllTokensMultiChain(addresses);
+      console.log('Dashboard loaded tokens:', allTokens);
       setTokens(allTokens);
       
       const total = await BalanceService.getTotalBalance(allTokens);

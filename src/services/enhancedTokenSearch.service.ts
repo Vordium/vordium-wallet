@@ -95,6 +95,20 @@ export class EnhancedTokenSearchService {
             // Get the best available logo
             const logo = coin.large || coin.small || coin.thumb || coin.image || '';
             
+            // Debug logging
+            console.log('CoinGecko token:', {
+              symbol: coin.symbol,
+              name: coin.name,
+              logo: logo,
+              chain: chainType,
+              coinData: {
+                large: coin.large,
+                small: coin.small,
+                thumb: coin.thumb,
+                image: coin.image
+              }
+            });
+            
             results.push({
               symbol: coin.symbol?.toUpperCase() || '',
               name: coin.name || '',

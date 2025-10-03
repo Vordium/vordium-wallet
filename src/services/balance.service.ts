@@ -172,8 +172,58 @@ export class BalanceService {
   // New method using comprehensive token service
   static async getAllTokensMultiChain(addresses: { [chain: string]: string }): Promise<TokenBalance[]> {
     try {
-      // Get live token balances from APIs
-      const allBalances: TokenServiceBalance[] = await tokenService.getTokenBalances(addresses.ethereum || addresses.eth || '');
+      // Get live token balances from APIs for all chains
+      const allBalances: TokenServiceBalance[] = [];
+      
+      // Get EVM chain balances
+      if (addresses.ethereum || addresses.eth) {
+        const evmBalances = await tokenService.getTokenBalances(addresses.ethereum || addresses.eth || '');
+        allBalances.push(...evmBalances);
+      }
+      
+      // Get Solana balances
+      if (addresses.solana) {
+        const solanaBalances = await tokenService.getTokenBalances(addresses.solana);
+        allBalances.push(...solanaBalances);
+      }
+      
+      // Get TRON balances (using original method for now)
+      if (addresses.tron) {
+        const tronTokens = await this.getTronTokens(addresses.tron);
+        allBalances.push(...tronTokens.map(token => ({
+          symbol: token.symbol,
+          name: token.name,
+          address: token.address,
+          chain: 'tron',
+          decimals: token.decimals,
+          balance: token.balance,
+          balance_formatted: token.balance,
+          logo: token.logo,
+          price: undefined,
+          value_usd: parseFloat(token.usdValue),
+          change24h: token.change24h,
+          isNative: token.isNative,
+        })));
+      }
+      
+      // Get Bitcoin balances (using original method for now)
+      if (addresses.bitcoin) {
+        const bitcoinTokens = await this.getBitcoinTokens(addresses.bitcoin);
+        allBalances.push(...bitcoinTokens.map(token => ({
+          symbol: token.symbol,
+          name: token.name,
+          address: token.address,
+          chain: 'bitcoin',
+          decimals: token.decimals,
+          balance: token.balance,
+          balance_formatted: token.balance,
+          logo: token.logo,
+          price: undefined,
+          value_usd: parseFloat(token.usdValue),
+          change24h: token.change24h,
+          isNative: token.isNative,
+        })));
+      }
       
       // Convert to our TokenBalance format
       const liveTokens = allBalances.map(balance => ({
@@ -223,6 +273,70 @@ export class BalanceService {
       console.error('Failed to load multi-chain tokens:', error);
       // Fallback to original method
       return this.getAllTokens(addresses.ethereum || addresses.eth || '', addresses.tron || '');
+    }
+  }
+
+  // Get TRON tokens
+  private static async getTronTokens(address: string): Promise<TokenBalance[]> {
+    try {
+      const trxBalance = await this.getTrxBalance(address);
+      const trxUsd = await this.getUsdValue('TRX', trxBalance);
+      
+      return [
+        {
+          symbol: 'TRX',
+          name: 'TRON',
+          balance: trxBalance,
+          usdValue: trxUsd,
+          chain: 'Tron',
+          address: 'native',
+          decimals: 6,
+          isNative: true,
+          logo: this.getTokenLogo('TRX'),
+          change24h: undefined,
+        }
+      ];
+    } catch (error) {
+      console.error('Failed to load TRON tokens:', error);
+      return [];
+    }
+  }
+
+  // Get Bitcoin balance
+  private static async getBitcoinBalance(address: string): Promise<string> {
+    try {
+      // For now, return 0 balance as we don't have a real Bitcoin API
+      // In production, you would integrate with a Bitcoin API like BlockCypher
+      return '0';
+    } catch (error) {
+      console.error('Failed to get Bitcoin balance:', error);
+      return '0';
+    }
+  }
+
+  // Get Bitcoin tokens
+  private static async getBitcoinTokens(address: string): Promise<TokenBalance[]> {
+    try {
+      const bitcoinBalance = await this.getBitcoinBalance(address);
+      const bitcoinUsd = await this.getUsdValue('BTC', bitcoinBalance);
+      
+      return [
+        {
+          symbol: 'BTC',
+          name: 'Bitcoin',
+          balance: bitcoinBalance,
+          usdValue: bitcoinUsd,
+          chain: 'Bitcoin',
+          address: 'native',
+          decimals: 8,
+          isNative: true,
+          logo: this.getTokenLogo('BTC'),
+          change24h: undefined,
+        }
+      ];
+    } catch (error) {
+      console.error('Failed to load Bitcoin tokens:', error);
+      return [];
     }
   }
 

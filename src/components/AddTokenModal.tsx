@@ -100,6 +100,19 @@ export function AddTokenModal({ isOpen, onClose }: { isOpen: boolean; onClose: (
         }
       }
 
+      // Debug logging
+      console.log('Adding token to store:', {
+        symbol: token.symbol,
+        name: token.name,
+        address: token.address,
+        chain: token.chain,
+        decimals: token.decimals,
+        balance,
+        logo: token.logo,
+        isNative: false,
+        usdValue: '0'
+      });
+
       // Add to store
       addToken({
         symbol: token.symbol,
