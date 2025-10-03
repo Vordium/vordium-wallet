@@ -65,8 +65,20 @@ export class MoralisService {
   }
 
   private async makeRequest(endpoint: string, params: Record<string, any> = {}): Promise<any> {
+    console.log('Moralis API Request:', {
+      enabled: API_CONFIG.MORALIS.ENABLED,
+      apiKey: this.apiKey ? `${this.apiKey.substring(0, 8)}...` : 'NOT SET',
+      baseUrl: this.baseUrl,
+      endpoint,
+      params
+    });
+
     if (!API_CONFIG.MORALIS.ENABLED) {
       throw new Error('Moralis API is not configured');
+    }
+
+    if (!this.apiKey) {
+      throw new Error('Moralis API key is not set');
     }
 
     const url = new URL(`${this.baseUrl}${endpoint}`);
@@ -76,6 +88,8 @@ export class MoralisService {
       }
     });
 
+    console.log('Moralis API URL:', url.toString());
+
     const response = await fetch(url.toString(), {
       headers: {
         'X-API-Key': this.apiKey,
@@ -83,8 +97,16 @@ export class MoralisService {
       },
     });
 
+    console.log('Moralis API Response:', {
+      status: response.status,
+      statusText: response.statusText,
+      ok: response.ok
+    });
+
     if (!response.ok) {
-      throw new Error(`Moralis API error: ${response.status} ${response.statusText}`);
+      const errorText = await response.text();
+      console.error('Moralis API Error Response:', errorText);
+      throw new Error(`Moralis API error: ${response.status} - ${errorText}`);
     }
 
     return response.json();

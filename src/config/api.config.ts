@@ -37,6 +37,18 @@ export const API_CONFIG = {
   },
 };
 
+// Debug API configuration
+if (typeof window !== 'undefined') {
+  console.log('=== API Configuration Debug ===');
+  console.log('Moralis API Key:', API_CONFIG.MORALIS.API_KEY ? `${API_CONFIG.MORALIS.API_KEY.substring(0, 8)}...` : 'NOT SET');
+  console.log('Moralis Enabled:', API_CONFIG.MORALIS.ENABLED);
+  console.log('Helius API Key:', API_CONFIG.HELIUS.API_KEY ? `${API_CONFIG.HELIUS.API_KEY.substring(0, 8)}...` : 'NOT SET');
+  console.log('Helius Enabled:', API_CONFIG.HELIUS.ENABLED);
+  console.log('CoinGecko API Key:', API_CONFIG.COINGECKO.API_KEY ? `${API_CONFIG.COINGECKO.API_KEY.substring(0, 8)}...` : 'NOT SET');
+  console.log('CoinGecko Enabled:', API_CONFIG.COINGECKO.ENABLED);
+  console.log('================================');
+}
+
 // Chain configurations
 export const CHAIN_CONFIG = {
   ETHEREUM: {

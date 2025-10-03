@@ -172,57 +172,101 @@ export class BalanceService {
   // New method using comprehensive token service
   static async getAllTokensMultiChain(addresses: { [chain: string]: string }): Promise<TokenBalance[]> {
     try {
+      console.log('Loading tokens for addresses:', addresses);
+      
       // Get live token balances from APIs for all chains
       const allBalances: TokenServiceBalance[] = [];
       
-      // Get EVM chain balances
+      // Get EVM chain balances (only if we have a valid Ethereum address)
       if (addresses.ethereum || addresses.eth) {
-        const evmBalances = await tokenService.getTokenBalances(addresses.ethereum || addresses.eth || '');
-        allBalances.push(...evmBalances);
+        const ethAddress = addresses.ethereum || addresses.eth || '';
+        if (ethAddress && ethAddress.startsWith('0x') && ethAddress.length === 42) {
+          try {
+            console.log('Loading EVM tokens for address:', ethAddress);
+            const evmBalances = await tokenService.getTokenBalances(ethAddress);
+            allBalances.push(...evmBalances);
+            console.log('EVM tokens loaded:', evmBalances.length);
+          } catch (error) {
+            console.error('Failed to load EVM tokens:', error);
+          }
+        }
       }
       
-      // Get Solana balances
+      // Get Solana balances (only if we have a valid Solana address)
       if (addresses.solana) {
-        const solanaBalances = await tokenService.getTokenBalances(addresses.solana);
-        allBalances.push(...solanaBalances);
+        const solAddress = addresses.solana;
+        // Solana addresses are base58 encoded and typically 32-44 characters
+        if (solAddress && solAddress.length >= 32 && solAddress.length <= 44 && !solAddress.startsWith('0x')) {
+          try {
+            console.log('Loading Solana tokens for address:', solAddress);
+            const solanaBalances = await tokenService.getTokenBalances(solAddress);
+            allBalances.push(...solanaBalances);
+            console.log('Solana tokens loaded:', solanaBalances.length);
+          } catch (error) {
+            console.error('Failed to load Solana tokens:', error);
+          }
+        } else {
+          console.log('Invalid Solana address format:', solAddress);
+        }
       }
       
       // Get TRON balances (using original method for now)
       if (addresses.tron) {
-        const tronTokens = await this.getTronTokens(addresses.tron);
-        allBalances.push(...tronTokens.map(token => ({
-          symbol: token.symbol,
-          name: token.name,
-          address: token.address || '',
-          chain: 'tron',
-          decimals: token.decimals,
-          balance: token.balance,
-          balance_formatted: token.balance,
-          logo: token.logo,
-          price: undefined,
-          value_usd: parseFloat(token.usdValue),
-          change24h: token.change24h,
-          isNative: token.isNative,
-        })));
+        const tronAddress = addresses.tron;
+        if (tronAddress && tronAddress.startsWith('T') && tronAddress.length === 34) {
+          try {
+            console.log('Loading TRON tokens for address:', tronAddress);
+            const tronTokens = await this.getTronTokens(tronAddress);
+            allBalances.push(...tronTokens.map(token => ({
+              symbol: token.symbol,
+              name: token.name,
+              address: token.address || '',
+              chain: 'tron',
+              decimals: token.decimals,
+              balance: token.balance,
+              balance_formatted: token.balance,
+              logo: token.logo,
+              price: undefined,
+              value_usd: parseFloat(token.usdValue),
+              change24h: token.change24h,
+              isNative: token.isNative,
+            })));
+            console.log('TRON tokens loaded:', tronTokens.length);
+          } catch (error) {
+            console.error('Failed to load TRON tokens:', error);
+          }
+        }
       }
       
       // Get Bitcoin balances (using original method for now)
       if (addresses.bitcoin) {
-        const bitcoinTokens = await this.getBitcoinTokens(addresses.bitcoin);
-        allBalances.push(...bitcoinTokens.map(token => ({
-          symbol: token.symbol,
-          name: token.name,
-          address: token.address || '',
-          chain: 'bitcoin',
-          decimals: token.decimals,
-          balance: token.balance,
-          balance_formatted: token.balance,
-          logo: token.logo,
-          price: undefined,
-          value_usd: parseFloat(token.usdValue),
-          change24h: token.change24h,
-          isNative: token.isNative,
-        })));
+        const btcAddress = addresses.bitcoin;
+        // Bitcoin addresses start with 1, 3, or bc1 and are not Ethereum addresses
+        if (btcAddress && (btcAddress.startsWith('1') || btcAddress.startsWith('3') || btcAddress.startsWith('bc1')) && !btcAddress.startsWith('0x')) {
+          try {
+            console.log('Loading Bitcoin tokens for address:', btcAddress);
+            const bitcoinTokens = await this.getBitcoinTokens(btcAddress);
+            allBalances.push(...bitcoinTokens.map(token => ({
+              symbol: token.symbol,
+              name: token.name,
+              address: token.address || '',
+              chain: 'bitcoin',
+              decimals: token.decimals,
+              balance: token.balance,
+              balance_formatted: token.balance,
+              logo: token.logo,
+              price: undefined,
+              value_usd: parseFloat(token.usdValue),
+              change24h: token.change24h,
+              isNative: token.isNative,
+            })));
+            console.log('Bitcoin tokens loaded:', bitcoinTokens.length);
+          } catch (error) {
+            console.error('Failed to load Bitcoin tokens:', error);
+          }
+        } else {
+          console.log('Invalid Bitcoin address format:', btcAddress);
+        }
       }
       
       // Convert to our TokenBalance format
@@ -374,16 +418,26 @@ export class BalanceService {
         if (!address) continue;
 
         // Load balance based on chain
-        if (customToken.chain === 'Ethereum' && customToken.address !== 'native') {
-          const provider = new ethers.JsonRpcProvider(process.env.NEXT_PUBLIC_ETHEREUM_RPC || 'https://eth.llamarpc.com');
-          const contract = new ethers.Contract(customToken.address, ERC20_ABI, provider);
-          const bal = await contract.balanceOf(address);
-          balance = ethers.formatUnits(bal, customToken.decimals);
-        } else if (customToken.chain === 'Tron' && customToken.address !== 'native') {
-          const tronWeb = new TronWeb({ fullHost: 'https://api.trongrid.io' });
-          const contract = await tronWeb.contract().at(customToken.address);
-          const bal = await contract.balanceOf(address).call();
-          balance = (bal / Math.pow(10, customToken.decimals)).toString();
+        if (customToken.chain === 'Ethereum' && customToken.address !== 'native' && customToken.address.startsWith('0x')) {
+          try {
+            const provider = new ethers.JsonRpcProvider(process.env.NEXT_PUBLIC_ETHEREUM_RPC || 'https://eth.llamarpc.com');
+            const contract = new ethers.Contract(customToken.address, ERC20_ABI, provider);
+            const bal = await contract.balanceOf(address);
+            balance = ethers.formatUnits(bal, customToken.decimals);
+          } catch (error) {
+            console.error(`Failed to load balance for ${customToken.symbol}:`, error);
+            balance = '0';
+          }
+        } else if (customToken.chain === 'Tron' && customToken.address !== 'native' && customToken.address.startsWith('T')) {
+          try {
+            const tronWeb = new TronWeb({ fullHost: 'https://api.trongrid.io' });
+            const contract = await tronWeb.contract().at(customToken.address);
+            const bal = await contract.balanceOf(address).call();
+            balance = (bal / Math.pow(10, customToken.decimals)).toString();
+          } catch (error) {
+            console.error(`Failed to load balance for ${customToken.symbol}:`, error);
+            balance = '0';
+          }
         }
         // For Solana and Bitcoin, we'll use 0 balance for now since we don't have the full implementation
 
