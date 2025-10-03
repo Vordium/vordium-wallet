@@ -83,7 +83,7 @@ export function TokenSelector({
       address: searchResult.address,
       decimals: searchResult.decimals,
       isNative: searchResult.address === 'native',
-      icon: searchResult.logo,
+      logo: searchResult.logo,
     };
     onSelect(tokenBalance);
     onClose();
