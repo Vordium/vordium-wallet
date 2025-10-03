@@ -47,17 +47,25 @@ function SwapPageContent() {
 
   const evmAccount = accounts.find(a => a.chain === 'EVM');
   const tronAccount = accounts.find(a => a.chain === 'TRON');
+  const bitcoinAccount = accounts.find(a => a.chain === 'BITCOIN');
+  const solanaAccount = accounts.find(a => a.chain === 'SOLANA');
 
   useEffect(() => {
     loadTokens();
-  }, [evmAccount, tronAccount]);
+  }, [evmAccount, tronAccount, bitcoinAccount, solanaAccount]);
 
   const loadTokens = async () => {
-    if (!evmAccount || !tronAccount) return;
+    if (!evmAccount || !tronAccount || !bitcoinAccount || !solanaAccount) return;
     
     setLoading(true);
     try {
-      const tokenList = await BalanceService.getAllTokens(evmAccount.address, tronAccount.address);
+      const addresses = {
+        ethereum: evmAccount.address,
+        tron: tronAccount.address,
+        bitcoin: bitcoinAccount.address,
+        solana: solanaAccount.address,
+      };
+      const tokenList = await BalanceService.getAllTokensMultiChain(addresses);
       setTokens(tokenList);
       
       // Set default tokens

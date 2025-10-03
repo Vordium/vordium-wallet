@@ -30,14 +30,22 @@ function AlertsPageContent() {
 
   const evmAccount = accounts.find(a => a.chain === 'EVM');
   const tronAccount = accounts.find(a => a.chain === 'TRON');
+  const bitcoinAccount = accounts.find(a => a.chain === 'BITCOIN');
+  const solanaAccount = accounts.find(a => a.chain === 'SOLANA');
 
   const loadData = useCallback(async () => {
-    if (!evmAccount || !tronAccount) return;
+    if (!evmAccount || !tronAccount || !bitcoinAccount || !solanaAccount) return;
     
     setLoading(true);
     try {
-      // Load tokens
-      const tokenList = await BalanceService.getAllTokens(evmAccount.address, tronAccount.address);
+      // Load tokens from all chains
+      const addresses = {
+        ethereum: evmAccount.address,
+        tron: tronAccount.address,
+        bitcoin: bitcoinAccount.address,
+        solana: solanaAccount.address,
+      };
+      const tokenList = await BalanceService.getAllTokensMultiChain(addresses);
       setTokens(tokenList);
       
       // Load alerts from localStorage

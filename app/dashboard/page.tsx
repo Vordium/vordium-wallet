@@ -12,7 +12,6 @@ import { WalletImportModal } from '@/components/WalletImportModal';
 import { BalanceService, type TokenBalance } from '@/services/balance.service';
 import { NotificationCenter, useNotifications } from '@/components/NotificationSystem';
 import { PageSkeleton, BalanceCardSkeleton, TokenRowSkeleton } from '@/components/ui/Skeleton';
-import { APITestComponent } from '@/components/APITestComponent';
 import { getTrustWalletLogo, NATIVE_LOGOS } from '@/lib/tokenLogos';
 import { 
   SettingsIcon, 
@@ -264,11 +263,6 @@ export default function DashboardPage() {
         {/* Tab Content */}
         {activeTab === 'tokens' && (
           <>
-            {/* API Test Component - Temporary for debugging */}
-            <div className="mb-6">
-              <APITestComponent />
-            </div>
-            
             {loading ? (
               <div className="space-y-1">
                 {[1, 2, 3, 4, 5].map(i => (

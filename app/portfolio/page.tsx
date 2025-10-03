@@ -31,17 +31,25 @@ export default function PortfolioPage() {
 
   const evmAccount = accounts.find(a => a.chain === 'EVM');
   const tronAccount = accounts.find(a => a.chain === 'TRON');
+  const bitcoinAccount = accounts.find(a => a.chain === 'BITCOIN');
+  const solanaAccount = accounts.find(a => a.chain === 'SOLANA');
 
   useEffect(() => {
     loadPortfolioData();
-  }, [evmAccount, tronAccount, timeRange]);
+  }, [evmAccount, tronAccount, bitcoinAccount, solanaAccount, timeRange]);
 
   const loadPortfolioData = async () => {
-    if (!evmAccount || !tronAccount) return;
+    if (!evmAccount || !tronAccount || !bitcoinAccount || !solanaAccount) return;
     
     setLoading(true);
     try {
-      const tokens = await BalanceService.getAllTokens(evmAccount.address, tronAccount.address);
+      const addresses = {
+        ethereum: evmAccount.address,
+        tron: tronAccount.address,
+        bitcoin: bitcoinAccount.address,
+        solana: solanaAccount.address,
+      };
+      const tokens = await BalanceService.getAllTokensMultiChain(addresses);
       
       const totalValue = tokens.reduce((sum, token) => sum + parseFloat(token.usdValue), 0);
       const totalChange24h = tokens.reduce((sum, token) => sum + (parseFloat(token.usdValue) * 0.05), 0); // Mock 5% change
