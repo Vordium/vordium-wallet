@@ -5,7 +5,7 @@
 
 import { moralisService, type MoralisTokenBalance, type MoralisNativeBalance } from './moralis.service';
 import { heliusService, type HeliusTokenBalance, type HeliusNativeBalance } from './helius.service';
-import { bitcoinService, type BitcoinBalance } from './bitcoin.service';
+import { BitcoinService, type BitcoinPrice } from './bitcoin.service';
 import { CHAIN_CONFIG } from '@/config/api.config';
 
 export interface TokenBalance {
@@ -141,9 +141,9 @@ export class TokenService {
 
       // Get Bitcoin balance
       try {
-        const bitcoinBalance = await bitcoinService.getBalance(address);
+        const bitcoinBalance = await BitcoinService.getBalance(address);
         if (bitcoinBalance) {
-          const bitcoinPrice = await bitcoinService.getBitcoinPrice();
+          const bitcoinPrice = await BitcoinService.getPrice();
           allBalances.push({
             symbol: 'BTC',
             name: 'Bitcoin',
@@ -334,7 +334,7 @@ export class TokenService {
           return await heliusService.getTokenPrice(address);
 
         case 'bitcoin':
-          return await bitcoinService.getBitcoinPrice();
+          return await BitcoinService.getPrice();
 
         default:
           return null;
