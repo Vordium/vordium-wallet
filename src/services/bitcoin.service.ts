@@ -1,227 +1,298 @@
-/**
- * Bitcoin Service
- * Handles Bitcoin blockchain data and transactions
- */
-
+// Bitcoin Service - Live Bitcoin blockchain integration
 import { API_CONFIG } from '@/config/api.config';
 
-export interface BitcoinBalance {
-  address: string;
+export interface BitcoinTransaction {
+  hash: string;
+  block_height: number;
+  block_index: number;
+  time: number;
   balance: number;
-  balance_formatted: string;
+  fee: number;
+  inputs: Array<{
+    prev_hash: string;
+    output_index: number;
+    output_value: number;
+    addresses: string[];
+  }>;
+  outputs: Array<{
+    value: number;
+    addresses: string[];
+    script_type: string;
+  }>;
+}
+
+export interface BitcoinAddressInfo {
+  address: string;
   total_received: number;
   total_sent: number;
-  tx_count: number;
-  price?: number;
-  value_usd?: number;
+  balance: number;
+  unconfirmed_balance: number;
+  final_balance: number;
+  n_tx: number;
+  unconfirmed_n_tx: number;
+  final_n_tx: number;
+  txrefs: BitcoinTransaction[];
 }
 
-export interface BitcoinTransaction {
-  txid: string;
-  hash: string;
-  version: number;
-  size: number;
-  vsize: number;
-  weight: number;
-  locktime: number;
-  vin: any[];
-  vout: any[];
-  hex: string;
-  blockhash: string;
-  confirmations: number;
-  time: number;
-  blocktime: number;
-}
-
-export interface BitcoinUTXO {
-  txid: string;
-  vout: number;
-  value: number;
-  scriptPubKey: {
-    asm: string;
-    hex: string;
-    reqSigs: number;
-    type: string;
-    addresses: string[];
-  };
+export interface BitcoinPrice {
+  symbol: string;
+  price: number;
+  timestamp: number;
 }
 
 export class BitcoinService {
-  private static instance: BitcoinService;
-  private baseUrl: string;
-  private apiKey: string;
+  private static cache = new Map<string, { data: any; timestamp: number }>();
+  private static readonly CACHE_DURATION = 30000; // 30 seconds
 
-  private constructor() {
-    this.baseUrl = 'https://blockstream.info/api'; // Using Blockstream API as it's free and reliable
-    this.apiKey = API_CONFIG.MORALIS.API_KEY; // We can use Moralis for Bitcoin if needed
-  }
+  // Get Bitcoin balance for an address
+  static async getBalance(address: string): Promise<string> {
+    try {
+      const cacheKey = `balance-${address}`;
+      const cached = this.getCachedData(cacheKey);
+      if (cached) return cached.balance;
 
-  static getInstance(): BitcoinService {
-    if (!BitcoinService.instance) {
-      BitcoinService.instance = new BitcoinService();
-    }
-    return BitcoinService.instance;
-  }
-
-  private async makeRequest(endpoint: string, params: Record<string, any> = {}): Promise<any> {
-    const url = new URL(`${this.baseUrl}${endpoint}`);
-    Object.keys(params).forEach(key => {
-      if (params[key] !== undefined && params[key] !== null) {
-        url.searchParams.append(key, params[key].toString());
+      if (API_CONFIG.BLOCKCYPHER.ENABLED) {
+        const balance = await this.getBlockCypherBalance(address);
+        if (balance !== null) {
+          this.setCachedData(cacheKey, { balance });
+          return balance;
+        }
       }
-    });
 
-    const response = await fetch(url.toString(), {
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    });
+      if (API_CONFIG.BLOCKSTREAM.ENABLED) {
+        const balance = await this.getBlockstreamBalance(address);
+        if (balance !== null) {
+          this.setCachedData(cacheKey, { balance });
+          return balance;
+        }
+      }
 
-    if (!response.ok) {
-      throw new Error(`Bitcoin API error: ${response.status} ${response.statusText}`);
-    }
-
-    return response.json();
-  }
-
-  /**
-   * Get Bitcoin balance for an address
-   */
-  async getBalance(address: string): Promise<BitcoinBalance | null> {
-    try {
-      const data = await this.makeRequest(`/address/${address}`);
-
-      return {
-        address,
-        balance: data.chain_stats.funded_txo_sum - data.chain_stats.spent_txo_sum,
-        balance_formatted: ((data.chain_stats.funded_txo_sum - data.chain_stats.spent_txo_sum) / 100000000).toFixed(8),
-        total_received: data.chain_stats.funded_txo_sum,
-        total_sent: data.chain_stats.spent_txo_sum,
-        tx_count: data.chain_stats.tx_count,
-      };
+      console.warn('No Bitcoin API configured, returning 0 balance');
+      return '0';
     } catch (error) {
-      console.error('Error fetching Bitcoin balance:', error);
-      return null;
+      console.error('Error getting Bitcoin balance:', error);
+      return '0';
     }
   }
 
-  /**
-   * Get UTXOs for an address
-   */
-  async getUTXOs(address: string): Promise<BitcoinUTXO[]> {
+  // Get Bitcoin transactions for an address
+  static async getTransactions(address: string, limit: number = 50): Promise<BitcoinTransaction[]> {
     try {
-      const data = await this.makeRequest(`/address/${address}/utxo`);
+      const cacheKey = `transactions-${address}-${limit}`;
+      const cached = this.getCachedData(cacheKey);
+      if (cached) return cached.transactions;
 
-      return data.map((utxo: any) => ({
-        txid: utxo.txid,
-        vout: utxo.vout,
-        value: utxo.value,
-        scriptPubKey: utxo.scriptPubKey,
-      }));
+      if (API_CONFIG.BLOCKCYPHER.ENABLED) {
+        const transactions = await this.getBlockCypherTransactions(address, limit);
+        if (transactions) {
+          this.setCachedData(cacheKey, { transactions });
+          return transactions;
+        }
+      }
+
+      if (API_CONFIG.BLOCKSTREAM.ENABLED) {
+        const transactions = await this.getBlockstreamTransactions(address, limit);
+        if (transactions) {
+          this.setCachedData(cacheKey, { transactions });
+          return transactions;
+        }
+      }
+
+      console.warn('No Bitcoin API configured, returning empty transactions');
+      return [];
     } catch (error) {
-      console.error('Error fetching UTXOs:', error);
+      console.error('Error getting Bitcoin transactions:', error);
       return [];
     }
   }
 
-  /**
-   * Get transaction history
-   */
-  async getTransactionHistory(address: string, limit: number = 50): Promise<BitcoinTransaction[]> {
+  // Get Bitcoin price
+  static async getPrice(): Promise<BitcoinPrice | null> {
     try {
-      const data = await this.makeRequest(`/address/${address}/txs`, {
-        limit,
+      const cacheKey = 'bitcoin-price';
+      const cached = this.getCachedData(cacheKey);
+      if (cached) return cached.price;
+
+      if (API_CONFIG.COINGECKO.ENABLED) {
+        const price = await this.getCoinGeckoPrice();
+        if (price) {
+          this.setCachedData(cacheKey, { price });
+          return price;
+        }
+      }
+
+      return null;
+    } catch (error) {
+      console.error('Error getting Bitcoin price:', error);
+      return null;
+    }
+  }
+
+  // Validate Bitcoin address
+  static validateAddress(address: string): boolean {
+    // Basic Bitcoin address validation
+    const patterns = [
+      /^[13][a-km-zA-HJ-NP-Z1-9]{25,34}$/, // Legacy addresses
+      /^bc1[a-z0-9]{39,59}$/, // Bech32 addresses
+    ];
+
+    return patterns.some(pattern => pattern.test(address));
+  }
+
+  // Get balance from BlockCypher
+  private static async getBlockCypherBalance(address: string): Promise<string | null> {
+    try {
+      const url = `${API_CONFIG.BLOCKCYPHER.API_URL}/addrs/${address}/balance`;
+      const response = await fetch(url, {
+        headers: {
+          'Accept': 'application/json',
+          ...(API_CONFIG.BLOCKCYPHER.API_KEY && { 'Authorization': `Bearer ${API_CONFIG.BLOCKCYPHER.API_KEY}` }),
+        },
       });
 
+      if (!response.ok) {
+        throw new Error(`BlockCypher API error: ${response.status}`);
+      }
+
+      const data = await response.json();
+      const balance = data.balance || 0;
+      return (balance / 100000000).toFixed(8); // Convert satoshis to BTC
+    } catch (error) {
+      console.error('BlockCypher balance error:', error);
+      return null;
+    }
+  }
+
+  // Get balance from Blockstream
+  private static async getBlockstreamBalance(address: string): Promise<string | null> {
+    try {
+      const url = `${API_CONFIG.BLOCKSTREAM.API_URL}/address/${address}`;
+      const response = await fetch(url, {
+        headers: {
+          'Accept': 'application/json',
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error(`Blockstream API error: ${response.status}`);
+      }
+
+      const data = await response.json();
+      const balance = data.chain_stats.funded_txo_sum - data.chain_stats.spent_txo_sum;
+      return (balance / 100000000).toFixed(8); // Convert satoshis to BTC
+    } catch (error) {
+      console.error('Blockstream balance error:', error);
+      return null;
+    }
+  }
+
+  // Get transactions from BlockCypher
+  private static async getBlockCypherTransactions(address: string, limit: number): Promise<BitcoinTransaction[] | null> {
+    try {
+      const url = `${API_CONFIG.BLOCKCYPHER.API_URL}/addrs/${address}/full?limit=${limit}`;
+      const response = await fetch(url, {
+        headers: {
+          'Accept': 'application/json',
+          ...(API_CONFIG.BLOCKCYPHER.API_KEY && { 'Authorization': `Bearer ${API_CONFIG.BLOCKCYPHER.API_KEY}` }),
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error(`BlockCypher API error: ${response.status}`);
+      }
+
+      const data = await response.json();
+      return data.txs || [];
+    } catch (error) {
+      console.error('BlockCypher transactions error:', error);
+      return null;
+    }
+  }
+
+  // Get transactions from Blockstream
+  private static async getBlockstreamTransactions(address: string, limit: number): Promise<BitcoinTransaction[] | null> {
+    try {
+      const url = `${API_CONFIG.BLOCKSTREAM.API_URL}/address/${address}/txs?limit=${limit}`;
+      const response = await fetch(url, {
+        headers: {
+          'Accept': 'application/json',
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error(`Blockstream API error: ${response.status}`);
+      }
+
+      const data = await response.json();
       return data.map((tx: any) => ({
-        txid: tx.txid,
-        hash: tx.hash,
-        version: tx.version,
-        size: tx.size,
-        vsize: tx.vsize,
-        weight: tx.weight,
-        locktime: tx.locktime,
-        vin: tx.vin,
-        vout: tx.vout,
-        hex: tx.hex,
-        blockhash: tx.status.block_hash,
-        confirmations: tx.status.confirmations,
+        hash: tx.txid,
+        block_height: tx.status.block_height,
+        block_index: tx.status.block_time,
         time: tx.status.block_time,
-        blocktime: tx.status.block_time,
+        balance: tx.vout.reduce((sum: number, output: any) => sum + output.value, 0),
+        fee: tx.fee,
+        inputs: tx.vin.map((input: any) => ({
+          prev_hash: input.txid,
+          output_index: input.vout,
+          output_value: 0, // Blockstream doesn't provide this easily
+          addresses: input.prevout?.scriptpubkey_address ? [input.prevout.scriptpubkey_address] : [],
+        })),
+        outputs: tx.vout.map((output: any) => ({
+          value: output.value,
+          addresses: output.scriptpubkey_address ? [output.scriptpubkey_address] : [],
+          script_type: output.scriptpubkey_type,
+        })),
       }));
     } catch (error) {
-      console.error('Error fetching transaction history:', error);
-      return [];
-    }
-  }
-
-  /**
-   * Get transaction details
-   */
-  async getTransaction(txid: string): Promise<BitcoinTransaction | null> {
-    try {
-      const data = await this.makeRequest(`/tx/${txid}`);
-
-      return {
-        txid: data.txid,
-        hash: data.hash,
-        version: data.version,
-        size: data.size,
-        vsize: data.vsize,
-        weight: data.weight,
-        locktime: data.locktime,
-        vin: data.vin,
-        vout: data.vout,
-        hex: data.hex,
-        blockhash: data.status.block_hash,
-        confirmations: data.status.confirmations,
-        time: data.status.block_time,
-        blocktime: data.status.block_time,
-      };
-    } catch (error) {
-      console.error('Error fetching transaction:', error);
+      console.error('Blockstream transactions error:', error);
       return null;
     }
   }
 
-  /**
-   * Get Bitcoin price
-   */
-  async getBitcoinPrice(): Promise<number | null> {
+  // Get price from CoinGecko
+  private static async getCoinGeckoPrice(): Promise<BitcoinPrice | null> {
     try {
-      // Using CoinGecko API for Bitcoin price
-      const response = await fetch('/api/prices?ids=bitcoin');
+      const url = `${API_CONFIG.COINGECKO.API_URL}/simple/price?ids=bitcoin&vs_currencies=usd`;
+      const response = await fetch(url, {
+        headers: {
+          'Accept': 'application/json',
+          ...(API_CONFIG.COINGECKO.API_KEY && { 'x-cg-demo-api-key': API_CONFIG.COINGECKO.API_KEY }),
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error(`CoinGecko API error: ${response.status}`);
+      }
+
       const data = await response.json();
-      return data.bitcoin?.usd || null;
+      if (data.bitcoin && data.bitcoin.usd) {
+        return {
+          symbol: 'BTC',
+          price: data.bitcoin.usd,
+          timestamp: Date.now(),
+        };
+      }
+
+      return null;
     } catch (error) {
-      console.error('Error fetching Bitcoin price:', error);
+      console.error('CoinGecko price error:', error);
       return null;
     }
   }
 
-  /**
-   * Validate Bitcoin address
-   */
-  validateAddress(address: string): boolean {
-    // Basic Bitcoin address validation
-    const bitcoinRegex = /^[13][a-km-zA-HJ-NP-Z1-9]{25,34}$|^bc1[a-z0-9]{39,59}$/;
-    return bitcoinRegex.test(address);
+  // Cache management
+  private static getCachedData(key: string): any {
+    const cached = this.cache.get(key);
+    if (cached && Date.now() - cached.timestamp < this.CACHE_DURATION) {
+      return cached.data;
+    }
+    return null;
   }
 
-  /**
-   * Generate Bitcoin address from private key (for testing purposes)
-   */
-  async generateAddressFromPrivateKey(privateKey: string): Promise<string | null> {
-    try {
-      // This would require a Bitcoin library like bitcoinjs-lib
-      // For now, we'll return null as this should be handled by a proper Bitcoin library
-      console.warn('Bitcoin address generation requires bitcoinjs-lib library');
-      return null;
-    } catch (error) {
-      console.error('Error generating Bitcoin address:', error);
-      return null;
-    }
+  private static setCachedData(key: string, data: any): void {
+    this.cache.set(key, {
+      data,
+      timestamp: Date.now(),
+    });
   }
 }
-
-export const bitcoinService = BitcoinService.getInstance();

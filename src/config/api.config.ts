@@ -25,6 +25,20 @@ export const API_CONFIG = {
     ENABLED: !!(process.env.NEXT_PUBLIC_COINGECKO_API_KEY || process.env.COINGECKO_API_KEY),
   },
   
+  // BlockCypher API - For Bitcoin blockchain data
+  BLOCKCYPHER: {
+    API_KEY: process.env.NEXT_PUBLIC_BLOCKCYPHER_API_KEY || process.env.BLOCKCYPHER_API_KEY || '',
+    API_URL: process.env.NEXT_PUBLIC_BITCOIN_API || process.env.BITCOIN_API || 'https://api.blockcypher.com/v1/btc/main',
+    ENABLED: !!(process.env.NEXT_PUBLIC_BLOCKCYPHER_API_KEY || process.env.BLOCKCYPHER_API_KEY),
+  },
+  
+  // Blockstream API - For Bitcoin blockchain data (backup)
+  BLOCKSTREAM: {
+    API_KEY: process.env.NEXT_PUBLIC_BLOCKSTREAM_API_KEY || process.env.BLOCKSTREAM_API_KEY || '',
+    API_URL: process.env.NEXT_PUBLIC_BITCOIN_RPC || process.env.BITCOIN_RPC || 'https://blockstream.info/api',
+    ENABLED: !!(process.env.NEXT_PUBLIC_BLOCKSTREAM_API_KEY || process.env.BLOCKSTREAM_API_KEY),
+  },
+  
   // WalletConnect Configuration
   WALLETCONNECT: {
     PROJECT_ID: process.env.NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID || process.env.WALLETCONNECT_PROJECT_ID || '',
@@ -46,6 +60,10 @@ if (typeof window !== 'undefined') {
   console.log('Helius Enabled:', API_CONFIG.HELIUS.ENABLED);
   console.log('CoinGecko API Key:', API_CONFIG.COINGECKO.API_KEY ? `${API_CONFIG.COINGECKO.API_KEY.substring(0, 8)}...` : 'NOT SET');
   console.log('CoinGecko Enabled:', API_CONFIG.COINGECKO.ENABLED);
+  console.log('BlockCypher API Key:', API_CONFIG.BLOCKCYPHER.API_KEY ? `${API_CONFIG.BLOCKCYPHER.API_KEY.substring(0, 8)}...` : 'NOT SET');
+  console.log('BlockCypher Enabled:', API_CONFIG.BLOCKCYPHER.ENABLED);
+  console.log('Blockstream API Key:', API_CONFIG.BLOCKSTREAM.API_KEY ? `${API_CONFIG.BLOCKSTREAM.API_KEY.substring(0, 8)}...` : 'NOT SET');
+  console.log('Blockstream Enabled:', API_CONFIG.BLOCKSTREAM.ENABLED);
   console.log('================================');
 }
 
@@ -55,9 +73,9 @@ export const CHAIN_CONFIG = {
     id: 1,
     name: 'Ethereum',
     symbol: 'ETH',
-    rpcUrl: 'https://eth-mainnet.g.alchemy.com/v2/demo',
+    rpcUrl: process.env.NEXT_PUBLIC_ETHEREUM_RPC || 'https://eth-mainnet.g.alchemy.com/v2/demo',
     explorerUrl: 'https://etherscan.io',
-    logoUrl: 'https://assets.coingecko.com/coins/images/279/large/ethereum.png',
+    logoUrl: 'https://via.placeholder.com/64/6B7280/FFFFFF?text=ETH',
   },
   POLYGON: {
     id: 137,
@@ -87,25 +105,25 @@ export const CHAIN_CONFIG = {
     id: 101,
     name: 'Solana',
     symbol: 'SOL',
-    rpcUrl: 'https://api.mainnet-beta.solana.com',
+    rpcUrl: process.env.NEXT_PUBLIC_SOLANA_RPC || 'https://api.mainnet-beta.solana.com',
     explorerUrl: 'https://explorer.solana.com',
-    logoUrl: 'https://assets.coingecko.com/coins/images/4128/large/solana.png',
+    logoUrl: 'https://via.placeholder.com/64/6B7280/FFFFFF?text=SOL',
   },
   BITCOIN: {
     id: 0,
     name: 'Bitcoin',
     symbol: 'BTC',
-    rpcUrl: '', // Bitcoin doesn't use RPC in the same way
+    rpcUrl: process.env.NEXT_PUBLIC_BITCOIN_RPC || 'https://blockstream.info/api',
     explorerUrl: 'https://blockstream.info',
-    logoUrl: 'https://assets.coingecko.com/coins/images/1/large/bitcoin.png',
+    logoUrl: 'https://via.placeholder.com/64/6B7280/FFFFFF?text=BTC',
   },
   TRON: {
     id: 195,
     name: 'TRON',
     symbol: 'TRX',
-    rpcUrl: 'https://api.trongrid.io',
+    rpcUrl: process.env.NEXT_PUBLIC_TRON_RPC || 'https://api.trongrid.io',
     explorerUrl: 'https://tronscan.org',
-    logoUrl: 'https://assets.coingecko.com/coins/images/1094/large/tron-logo.png',
+    logoUrl: 'https://via.placeholder.com/64/6B7280/FFFFFF?text=TRX',
   },
 };
 
