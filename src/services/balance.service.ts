@@ -169,68 +169,36 @@ export class BalanceService {
     return tokens;
   }
 
-  // New method using comprehensive token service
+  // Live multi-chain token loading using best practices from major wallets
   static async getAllTokensMultiChain(addresses: { [chain: string]: string }): Promise<TokenBalance[]> {
     try {
-      console.log('Loading tokens for addresses:', addresses);
+      console.log('Loading live tokens for addresses:', addresses);
       
-      // Get live token balances from APIs for all chains
-      const allBalances: TokenServiceBalance[] = [];
+      const allTokens: TokenBalance[] = [];
       
-      // Get EVM chain balances (only if we have a valid Ethereum address)
+      // 1. Load EVM tokens using direct RPC calls (like MetaMask)
       if (addresses.ethereum || addresses.eth) {
         const ethAddress = addresses.ethereum || addresses.eth || '';
         if (ethAddress && ethAddress.startsWith('0x') && ethAddress.length === 42) {
           try {
-            console.log('Loading EVM tokens for address:', ethAddress);
-            const evmBalances = await tokenService.getTokenBalances(ethAddress);
-            allBalances.push(...evmBalances);
-            console.log('EVM tokens loaded:', evmBalances.length);
+            console.log('Loading EVM tokens for:', ethAddress);
+            const evmTokens = await this.loadEVMTokens(ethAddress);
+            allTokens.push(...evmTokens);
+            console.log('EVM tokens loaded:', evmTokens.length);
           } catch (error) {
             console.error('Failed to load EVM tokens:', error);
           }
         }
       }
       
-      // Get Solana balances (only if we have a valid Solana address)
-      if (addresses.solana) {
-        const solAddress = addresses.solana;
-        // Solana addresses are base58 encoded and typically 32-44 characters
-        if (solAddress && solAddress.length >= 32 && solAddress.length <= 44 && !solAddress.startsWith('0x')) {
-          try {
-            console.log('Loading Solana tokens for address:', solAddress);
-            const solanaBalances = await tokenService.getTokenBalances(solAddress);
-            allBalances.push(...solanaBalances);
-            console.log('Solana tokens loaded:', solanaBalances.length);
-          } catch (error) {
-            console.error('Failed to load Solana tokens:', error);
-          }
-        } else {
-          console.log('Invalid Solana address format:', solAddress);
-        }
-      }
-      
-      // Get TRON balances (using original method for now)
+      // 2. Load TRON tokens using direct API calls
       if (addresses.tron) {
         const tronAddress = addresses.tron;
         if (tronAddress && tronAddress.startsWith('T') && tronAddress.length === 34) {
           try {
-            console.log('Loading TRON tokens for address:', tronAddress);
-            const tronTokens = await this.getTronTokens(tronAddress);
-            allBalances.push(...tronTokens.map(token => ({
-              symbol: token.symbol,
-              name: token.name,
-              address: token.address || '',
-              chain: 'tron',
-              decimals: token.decimals,
-              balance: token.balance,
-              balance_formatted: token.balance,
-              logo: token.logo,
-              price: undefined,
-              value_usd: parseFloat(token.usdValue),
-              change24h: token.change24h,
-              isNative: token.isNative,
-            })));
+            console.log('Loading TRON tokens for:', tronAddress);
+            const tronTokens = await this.loadTronTokens(tronAddress);
+            allTokens.push(...tronTokens);
             console.log('TRON tokens loaded:', tronTokens.length);
           } catch (error) {
             console.error('Failed to load TRON tokens:', error);
@@ -238,91 +206,384 @@ export class BalanceService {
         }
       }
       
-      // Get Bitcoin balances (using original method for now)
+      // 3. Load Solana tokens using direct RPC calls
+      if (addresses.solana) {
+        const solAddress = addresses.solana;
+        if (solAddress && solAddress.length >= 32 && solAddress.length <= 44 && !solAddress.startsWith('0x')) {
+          try {
+            console.log('Loading Solana tokens for:', solAddress);
+            const solanaTokens = await this.loadSolanaTokens(solAddress);
+            allTokens.push(...solanaTokens);
+            console.log('Solana tokens loaded:', solanaTokens.length);
+          } catch (error) {
+            console.error('Failed to load Solana tokens:', error);
+          }
+        }
+      }
+      
+      // 4. Load Bitcoin balance using direct API calls
       if (addresses.bitcoin) {
         const btcAddress = addresses.bitcoin;
-        // Bitcoin addresses start with 1, 3, or bc1 and are not Ethereum addresses
         if (btcAddress && (btcAddress.startsWith('1') || btcAddress.startsWith('3') || btcAddress.startsWith('bc1')) && !btcAddress.startsWith('0x')) {
           try {
-            console.log('Loading Bitcoin tokens for address:', btcAddress);
-            const bitcoinTokens = await this.getBitcoinTokens(btcAddress);
-            allBalances.push(...bitcoinTokens.map(token => ({
-              symbol: token.symbol,
-              name: token.name,
-              address: token.address || '',
-              chain: 'bitcoin',
-              decimals: token.decimals,
-              balance: token.balance,
-              balance_formatted: token.balance,
-              logo: token.logo,
-              price: undefined,
-              value_usd: parseFloat(token.usdValue),
-              change24h: token.change24h,
-              isNative: token.isNative,
-            })));
+            console.log('Loading Bitcoin balance for:', btcAddress);
+            const bitcoinTokens = await this.loadBitcoinTokens(btcAddress);
+            allTokens.push(...bitcoinTokens);
             console.log('Bitcoin tokens loaded:', bitcoinTokens.length);
           } catch (error) {
             console.error('Failed to load Bitcoin tokens:', error);
           }
-        } else {
-          console.log('Invalid Bitcoin address format:', btcAddress);
         }
       }
       
-      // Convert to our TokenBalance format
-      const liveTokens = allBalances.map(balance => ({
-        symbol: balance.symbol,
-        name: balance.name,
-        balance: balance.balance,
-        usdValue: balance.value_usd?.toString() || '0',
-        chain: this.mapChainName(balance.chain) as 'Ethereum' | 'Tron' | 'Solana' | 'Bitcoin',
-        address: balance.address,
-        decimals: balance.decimals,
-        isNative: balance.isNative,
-        logo: balance.logo || this.getTokenLogo(balance.symbol, balance.address),
-        change24h: balance.change24h,
-      }));
-
-      // Get custom tokens from localStorage
-      const getCustomTokens = () => {
-        try {
-          const stored = localStorage.getItem('vordium-tokens');
-          return stored ? JSON.parse(stored) : [];
-        } catch {
-          return [];
-        }
-      };
-
-      const customTokens = getCustomTokens();
+      // 5. Load custom tokens from localStorage
+      const customTokens = await this.loadCustomTokens(addresses);
+      allTokens.push(...customTokens);
       
-      // Load balances for custom tokens
-      const customTokenBalances = await this.loadCustomTokenBalances(customTokens, addresses);
-      console.log('Custom tokens loaded:', customTokenBalances);
-      
-      // Combine live tokens and custom tokens, avoiding duplicates
-      const combinedTokens: TokenBalance[] = [...liveTokens];
-      console.log('Live tokens:', liveTokens);
-      
-      for (const customToken of customTokenBalances) {
-        // Skip if already exists in live tokens
-        if (!combinedTokens.some(t => 
-          t.symbol === customToken.symbol && 
-          t.chain === customToken.chain && 
-          (t.address || '') === (customToken.address || '')
-        )) {
-          console.log('Adding custom token to combined tokens:', customToken);
-          combinedTokens.push(customToken);
-        } else {
-          console.log('Custom token already exists in live tokens:', customToken);
-        }
-      }
-      
-      console.log('Final combined tokens:', combinedTokens);
-      return combinedTokens;
+      console.log('Total tokens loaded:', allTokens.length);
+      return allTokens;
     } catch (error) {
       console.error('Failed to load multi-chain tokens:', error);
       // Fallback to original method
       return this.getAllTokens(addresses.ethereum || addresses.eth || '', addresses.tron || '');
+    }
+  }
+
+  // Load EVM tokens using direct RPC calls (like MetaMask)
+  private static async loadEVMTokens(address: string): Promise<TokenBalance[]> {
+    const tokens: TokenBalance[] = [];
+    
+    try {
+      // Use free public RPC endpoints
+      const rpcUrls = [
+        'https://eth.llamarpc.com',
+        'https://rpc.ankr.com/eth',
+        'https://ethereum.publicnode.com'
+      ];
+      
+      let provider: ethers.JsonRpcProvider | null = null;
+      
+      // Try different RPC endpoints
+      for (const rpcUrl of rpcUrls) {
+        try {
+          provider = new ethers.JsonRpcProvider(rpcUrl);
+          await provider.getBlockNumber(); // Test connection
+          console.log('Connected to RPC:', rpcUrl);
+          break;
+        } catch (error) {
+          console.log('Failed to connect to RPC:', rpcUrl);
+          continue;
+        }
+      }
+      
+      if (!provider) {
+        throw new Error('No working RPC endpoint found');
+      }
+      
+      // Get native ETH balance
+      const ethBalance = await provider.getBalance(address);
+      const ethBalanceFormatted = ethers.formatEther(ethBalance);
+      
+      // Get ETH price from CoinGecko (free)
+      const ethPrice = await this.getTokenPrice('ethereum');
+      const ethUsdValue = (parseFloat(ethBalanceFormatted) * ethPrice).toFixed(2);
+      
+      tokens.push({
+        symbol: 'ETH',
+        name: 'Ethereum',
+        balance: ethBalanceFormatted,
+        usdValue: ethUsdValue,
+        chain: 'Ethereum',
+        address: 'native',
+        decimals: 18,
+        isNative: true,
+        logo: 'https://assets.coingecko.com/coins/images/279/large/ethereum.png',
+        change24h: await this.getTokenChange24h('ethereum'),
+      });
+      
+      // Get popular ERC-20 tokens (USDT, USDC, DAI, etc.)
+      const popularTokens = [
+        {
+          symbol: 'USDT',
+          name: 'Tether USD',
+          address: '0xdAC17F958D2ee523a2206206994597C13D831ec7',
+          decimals: 6,
+          coingeckoId: 'tether'
+        },
+        {
+          symbol: 'USDC',
+          name: 'USD Coin',
+          address: '0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48',
+          decimals: 6,
+          coingeckoId: 'usd-coin'
+        },
+        {
+          symbol: 'DAI',
+          name: 'Dai Stablecoin',
+          address: '0x6B175474E89094C44Da98b954EedeAC495271d0F',
+          decimals: 18,
+          coingeckoId: 'dai'
+        }
+      ];
+      
+      for (const token of popularTokens) {
+        try {
+          const contract = new ethers.Contract(token.address, ERC20_ABI, provider);
+          const balance = await contract.balanceOf(address);
+          const balanceFormatted = ethers.formatUnits(balance, token.decimals);
+          
+          if (parseFloat(balanceFormatted) > 0) {
+            const price = await this.getTokenPrice(token.coingeckoId);
+            const usdValue = (parseFloat(balanceFormatted) * price).toFixed(2);
+            
+            tokens.push({
+              symbol: token.symbol,
+              name: token.name,
+              balance: balanceFormatted,
+              usdValue: usdValue,
+              chain: 'Ethereum',
+              address: token.address,
+              decimals: token.decimals,
+              isNative: false,
+              logo: `https://assets.coingecko.com/coins/images/${this.getTokenImageId(token.symbol)}/large/${token.symbol.toLowerCase()}.png`,
+              change24h: await this.getTokenChange24h(token.coingeckoId),
+            });
+          }
+        } catch (error) {
+          console.error(`Failed to load ${token.symbol}:`, error);
+        }
+      }
+      
+    } catch (error) {
+      console.error('Failed to load EVM tokens:', error);
+    }
+    
+    return tokens;
+  }
+
+  // Load TRON tokens using direct API calls
+  private static async loadTronTokens(address: string): Promise<TokenBalance[]> {
+    const tokens: TokenBalance[] = [];
+    
+    try {
+      // Get TRX balance
+      const trxBalance = await this.getTrxBalance(address);
+      const trxPrice = await this.getTokenPrice('tron');
+      const trxUsdValue = (parseFloat(trxBalance) * trxPrice).toFixed(2);
+      
+      tokens.push({
+        symbol: 'TRX',
+        name: 'TRON',
+        balance: trxBalance,
+        usdValue: trxUsdValue,
+        chain: 'Tron',
+        address: 'native',
+        decimals: 6,
+        isNative: true,
+        logo: 'https://assets.coingecko.com/coins/images/1094/large/tron-logo.png',
+        change24h: await this.getTokenChange24h('tron'),
+      });
+      
+    } catch (error) {
+      console.error('Failed to load TRON tokens:', error);
+    }
+    
+    return tokens;
+  }
+
+  // Load Solana tokens using direct RPC calls
+  private static async loadSolanaTokens(address: string): Promise<TokenBalance[]> {
+    const tokens: TokenBalance[] = [];
+    
+    try {
+      // Use free Solana RPC
+      const rpcUrl = 'https://api.mainnet-beta.solana.com';
+      
+      // Get SOL balance
+      const solBalance = await this.getSolBalance(address, rpcUrl);
+      const solPrice = await this.getTokenPrice('solana');
+      const solUsdValue = (parseFloat(solBalance) * solPrice).toFixed(2);
+      
+      tokens.push({
+        symbol: 'SOL',
+        name: 'Solana',
+        balance: solBalance,
+        usdValue: solUsdValue,
+        chain: 'Solana',
+        address: 'native',
+        decimals: 9,
+        isNative: true,
+        logo: 'https://assets.coingecko.com/coins/images/4128/large/solana.png',
+        change24h: await this.getTokenChange24h('solana'),
+      });
+      
+    } catch (error) {
+      console.error('Failed to load Solana tokens:', error);
+    }
+    
+    return tokens;
+  }
+
+  // Load Bitcoin balance using direct API calls
+  private static async loadBitcoinTokens(address: string): Promise<TokenBalance[]> {
+    const tokens: TokenBalance[] = [];
+    
+    try {
+      // Use free Bitcoin API
+      const btcBalance = await this.getBitcoinBalance(address);
+      const btcPrice = await this.getTokenPrice('bitcoin');
+      const btcUsdValue = (parseFloat(btcBalance) * btcPrice).toFixed(2);
+      
+      tokens.push({
+        symbol: 'BTC',
+        name: 'Bitcoin',
+        balance: btcBalance,
+        usdValue: btcUsdValue,
+        chain: 'Bitcoin',
+        address: 'native',
+        decimals: 8,
+        isNative: true,
+        logo: 'https://assets.coingecko.com/coins/images/1/large/bitcoin.png',
+        change24h: await this.getTokenChange24h('bitcoin'),
+      });
+      
+    } catch (error) {
+      console.error('Failed to load Bitcoin tokens:', error);
+    }
+    
+    return tokens;
+  }
+
+  // Load custom tokens from localStorage
+  private static async loadCustomTokens(addresses: { [chain: string]: string }): Promise<TokenBalance[]> {
+    try {
+      const stored = localStorage.getItem('vordium-tokens');
+      if (!stored) return [];
+      
+      const customTokens = JSON.parse(stored);
+      const tokens: TokenBalance[] = [];
+      
+      for (const token of customTokens) {
+        try {
+          // Load balance based on chain
+          let balance = '0';
+          if (token.chain === 'Ethereum' && token.address !== 'native') {
+            balance = await this.getERC20Balance(token.address, addresses.ethereum || addresses.eth || '', token.decimals);
+          } else if (token.chain === 'Tron' && token.address !== 'native') {
+            balance = await this.getTRC20Balance(token.address, addresses.tron || '', token.decimals);
+          }
+          
+          const price = await this.getTokenPrice(token.coingeckoId || token.symbol.toLowerCase());
+          const usdValue = (parseFloat(balance) * price).toFixed(2);
+          
+          tokens.push({
+            symbol: token.symbol,
+            name: token.name,
+            balance: balance,
+            usdValue: usdValue,
+            chain: token.chain,
+            address: token.address,
+            decimals: token.decimals,
+            isNative: token.isNative || false,
+            logo: token.logo || `https://assets.coingecko.com/coins/images/${this.getTokenImageId(token.symbol)}/large/${token.symbol.toLowerCase()}.png`,
+            change24h: await this.getTokenChange24h(token.coingeckoId || token.symbol.toLowerCase()),
+          });
+        } catch (error) {
+          console.error(`Failed to load custom token ${token.symbol}:`, error);
+        }
+      }
+      
+      return tokens;
+    } catch (error) {
+      console.error('Failed to load custom tokens:', error);
+      return [];
+    }
+  }
+
+  // Get token price from CoinGecko (free API)
+  private static async getTokenPrice(coinId: string): Promise<number> {
+    try {
+      const response = await fetch(`https://api.coingecko.com/api/v3/simple/price?ids=${coinId}&vs_currencies=usd`);
+      const data = await response.json();
+      return data[coinId]?.usd || 0;
+    } catch (error) {
+      console.error(`Failed to get price for ${coinId}:`, error);
+      return 0;
+    }
+  }
+
+  // Get 24h price change from CoinGecko
+  private static async getTokenChange24h(coinId: string): Promise<number> {
+    try {
+      const response = await fetch(`https://api.coingecko.com/api/v3/simple/price?ids=${coinId}&vs_currencies=usd&include_24hr_change=true`);
+      const data = await response.json();
+      return data[coinId]?.usd_24h_change || 0;
+    } catch (error) {
+      console.error(`Failed to get 24h change for ${coinId}:`, error);
+      return 0;
+    }
+  }
+
+  // Get token image ID for CoinGecko
+  private static getTokenImageId(symbol: string): string {
+    const imageIds: { [key: string]: string } = {
+      'ETH': '279',
+      'USDT': '325',
+      'USDC': '6319',
+      'DAI': '9956',
+      'TRX': '1094',
+      'SOL': '4128',
+      'BTC': '1'
+    };
+    return imageIds[symbol.toUpperCase()] || '1';
+  }
+
+  // Get ERC-20 token balance
+  private static async getERC20Balance(tokenAddress: string, userAddress: string, decimals: number): Promise<string> {
+    try {
+      const provider = new ethers.JsonRpcProvider('https://eth.llamarpc.com');
+      const contract = new ethers.Contract(tokenAddress, ERC20_ABI, provider);
+      const balance = await contract.balanceOf(userAddress);
+      return ethers.formatUnits(balance, decimals);
+    } catch (error) {
+      console.error('Failed to get ERC-20 balance:', error);
+      return '0';
+    }
+  }
+
+  // Get TRC-20 token balance
+  private static async getTRC20Balance(tokenAddress: string, userAddress: string, decimals: number): Promise<string> {
+    try {
+      const tronWeb = new TronWeb({ fullHost: 'https://api.trongrid.io' });
+      const contract = await tronWeb.contract().at(tokenAddress);
+      const balance = await contract.balanceOf(userAddress).call();
+      return (balance / Math.pow(10, decimals)).toString();
+    } catch (error) {
+      console.error('Failed to get TRC-20 balance:', error);
+      return '0';
+    }
+  }
+
+  // Get SOL balance
+  private static async getSolBalance(address: string, rpcUrl: string): Promise<string> {
+    try {
+      const response = await fetch(rpcUrl, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          jsonrpc: '2.0',
+          id: 1,
+          method: 'getBalance',
+          params: [address]
+        })
+      });
+      
+      const data = await response.json();
+      const lamports = data.result?.value || 0;
+      return (lamports / 1000000000).toString(); // Convert lamports to SOL
+    } catch (error) {
+      console.error('Failed to get SOL balance:', error);
+      return '0';
     }
   }
 

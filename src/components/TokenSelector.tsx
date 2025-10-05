@@ -38,46 +38,41 @@ export function TokenSelector({
         token.name.toLowerCase().includes(searchQuery.toLowerCase())
       );
       
-      // Try Enhanced TokenSearchService first, fallback to static search
-      EnhancedTokenSearchService.searchTokens(searchQuery)
-        .then(popularResults => {
-          console.log('Enhanced search results:', popularResults);
-          if (popularResults && popularResults.length > 0) {
-            setSearchResults(popularResults);
-          } else {
-            // Fallback to static search if no results
-            console.log('No enhanced results, using static search');
-            const staticResults = TokenSearchService.searchTokens(searchQuery);
-            setSearchResults(staticResults.map(result => ({
-              symbol: result.symbol,
-              name: result.name,
-              address: result.address,
-              chain: result.chain,
-              decimals: result.decimals,
-              logo: result.logo,
-              verified: result.verified,
-            })));
-          }
-          setFilteredTokens(dashboardFiltered);
-          setIsSearching(false);
-        })
-        .catch(error => {
-          console.error('Error searching tokens:', error);
-          // Fallback to static search
-          console.log('Enhanced search failed, using static search');
-          const staticResults = TokenSearchService.searchTokens(searchQuery);
-          setSearchResults(staticResults.map(result => ({
-            symbol: result.symbol,
-            name: result.name,
-            address: result.address,
-            chain: result.chain,
-            decimals: result.decimals,
-            logo: result.logo,
-            verified: result.verified,
-          })));
-          setFilteredTokens(dashboardFiltered);
-          setIsSearching(false);
-        });
+      // Use live CoinGecko search (free API)
+      console.log('Searching live tokens from CoinGecko');
+      try {
+        const response = await fetch(`https://api.coingecko.com/api/v3/search?query=${encodeURIComponent(searchQuery)}`);
+        const data = await response.json();
+        
+        const liveResults = data.coins?.slice(0, 10).map((coin: any) => ({
+          symbol: coin.symbol.toUpperCase(),
+          name: coin.name,
+          address: coin.id, // Use CoinGecko ID as identifier
+          chain: 'Ethereum', // Default to Ethereum for now
+          decimals: 18,
+          logo: coin.large || coin.small || coin.thumb || '',
+          verified: true,
+        })) || [];
+        
+        setSearchResults(liveResults);
+        console.log('Live search results:', liveResults.length);
+      } catch (error) {
+        console.error('Live search failed, using static search:', error);
+        // Fallback to static search
+        const staticResults = TokenSearchService.searchTokens(searchQuery);
+        setSearchResults(staticResults.map(result => ({
+          symbol: result.symbol,
+          name: result.name,
+          address: result.address,
+          chain: result.chain,
+          decimals: result.decimals,
+          logo: result.logo,
+          verified: result.verified,
+        })));
+      }
+      
+      setFilteredTokens(dashboardFiltered);
+      setIsSearching(false);
     } else {
       setFilteredTokens(tokens);
       setSearchResults([]);
