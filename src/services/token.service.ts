@@ -335,7 +335,8 @@ export class TokenService {
           return await heliusService.getTokenPrice(address);
 
         case 'bitcoin':
-          return await BitcoinService.getPrice();
+          const bitcoinPrice = await BitcoinService.getPrice();
+          return bitcoinPrice?.price ?? null;
 
         default:
           return null;
