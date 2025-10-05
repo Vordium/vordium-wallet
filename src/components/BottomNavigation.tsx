@@ -1,7 +1,7 @@
 'use client';
 
 import { useRouter, usePathname } from 'next/navigation';
-import { HomeIcon, BrowserIcon, LockIcon, TrendingIcon, SwapIcon } from './icons/GrayIcons';
+import { HomeIcon, BrowserIcon, LockIcon, TrendingIcon, SendIcon, ReceiveIcon } from './icons/GrayIcons';
 
 export function BottomNavigation() {
   const router = useRouter();
@@ -38,32 +38,32 @@ export function BottomNavigation() {
           <span className="text-xs font-medium">Trending</span>
         </button>
 
-        {/* Swap Button - Center with Enhanced Animation */}
+        {/* Send Button - Center with Enhanced Animation */}
         <button
-          onClick={() => router.push('/swap')}
+          onClick={() => router.push('/send')}
           className={`group relative flex items-center justify-center w-14 h-14 rounded-full transition-all duration-300 transform -translate-y-2 ${
-            isActive('/swap')
-              ? 'bg-blue-600 text-white shadow-2xl shadow-blue-600/60 scale-110'
-              : 'bg-gray-700 text-gray-300 hover:bg-blue-600 hover:text-white hover:shadow-2xl hover:shadow-blue-600/60 hover:scale-110 hover:-translate-y-3'
+            isActive('/send')
+              ? 'bg-gray-600 text-white shadow-2xl shadow-gray-600/60 scale-110'
+              : 'bg-gray-700 text-gray-300 hover:bg-gray-600 hover:text-white hover:shadow-2xl hover:shadow-gray-600/60 hover:scale-110 hover:-translate-y-3'
           }`}
         >
-          <div className={`relative z-10 ${isActive('/swap') ? 'animate-pulse' : ''}`}>
-            <SwapIcon className="w-7 h-7" />
-            {isActive('/swap') && (
-              <div className="absolute inset-0 rounded-full bg-blue-400 opacity-30 animate-ping"></div>
+          <div className={`relative z-10 ${isActive('/send') ? 'animate-pulse' : ''}`}>
+            <SendIcon className="w-7 h-7" />
+            {isActive('/send') && (
+              <div className="absolute inset-0 rounded-full bg-gray-400 opacity-30 animate-ping"></div>
             )}
           </div>
           {/* Enhanced glow effect */}
           <div className={`absolute inset-0 rounded-full transition-all duration-300 ${
-            isActive('/swap')
-              ? 'bg-blue-400 opacity-20 animate-pulse'
-              : 'bg-blue-400 opacity-0 group-hover:opacity-20'
+            isActive('/send')
+              ? 'bg-gray-400 opacity-20 animate-pulse'
+              : 'bg-gray-400 opacity-0 group-hover:opacity-20'
           }`}></div>
           {/* Additional outer glow */}
           <div className={`absolute -inset-1 rounded-full transition-all duration-300 ${
-            isActive('/swap')
-              ? 'bg-blue-500 opacity-10 animate-pulse'
-              : 'bg-blue-500 opacity-0 group-hover:opacity-10'
+            isActive('/send')
+              ? 'bg-gray-500 opacity-10 animate-pulse'
+              : 'bg-gray-500 opacity-0 group-hover:opacity-10'
           }`}></div>
         </button>
 
