@@ -142,18 +142,19 @@ export class TokenService {
       // Get Bitcoin balance
       try {
         const bitcoinBalance = await BitcoinService.getBalance(address);
-        if (bitcoinBalance) {
+        if (bitcoinBalance && bitcoinBalance !== '0') {
           const bitcoinPrice = await BitcoinService.getPrice();
+          const balanceNumber = parseFloat(bitcoinBalance);
           allBalances.push({
             symbol: 'BTC',
             name: 'Bitcoin',
             address: address,
             chain: 'bitcoin',
             decimals: 8,
-            balance: bitcoinBalance.balance.toString(),
-            balance_formatted: bitcoinBalance.balance_formatted,
-            price: bitcoinPrice ?? undefined,
-            value_usd: bitcoinPrice ? (bitcoinBalance.balance / 100000000) * bitcoinPrice : undefined,
+            balance: bitcoinBalance,
+            balance_formatted: parseFloat(bitcoinBalance).toFixed(8),
+            price: bitcoinPrice?.price ?? undefined,
+            value_usd: bitcoinPrice ? balanceNumber * bitcoinPrice.price : undefined,
             isNative: true,
           });
         }
