@@ -29,12 +29,11 @@ Add these to your Vercel dashboard:
 # =============================================================================
 
 # Ethereum RPC Endpoints
-NEXT_PUBLIC_ETHEREUM_RPC=https://eth-mainnet.g.alchemy.com/v2/YOUR_ALCHEMY_KEY
+NEXT_PUBLIC_ETHEREUM_RPC=https://eth-mainnet.g.alchemy.com/v2/9TUWBQyZF6u6n4lZCSbgePPYkAR4KjMX
 NEXT_PUBLIC_ETHEREUM_RPC_BACKUP=https://mainnet.infura.io/v3/YOUR_INFURA_KEY
-NEXT_PUBLIC_POLYGON_RPC=https://polygon-mainnet.g.alchemy.com/v2/YOUR_ALCHEMY_KEY
+NEXT_PUBLIC_POLYGON_RPC=https://polygon-mainnet.g.alchemy.com/v2/9TUWBQyZF6u6n4lZCSbgePPYkAR4KjMX
 NEXT_PUBLIC_BSC_RPC=https://bsc-dataseed.binance.org
-NEXT_PUBLIC_ARBITRUM_RPC=https://arb-mainnet.g.alchemy.com/v2/YOUR_ALCHEMY_KEY
-
+NEXT_PUBLIC_ARBITRUM_RPC=https://arb-mainnet.g.alchemy.com/v2/9TUWBQyZF6u6n4lZCSbgePPYkAR4KjMX
 # TRON RPC Endpoints
 NEXT_PUBLIC_TRON_API=https://api.trongrid.io
 NEXT_PUBLIC_TRONGRID_API_KEY=YOUR_TRONGRID_API_KEY
@@ -47,7 +46,7 @@ NEXT_PUBLIC_HELIUS_API_KEY=YOUR_HELIUS_API_KEY
 
 # Bitcoin RPC Endpoints (CRITICAL - You were missing this!)
 NEXT_PUBLIC_BITCOIN_API=https://api.blockcypher.com/v1/btc/main
-NEXT_PUBLIC_BLOCKCYPHER_API_KEY=YOUR_BLOCKCYPHER_API_KEY
+NEXT_PUBLIC_BLOCKCYPHER_API_KEY=1b944851e2974b938927636b7f407f29
 NEXT_PUBLIC_BITCOIN_RPC=https://blockstream.info/api
 NEXT_PUBLIC_BLOCKSTREAM_API_KEY=YOUR_BLOCKSTREAM_API_KEY
 
