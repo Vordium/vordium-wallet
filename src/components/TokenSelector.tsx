@@ -5,7 +5,6 @@ import { SearchIcon, ArrowLeftIcon } from './icons/GrayIcons';
 import { type TokenBalance } from '@/services/balance.service';
 import { FormInputSkeleton } from './ui/Skeleton';
 import { TokenSearchService, type TokenSearchResult } from '@/services/tokenSearch.service';
-import { EnhancedTokenSearchService, type EnhancedTokenSearchResult } from '@/services/enhancedTokenSearch.service';
 
 interface TokenSelectorProps {
   isOpen: boolean;
@@ -26,7 +25,7 @@ export function TokenSelector({
 }: TokenSelectorProps) {
   const [searchQuery, setSearchQuery] = useState('');
   const [filteredTokens, setFilteredTokens] = useState<TokenBalance[]>([]);
-  const [searchResults, setSearchResults] = useState<EnhancedTokenSearchResult[]>([]);
+  const [searchResults, setSearchResults] = useState<TokenSearchResult[]>([]);
   const [isSearching, setIsSearching] = useState(false);
 
   useEffect(() => {
@@ -39,38 +38,10 @@ export function TokenSelector({
           token.name.toLowerCase().includes(searchQuery.toLowerCase())
         );
         
-        // Use live CoinGecko search (free API)
-        console.log('Searching live tokens from CoinGecko');
-        try {
-          const response = await fetch(`https://api.coingecko.com/api/v3/search?query=${encodeURIComponent(searchQuery)}`);
-          const data = await response.json();
-          
-          const liveResults = data.coins?.slice(0, 10).map((coin: any) => ({
-            symbol: coin.symbol.toUpperCase(),
-            name: coin.name,
-            address: coin.id, // Use CoinGecko ID as identifier
-            chain: 'Ethereum', // Default to Ethereum for now
-            decimals: 18,
-            logo: coin.large || coin.small || coin.thumb || '',
-            verified: true,
-          })) || [];
-          
-          setSearchResults(liveResults);
-          console.log('Live search results:', liveResults.length);
-        } catch (error) {
-          console.error('Live search failed, using static search:', error);
-          // Fallback to static search
-          const staticResults = TokenSearchService.searchTokens(searchQuery);
-          setSearchResults(staticResults.map(result => ({
-            symbol: result.symbol,
-            name: result.name,
-            address: result.address,
-            chain: result.chain,
-            decimals: result.decimals,
-            logo: result.logo,
-            verified: result.verified,
-          })));
-        }
+        // Use static search for now to avoid build issues
+        console.log('Using static token search');
+        const staticResults = TokenSearchService.searchTokens(searchQuery);
+        setSearchResults(staticResults);
         
         setFilteredTokens(dashboardFiltered);
         setIsSearching(false);
@@ -88,8 +59,8 @@ export function TokenSelector({
     onClose();
   };
 
-  const handleSelectSearchResult = (searchResult: EnhancedTokenSearchResult) => {
-    // Convert EnhancedTokenSearchResult to TokenBalance format
+  const handleSelectSearchResult = (searchResult: TokenSearchResult) => {
+    // Convert TokenSearchResult to TokenBalance format
     const tokenBalance: TokenBalance = {
       symbol: searchResult.symbol,
       name: searchResult.name,
