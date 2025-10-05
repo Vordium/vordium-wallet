@@ -5,7 +5,6 @@ import { ethers } from 'ethers';
 import TronWeb from 'tronweb';
 import { useWalletStore } from '@/store/walletStore';
 import { TokenSearchService, type TokenSearchResult } from '@/services/tokenSearch.service';
-import { EnhancedTokenSearchService, type EnhancedTokenSearchResult } from '@/services/enhancedTokenSearch.service';
 import { SearchIcon, PlusIcon, ArrowLeftIcon } from './icons/GrayIcons';
 import { ModalSkeleton, FormInputSkeleton } from './ui/Skeleton';
 import Image from 'next/image';
@@ -29,47 +28,36 @@ export function AddTokenModal({ isOpen, onClose }: { isOpen: boolean; onClose: (
     }
 
     setSearching(true);
-    EnhancedTokenSearchService.searchTokens(searchQuery, selectedChain)
-      .then(results => {
-        console.log('AddTokenModal enhanced search results:', results);
-        if (results && results.length > 0) {
-          setSearchResults(results);
-        } else {
-          // Fallback to static search if no results
-          console.log('No enhanced results, using static search');
-          const staticResults = TokenSearchService.searchTokens(searchQuery, selectedChain);
-          setSearchResults(staticResults.map(result => ({
-            symbol: result.symbol,
-            name: result.name,
-            address: result.address,
-            chain: result.chain,
-            decimals: result.decimals,
-            logo: result.logo,
-            verified: result.verified,
-          })));
-        }
-        setSearching(false);
-      })
-      .catch(error => {
-        console.error('Error searching tokens:', error);
-        console.log('Enhanced search failed, using static search');
-        // Fallback to static search
-        const staticResults = TokenSearchService.searchTokens(searchQuery, selectedChain);
-        setSearchResults(staticResults.map(result => ({
-          symbol: result.symbol,
-          name: result.name,
-          address: result.address,
-          chain: result.chain,
-          decimals: result.decimals,
-          logo: result.logo,
-          verified: result.verified,
-        })));
-        setSearching(false);
-      });
+    // Use live search via our API route (avoids CORS issues)
+    console.log('AddTokenModal: Searching live tokens via API route');
+    try {
+      const response = await fetch(`/api/search?query=${encodeURIComponent(searchQuery)}`);
+      const data = await response.json();
+      
+      const liveResults: TokenSearchResult[] = data.coins?.slice(0, 10).map((coin: any) => ({
+        symbol: coin.symbol.toUpperCase(),
+        name: coin.name,
+        address: coin.id, // Use CoinGecko ID as identifier
+        chain: selectedChain, // Use selected chain
+        decimals: 18,
+        logo: coin.large || coin.small || coin.thumb || '',
+        verified: true,
+      })) || [];
+      
+      setSearchResults(liveResults);
+      console.log('AddTokenModal live search results:', liveResults.length);
+    } catch (error) {
+      console.error('AddTokenModal live search failed, using static search:', error);
+      // Fallback to static search
+      const staticResults = TokenSearchService.searchTokens(searchQuery, selectedChain);
+      setSearchResults(staticResults);
+    }
+    
+    setSearching(false);
   }, [searchQuery, selectedChain]);
 
   // Add token from search
-  async function handleAddToken(token: EnhancedTokenSearchResult) {
+  async function handleAddToken(token: TokenSearchResult) {
     try {
       setSearching(true);
       

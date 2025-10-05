@@ -854,7 +854,7 @@ export class BalanceService {
       if (!coinId) return '0.00';
 
       const response = await fetch(
-        `https://api.coingecko.com/api/v3/simple/price?ids=${coinId}&vs_currencies=usd`,
+        `/api/prices?ids=${coinId}`,
         { cache: 'no-store' }
       );
       const data = await response.json();
@@ -913,7 +913,7 @@ export class BalanceService {
   static async fetchTokenInfo(contractAddress: string, platform: string = 'ethereum'): Promise<{ logo?: string; name?: string } | null> {
     try {
       const response = await fetch(
-        `https://api.coingecko.com/api/v3/coins/${platform}/contract/${contractAddress}`,
+        `/api/contract?platform=${platform}&contract=${contractAddress}`,
         { 
           method: 'GET',
           headers: { 'Accept': 'application/json' }

@@ -190,7 +190,7 @@ export class BitcoinService {
   async getBitcoinPrice(): Promise<number | null> {
     try {
       // Using CoinGecko API for Bitcoin price
-      const response = await fetch('https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=usd');
+      const response = await fetch('/api/prices?ids=bitcoin');
       const data = await response.json();
       return data.bitcoin?.usd || null;
     } catch (error) {
