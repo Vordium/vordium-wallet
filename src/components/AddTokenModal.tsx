@@ -22,38 +22,42 @@ export function AddTokenModal({ isOpen, onClose }: { isOpen: boolean; onClose: (
 
   // Search tokens using enhanced service with live API data
   useEffect(() => {
-    if (searchQuery.length < 2) {
-      setSearchResults([]);
-      return;
-    }
+    const searchTokens = async () => {
+      if (searchQuery.length < 2) {
+        setSearchResults([]);
+        return;
+      }
 
-    setSearching(true);
-    // Use live search via our API route (avoids CORS issues)
-    console.log('AddTokenModal: Searching live tokens via API route');
-    try {
-      const response = await fetch(`/api/search?query=${encodeURIComponent(searchQuery)}`);
-      const data = await response.json();
+      setSearching(true);
+      // Use live search via our API route (avoids CORS issues)
+      console.log('AddTokenModal: Searching live tokens via API route');
+      try {
+        const response = await fetch(`/api/search?query=${encodeURIComponent(searchQuery)}`);
+        const data = await response.json();
+        
+        const liveResults: TokenSearchResult[] = data.coins?.slice(0, 10).map((coin: any) => ({
+          symbol: coin.symbol.toUpperCase(),
+          name: coin.name,
+          address: coin.id, // Use CoinGecko ID as identifier
+          chain: selectedChain, // Use selected chain
+          decimals: 18,
+          logo: coin.large || coin.small || coin.thumb || '',
+          verified: true,
+        })) || [];
+        
+        setSearchResults(liveResults);
+        console.log('AddTokenModal live search results:', liveResults.length);
+      } catch (error) {
+        console.error('AddTokenModal live search failed, using static search:', error);
+        // Fallback to static search
+        const staticResults = TokenSearchService.searchTokens(searchQuery, selectedChain);
+        setSearchResults(staticResults);
+      }
       
-      const liveResults: TokenSearchResult[] = data.coins?.slice(0, 10).map((coin: any) => ({
-        symbol: coin.symbol.toUpperCase(),
-        name: coin.name,
-        address: coin.id, // Use CoinGecko ID as identifier
-        chain: selectedChain, // Use selected chain
-        decimals: 18,
-        logo: coin.large || coin.small || coin.thumb || '',
-        verified: true,
-      })) || [];
-      
-      setSearchResults(liveResults);
-      console.log('AddTokenModal live search results:', liveResults.length);
-    } catch (error) {
-      console.error('AddTokenModal live search failed, using static search:', error);
-      // Fallback to static search
-      const staticResults = TokenSearchService.searchTokens(searchQuery, selectedChain);
-      setSearchResults(staticResults);
-    }
-    
-    setSearching(false);
+      setSearching(false);
+    };
+
+    searchTokens();
   }, [searchQuery, selectedChain]);
 
   // Add token from search
