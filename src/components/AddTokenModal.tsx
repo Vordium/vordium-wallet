@@ -12,7 +12,7 @@ import Image from 'next/image';
 export function AddTokenModal({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) {
   const [searchQuery, setSearchQuery] = useState('');
   const [searching, setSearching] = useState(false);
-  const [searchResults, setSearchResults] = useState<EnhancedTokenSearchResult[]>([]);
+  const [searchResults, setSearchResults] = useState<TokenSearchResult[]>([]);
   const [customAddress, setCustomAddress] = useState('');
   const [selectedChain, setSelectedChain] = useState<'Ethereum' | 'Tron' | 'Solana' | 'Bitcoin'>('Ethereum');
   const [successMessage, setSuccessMessage] = useState('');
