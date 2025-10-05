@@ -179,13 +179,31 @@ export class BalanceService {
       const customTokens = JSON.parse(stored);
       const validTokens = customTokens.filter((token: any) => {
         // Keep only tokens with valid addresses
-        if (token.address === 'native') return true;
+        if (token.address === 'native') {
+          // For native tokens, ensure they're on the correct network
+          if (token.symbol === 'BTC' && token.chain !== 'Bitcoin') {
+            console.log(`Fixing BTC token chain from ${token.chain} to Bitcoin`);
+            token.chain = 'Bitcoin';
+          } else if (token.symbol === 'ETH' && token.chain !== 'Ethereum') {
+            console.log(`Fixing ETH token chain from ${token.chain} to Ethereum`);
+            token.chain = 'Ethereum';
+          } else if (token.symbol === 'TRX' && token.chain !== 'Tron') {
+            console.log(`Fixing TRX token chain from ${token.chain} to Tron`);
+            token.chain = 'Tron';
+          } else if (token.symbol === 'SOL' && token.chain !== 'Solana') {
+            console.log(`Fixing SOL token chain from ${token.chain} to Solana`);
+            token.chain = 'Solana';
+          }
+          return true;
+        }
+        
+        // Validate contract addresses
         if (token.chain === 'Ethereum' && token.address.startsWith('0x')) return true;
         if (token.chain === 'Tron' && token.address.startsWith('T')) return true;
         if (token.chain === 'Solana' && token.address.length >= 32 && token.address.length <= 44) return true;
         if (token.chain === 'Bitcoin' && (token.address.startsWith('1') || token.address.startsWith('3') || token.address.startsWith('bc1'))) return true;
         
-        console.log(`Removing invalid token: ${token.symbol} with address: ${token.address}`);
+        console.log(`Removing invalid token: ${token.symbol} with address: ${token.address} on chain: ${token.chain}`);
         return false;
       });
       
@@ -520,9 +538,21 @@ export class BalanceService {
           // Load balance based on chain
           let balance = '0';
           if (fixedToken.chain === 'Ethereum' && fixedToken.address !== 'native' && fixedToken.address.startsWith('0x')) {
-            balance = await this.getERC20Balance(fixedToken.address, addresses.ethereum || addresses.eth || '', fixedToken.decimals);
+            const ethAddress = addresses.ethereum || addresses.eth || '';
+            if (ethAddress) {
+              balance = await this.getERC20Balance(fixedToken.address, ethAddress, fixedToken.decimals);
+            }
           } else if (fixedToken.chain === 'Tron' && fixedToken.address !== 'native' && fixedToken.address.startsWith('T')) {
-            balance = await this.getTRC20Balance(fixedToken.address, addresses.tron || '', fixedToken.decimals);
+            const tronAddress = addresses.tron || '';
+            if (tronAddress) {
+              balance = await this.getTRC20Balance(fixedToken.address, tronAddress, fixedToken.decimals);
+            }
+          } else if (fixedToken.chain === 'Bitcoin' && fixedToken.address === 'native') {
+            // Bitcoin native token - return 0 for now as we don't have Bitcoin API
+            balance = '0';
+          } else if (fixedToken.chain === 'Solana' && fixedToken.address === 'native') {
+            // Solana native token - return 0 for now as we don't have full Solana implementation
+            balance = '0';
           }
           
           const price = await this.getTokenPrice(fixedToken.coingeckoId || fixedToken.symbol.toLowerCase());
@@ -602,6 +632,12 @@ export class BalanceService {
   // Get ERC-20 token balance
   private static async getERC20Balance(tokenAddress: string, userAddress: string, decimals: number): Promise<string> {
     try {
+      // Validate token address before making contract call
+      if (!tokenAddress || tokenAddress === 'native' || !tokenAddress.startsWith('0x')) {
+        console.error('Invalid token address for ERC-20 balance:', tokenAddress);
+        return '0';
+      }
+      
       const provider = new ethers.JsonRpcProvider('https://eth.llamarpc.com');
       const contract = new ethers.Contract(tokenAddress, ERC20_ABI, provider);
       const balance = await contract.balanceOf(userAddress);
@@ -615,6 +651,12 @@ export class BalanceService {
   // Get TRC-20 token balance
   private static async getTRC20Balance(tokenAddress: string, userAddress: string, decimals: number): Promise<string> {
     try {
+      // Validate token address before making contract call
+      if (!tokenAddress || tokenAddress === 'native' || !tokenAddress.startsWith('T')) {
+        console.error('Invalid token address for TRC-20 balance:', tokenAddress);
+        return '0';
+      }
+      
       const tronWeb = new TronWeb({ fullHost: 'https://api.trongrid.io' });
       const contract = await tronWeb.contract().at(tokenAddress);
       const balance = await contract.balanceOf(userAddress).call();
