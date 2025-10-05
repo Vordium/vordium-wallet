@@ -26,6 +26,8 @@ export default function CreateSuccess() {
 
   const evmAccount = accounts.find(a => a.chain === 'EVM');
   const tronAccount = accounts.find(a => a.chain === 'TRON');
+  const solanaAccount = accounts.find(a => a.chain === 'SOLANA');
+  const bitcoinAccount = accounts.find(a => a.chain === 'BITCOIN');
 
   return (
     <main className="min-h-screen bg-gradient-to-br from-green-50 to-emerald-50 flex items-center justify-center p-4">
@@ -47,29 +49,43 @@ export default function CreateSuccess() {
         </div>
 
         {/* Wallet Info Card */}
-        <div className="bg-gradient-to-br from-blue-50 to-purple-50 rounded-2xl p-6 space-y-4 text-left">
-          <div className="flex items-center gap-2 text-gray-700 font-semibold">
+        <div className="bg-gray-800 rounded-2xl p-6 space-y-4 text-left">
+          <div className="flex items-center gap-2 text-white font-semibold">
             <span className="text-xl">📊</span>
             <span>Your Multi-Chain Wallet</span>
           </div>
           
           {evmAccount && (
-            <div className="bg-white rounded-lg p-3 space-y-1">
-              <p className="text-sm text-gray-600 font-medium">Ethereum Account</p>
-              <p className="font-mono text-sm text-gray-900 break-all">{evmAccount.address}</p>
+            <div className="bg-gray-700 rounded-lg p-3 space-y-1">
+              <p className="text-sm text-gray-300 font-medium">Ethereum Account</p>
+              <p className="font-mono text-sm text-white break-all">{evmAccount.address}</p>
             </div>
           )}
           
           {tronAccount && (
-            <div className="bg-white rounded-lg p-3 space-y-1">
-              <p className="text-sm text-gray-600 font-medium">TRON Account</p>
-              <p className="font-mono text-sm text-gray-900 break-all">{tronAccount.address}</p>
+            <div className="bg-gray-700 rounded-lg p-3 space-y-1">
+              <p className="text-sm text-gray-300 font-medium">TRON Account</p>
+              <p className="font-mono text-sm text-white break-all">{tronAccount.address}</p>
             </div>
           )}
           
-          <div className="flex items-center justify-center gap-2 text-sm text-green-700 font-medium pt-2">
+          {solanaAccount && (
+            <div className="bg-gray-700 rounded-lg p-3 space-y-1">
+              <p className="text-sm text-gray-300 font-medium">Solana Account</p>
+              <p className="font-mono text-sm text-white break-all">{solanaAccount.address}</p>
+            </div>
+          )}
+          
+          {bitcoinAccount && (
+            <div className="bg-gray-700 rounded-lg p-3 space-y-1">
+              <p className="text-sm text-gray-300 font-medium">Bitcoin Account</p>
+              <p className="font-mono text-sm text-white break-all">{bitcoinAccount.address}</p>
+            </div>
+          )}
+          
+          <div className="flex items-center justify-center gap-2 text-sm text-gray-300 font-medium pt-2">
             <span>✓</span>
-            <span>Both secured by 1 recovery phrase</span>
+            <span>All secured by 1 recovery phrase</span>
           </div>
         </div>
 

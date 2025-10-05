@@ -2,13 +2,14 @@
 @tailwind components;
 @tailwind utilities;
 
-/* UNIFIED DARK THEME - Professional Design System */
+/* UNIFIED DARK GRAY THEME - Professional Design System */
 :root {
-  /* Core Colors - Clean dark theme */
+  /* Core Colors - Dark grays and blacks only */
   --color-black: #000000;           /* Pure black - deepest backgrounds */
-  --color-very-dark-gray: #111827;  /* Very dark gray - main backgrounds */
-  --color-dark-gray: #1f2937;       /* Dark gray - secondary backgrounds */
-  --color-gray: #374151;            /* Gray - tertiary backgrounds, borders */
+  --color-very-dark-gray: #111111;  /* Very dark gray - main backgrounds */
+  --color-dark-gray: #1a1a1a;       /* Dark gray - secondary backgrounds */
+  --color-gray: #2a2a2a;            /* Gray - tertiary backgrounds, borders */
+  --color-light-gray-border: #3a3a3a; /* Light gray - borders and accents */
   
   /* Text Colors */
   --color-white: #ffffff;           /* Primary text */
@@ -16,14 +17,11 @@
   --color-muted-gray: #9ca3af;     /* Muted text */
   
   /* Interactive States */
-  --color-hover: #4b5563;           /* Hover state - slightly lighter gray */
-  --color-border: #374151;         /* Borders */
-  --color-input: #1f2937;          /* Input backgrounds */
+  --color-hover: #3a3a3a;           /* Hover state - slightly lighter gray */
+  --color-border: #2a2a2a;         /* Borders */
+  --color-input: #1a1a1a;          /* Input backgrounds */
   
-  /* Accent Colors - Minimal use */
-  --color-blue: #2563eb;            /* Primary accent */
-  --color-green: #10b981;           /* Success */
-  --color-red: #ef4444;             /* Error */
+  /* NO ACCENT COLORS - Only grays and blacks */
 }
 
 /* Global unified dark theme */
@@ -60,7 +58,7 @@ input:focus {
   box-shadow: 0 0 0 1px var(--color-gray) !important;
 }
 
-/* Override ALL Tailwind colors to use unified theme */
+/* Override ALL Tailwind colors to use unified gray theme */
 .bg-white { background-color: var(--color-dark-gray) !important; }
 .bg-gray-50 { background-color: var(--color-dark-gray) !important; }
 .bg-gray-100 { background-color: var(--color-gray) !important; }
@@ -86,18 +84,18 @@ input:focus {
 .text-gray-900 { color: var(--color-white) !important; }
 .text-black { color: var(--color-white) !important; }
 
-/* Strategic color usage - Allow accent colors for important elements */
-.text-blue-600, .text-blue-700, .text-blue-500 { color: var(--color-blue) !important; }
-.text-green-600, .text-green-400, .text-green-500 { color: var(--color-green) !important; }
-.text-red-600, .text-red-400, .text-red-500 { color: var(--color-red) !important; }
+/* NO COLORS - Force all colors to grays only */
+.text-blue-600, .text-blue-700, .text-blue-500 { color: var(--color-light-gray) !important; }
+.text-green-600, .text-green-400, .text-green-500 { color: var(--color-light-gray) !important; }
+.text-red-600, .text-red-400, .text-red-500 { color: var(--color-light-gray) !important; }
 .text-purple-600, .text-purple-500 { color: var(--color-light-gray) !important; }
-.text-indigo-600, .text-indigo-500 { color: var(--color-blue) !important; }
+.text-indigo-600, .text-indigo-500 { color: var(--color-light-gray) !important; }
 
-.bg-blue-600, .bg-blue-700, .bg-blue-500, .bg-blue-50 { background-color: var(--color-blue) !important; }
-.bg-green-600, .bg-green-400, .bg-green-500, .bg-green-50 { background-color: var(--color-green) !important; }
-.bg-red-600, .bg-red-400, .bg-red-500, .bg-red-50 { background-color: var(--color-red) !important; }
+.bg-blue-600, .bg-blue-700, .bg-blue-500, .bg-blue-50 { background-color: var(--color-gray) !important; }
+.bg-green-600, .bg-green-400, .bg-green-500, .bg-green-50 { background-color: var(--color-gray) !important; }
+.bg-red-600, .bg-red-400, .bg-red-500, .bg-red-50 { background-color: var(--color-gray) !important; }
 .bg-purple-600, .bg-purple-500 { background-color: var(--color-gray) !important; }
-.bg-indigo-600, .bg-indigo-500 { background-color: var(--color-blue) !important; }
+.bg-indigo-600, .bg-indigo-500 { background-color: var(--color-gray) !important; }
 
 /* Borders */
 .border-gray-200 { border-color: var(--color-border) !important; }

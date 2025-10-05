@@ -33,7 +33,13 @@ export default function TokenDetailPage({
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [loading, setLoading] = useState(true);
 
-  const chainName = params.chain === 'ethereum' ? 'Ethereum' : 'Tron';
+  const chainNameMap: Record<string, string> = {
+    'ethereum': 'Ethereum',
+    'tron': 'Tron',
+    'solana': 'Solana',
+    'bitcoin': 'Bitcoin'
+  };
+  const chainName = chainNameMap[params.chain] || params.chain;
   const isNative = params.address === 'native';
 
   useEffect(() => {
@@ -91,6 +97,8 @@ export default function TokenDetailPage({
       const coinIds: Record<string, string> = {
         ETH: 'ethereum',
         TRX: 'tron',
+        SOL: 'solana',
+        BTC: 'bitcoin',
         USDT: 'tether',
         USDC: 'usd-coin',
         DAI: 'dai',
@@ -324,10 +332,13 @@ export default function TokenDetailPage({
         ) : (
           <div className="space-y-3">
             {transactions.map((tx) => {
-              const explorerUrl =
-                params.chain === 'ethereum'
-                  ? `https://etherscan.io/tx/${tx.hash}`
-                  : `https://tronscan.org/#/transaction/${tx.hash}`;
+              const explorerUrls: Record<string, string> = {
+                'ethereum': `https://etherscan.io/tx/${tx.hash}`,
+                'tron': `https://tronscan.org/#/transaction/${tx.hash}`,
+                'solana': `https://explorer.solana.com/tx/${tx.hash}`,
+                'bitcoin': `https://blockstream.info/tx/${tx.hash}`
+              };
+              const explorerUrl = explorerUrls[params.chain] || `https://etherscan.io/tx/${tx.hash}`;
 
               return (
                 <button

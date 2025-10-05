@@ -948,6 +948,8 @@ export class BalanceService {
       const coinIds: Record<string, string> = {
         ETH: 'ethereum',
         TRX: 'tron',
+        SOL: 'solana',
+        BTC: 'bitcoin',
         USDT: 'tether',
         USDC: 'usd-coin',
         DAI: 'dai',

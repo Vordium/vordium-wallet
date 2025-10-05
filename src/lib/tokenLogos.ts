@@ -24,9 +24,11 @@ export function getTrustWalletLogo(chain: string, address: string): string {
 }
 
 export const NATIVE_LOGOS: Record<string, string> = {
-  'ETH': 'https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/info/logo.png',
-  'TRX': 'https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/tron/info/logo.png',
-  'BNB': 'https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/smartchain/info/logo.png',
-  'MATIC': 'https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/polygon/info/logo.png',
+  'ETH': 'https://via.placeholder.com/64/6B7280/FFFFFF?text=ETH',
+  'TRX': 'https://via.placeholder.com/64/6B7280/FFFFFF?text=TRX',
+  'SOL': 'https://via.placeholder.com/64/6B7280/FFFFFF?text=SOL',
+  'BTC': 'https://via.placeholder.com/64/6B7280/FFFFFF?text=BTC',
+  'BNB': 'https://via.placeholder.com/64/6B7280/FFFFFF?text=BNB',
+  'MATIC': 'https://via.placeholder.com/64/6B7280/FFFFFF?text=MATIC',
 };
 

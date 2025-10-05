@@ -23,7 +23,7 @@ export const TOKEN_MAPPINGS: TokenMapping[] = [
     contractAddress: '0xdAC17F958D2ee523a2206206994597C13D831ec7',
     chain: 'Ethereum',
     decimals: 6,
-    logo: 'https://assets.coingecko.com/coins/images/325/large/Tether.png'
+    logo: 'https://via.placeholder.com/64/6B7280/FFFFFF?text=USDT'
   },
   {
     coingeckoId: 'usd-coin',
@@ -32,7 +32,7 @@ export const TOKEN_MAPPINGS: TokenMapping[] = [
     contractAddress: '0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48',
     chain: 'Ethereum',
     decimals: 6,
-    logo: 'https://assets.coingecko.com/coins/images/6319/large/USD_Coin_icon.png'
+    logo: 'https://via.placeholder.com/64/6B7280/FFFFFF?text=USDC'
   },
   {
     coingeckoId: 'dai',
@@ -41,7 +41,7 @@ export const TOKEN_MAPPINGS: TokenMapping[] = [
     contractAddress: '0x6B175474E89094C44Da98b954EedeAC495271d0F',
     chain: 'Ethereum',
     decimals: 18,
-    logo: 'https://assets.coingecko.com/coins/images/9956/large/Badge_Dai.png'
+    logo: 'https://via.placeholder.com/64/6B7280/FFFFFF?text=DAI'
   },
   {
     coingeckoId: 'ethereum',
@@ -50,7 +50,7 @@ export const TOKEN_MAPPINGS: TokenMapping[] = [
     contractAddress: 'native',
     chain: 'Ethereum',
     decimals: 18,
-    logo: 'https://assets.coingecko.com/coins/images/279/large/ethereum.png'
+    logo: 'https://via.placeholder.com/64/6B7280/FFFFFF?text=ETH'
   },
   {
     coingeckoId: 'weth',
@@ -87,7 +87,7 @@ export const TOKEN_MAPPINGS: TokenMapping[] = [
     contractAddress: 'native',
     chain: 'Tron',
     decimals: 6,
-    logo: 'https://assets.coingecko.com/coins/images/1094/large/tron-logo.png'
+    logo: 'https://via.placeholder.com/64/6B7280/FFFFFF?text=TRX'
   },
   // Solana Tokens
   {
@@ -97,7 +97,7 @@ export const TOKEN_MAPPINGS: TokenMapping[] = [
     contractAddress: 'native',
     chain: 'Solana',
     decimals: 9,
-    logo: 'https://assets.coingecko.com/coins/images/4128/large/solana.png'
+    logo: 'https://via.placeholder.com/64/6B7280/FFFFFF?text=SOL'
   },
   // Bitcoin
   {
@@ -107,7 +107,7 @@ export const TOKEN_MAPPINGS: TokenMapping[] = [
     contractAddress: 'native',
     chain: 'Bitcoin',
     decimals: 8,
-    logo: 'https://assets.coingecko.com/coins/images/1/large/bitcoin.png'
+    logo: 'https://via.placeholder.com/64/6B7280/FFFFFF?text=BTC'
   }
 ];
 
