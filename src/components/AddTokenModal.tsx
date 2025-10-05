@@ -5,6 +5,7 @@ import { ethers } from 'ethers';
 import TronWeb from 'tronweb';
 import { useWalletStore } from '@/store/walletStore';
 import { TokenSearchService, type TokenSearchResult } from '@/services/tokenSearch.service';
+import { TokenMappingService } from '@/services/tokenMapping.service';
 import { SearchIcon, PlusIcon, ArrowLeftIcon } from './icons/GrayIcons';
 import { ModalSkeleton, FormInputSkeleton } from './ui/Skeleton';
 import Image from 'next/image';
@@ -35,15 +36,24 @@ export function AddTokenModal({ isOpen, onClose }: { isOpen: boolean; onClose: (
         const response = await fetch(`/api/search?query=${encodeURIComponent(searchQuery)}`);
         const data = await response.json();
         
-        const liveResults: TokenSearchResult[] = data.coins?.slice(0, 10).map((coin: any) => ({
-          symbol: coin.symbol.toUpperCase(),
-          name: coin.name,
-          address: coin.id, // Use CoinGecko ID as identifier
-          chain: selectedChain, // Use selected chain
-          decimals: 18,
-          logo: coin.large || coin.small || coin.thumb || '',
-          verified: true,
-        })) || [];
+        const liveResults: TokenSearchResult[] = data.coins?.slice(0, 10)
+          .map((coin: any) => {
+            // Try to find proper token mapping for selected chain
+            const mapping = TokenMappingService.getTokenByCoinGeckoId(coin.id);
+            if (mapping && mapping.chain === selectedChain) {
+              return {
+                symbol: mapping.symbol,
+                name: mapping.name,
+                address: mapping.contractAddress,
+                chain: mapping.chain,
+                decimals: mapping.decimals,
+                logo: mapping.logo,
+                verified: true,
+              };
+            }
+            return null;
+          })
+          .filter(Boolean) || [];
         
         setSearchResults(liveResults);
         console.log('AddTokenModal live search results:', liveResults.length);

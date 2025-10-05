@@ -5,6 +5,7 @@ import { SearchIcon, ArrowLeftIcon } from './icons/GrayIcons';
 import { type TokenBalance } from '@/services/balance.service';
 import { FormInputSkeleton } from './ui/Skeleton';
 import { TokenSearchService, type TokenSearchResult } from '@/services/tokenSearch.service';
+import { TokenMappingService } from '@/services/tokenMapping.service';
 
 interface TokenSelectorProps {
   isOpen: boolean;
@@ -44,15 +45,24 @@ export function TokenSelector({
           const response = await fetch(`/api/search?query=${encodeURIComponent(searchQuery)}`);
           const data = await response.json();
           
-          const liveResults: TokenSearchResult[] = data.coins?.slice(0, 10).map((coin: any) => ({
-            symbol: coin.symbol.toUpperCase(),
-            name: coin.name,
-            address: coin.id, // Use CoinGecko ID as identifier
-            chain: 'Ethereum', // Default to Ethereum for now
-            decimals: 18,
-            logo: coin.large || coin.small || coin.thumb || '',
-            verified: true,
-          })) || [];
+        const liveResults: TokenSearchResult[] = data.coins?.slice(0, 10)
+          .map((coin: any) => {
+            // Try to find proper token mapping
+            const mapping = TokenMappingService.getTokenByCoinGeckoId(coin.id);
+            if (mapping) {
+              return {
+                symbol: mapping.symbol,
+                name: mapping.name,
+                address: mapping.contractAddress,
+                chain: mapping.chain,
+                decimals: mapping.decimals,
+                logo: mapping.logo,
+                verified: true,
+              };
+            }
+            return null;
+          })
+          .filter(Boolean) || [];
           
           setSearchResults(liveResults);
           console.log('Live search results:', liveResults.length);

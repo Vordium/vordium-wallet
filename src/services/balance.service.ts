@@ -467,9 +467,9 @@ export class BalanceService {
         try {
           // Load balance based on chain
           let balance = '0';
-          if (token.chain === 'Ethereum' && token.address !== 'native') {
+          if (token.chain === 'Ethereum' && token.address !== 'native' && token.address.startsWith('0x')) {
             balance = await this.getERC20Balance(token.address, addresses.ethereum || addresses.eth || '', token.decimals);
-          } else if (token.chain === 'Tron' && token.address !== 'native') {
+          } else if (token.chain === 'Tron' && token.address !== 'native' && token.address.startsWith('T')) {
             balance = await this.getTRC20Balance(token.address, addresses.tron || '', token.decimals);
           }
           
