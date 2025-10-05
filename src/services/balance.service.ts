@@ -500,10 +500,10 @@ export class BalanceService {
     }
   }
 
-  // Get token price from CoinGecko (free API)
+  // Get token price from our API route (avoids CORS issues)
   private static async getTokenPrice(coinId: string): Promise<number> {
     try {
-      const response = await fetch(`https://api.coingecko.com/api/v3/simple/price?ids=${coinId}&vs_currencies=usd`);
+      const response = await fetch(`/api/prices?ids=${coinId}`);
       const data = await response.json();
       return data[coinId]?.usd || 0;
     } catch (error) {
@@ -512,10 +512,10 @@ export class BalanceService {
     }
   }
 
-  // Get 24h price change from CoinGecko
+  // Get 24h price change from our API route (avoids CORS issues)
   private static async getTokenChange24h(coinId: string): Promise<number> {
     try {
-      const response = await fetch(`https://api.coingecko.com/api/v3/simple/price?ids=${coinId}&vs_currencies=usd&include_24hr_change=true`);
+      const response = await fetch(`/api/prices?ids=${coinId}&include_24hr_change=true`);
       const data = await response.json();
       return data[coinId]?.usd_24h_change || 0;
     } catch (error) {

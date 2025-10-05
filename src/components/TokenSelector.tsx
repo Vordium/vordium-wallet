@@ -38,10 +38,30 @@ export function TokenSelector({
           token.name.toLowerCase().includes(searchQuery.toLowerCase())
         );
         
-        // Use static search for now to avoid build issues
-        console.log('Using static token search');
-        const staticResults = TokenSearchService.searchTokens(searchQuery);
-        setSearchResults(staticResults);
+        // Use live search via our API route (avoids CORS issues)
+        console.log('Searching live tokens via API route');
+        try {
+          const response = await fetch(`/api/search?query=${encodeURIComponent(searchQuery)}`);
+          const data = await response.json();
+          
+          const liveResults: TokenSearchResult[] = data.coins?.slice(0, 10).map((coin: any) => ({
+            symbol: coin.symbol.toUpperCase(),
+            name: coin.name,
+            address: coin.id, // Use CoinGecko ID as identifier
+            chain: 'Ethereum', // Default to Ethereum for now
+            decimals: 18,
+            logo: coin.large || coin.small || coin.thumb || '',
+            verified: true,
+          })) || [];
+          
+          setSearchResults(liveResults);
+          console.log('Live search results:', liveResults.length);
+        } catch (error) {
+          console.error('Live search failed, using static search:', error);
+          // Fallback to static search
+          const staticResults = TokenSearchService.searchTokens(searchQuery);
+          setSearchResults(staticResults);
+        }
         
         setFilteredTokens(dashboardFiltered);
         setIsSearching(false);
