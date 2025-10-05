@@ -3,6 +3,7 @@
 import { ethers } from 'ethers';
 import TronWeb from 'tronweb';
 import { tokenService, type TokenBalance as TokenServiceBalance } from './token.service';
+import { TokenMappingService } from './tokenMapping.service';
 
 export interface TokenBalance {
   symbol: string;
@@ -169,10 +170,41 @@ export class BalanceService {
     return tokens;
   }
 
+  // Clear invalid tokens from localStorage
+  static clearInvalidTokens(): void {
+    try {
+      const stored = localStorage.getItem('vordium-tokens');
+      if (!stored) return;
+      
+      const customTokens = JSON.parse(stored);
+      const validTokens = customTokens.filter((token: any) => {
+        // Keep only tokens with valid addresses
+        if (token.address === 'native') return true;
+        if (token.chain === 'Ethereum' && token.address.startsWith('0x')) return true;
+        if (token.chain === 'Tron' && token.address.startsWith('T')) return true;
+        if (token.chain === 'Solana' && token.address.length >= 32 && token.address.length <= 44) return true;
+        if (token.chain === 'Bitcoin' && (token.address.startsWith('1') || token.address.startsWith('3') || token.address.startsWith('bc1'))) return true;
+        
+        console.log(`Removing invalid token: ${token.symbol} with address: ${token.address}`);
+        return false;
+      });
+      
+      if (validTokens.length !== customTokens.length) {
+        console.log(`Cleaned ${customTokens.length - validTokens.length} invalid tokens from localStorage`);
+        localStorage.setItem('vordium-tokens', JSON.stringify(validTokens));
+      }
+    } catch (error) {
+      console.error('Failed to clear invalid tokens:', error);
+    }
+  }
+
   // Live multi-chain token loading using best practices from major wallets
   static async getAllTokensMultiChain(addresses: { [chain: string]: string }): Promise<TokenBalance[]> {
     try {
       console.log('Loading live tokens for addresses:', addresses);
+      
+      // Clear invalid tokens first
+      this.clearInvalidTokens();
       
       const allTokens: TokenBalance[] = [];
       
@@ -462,35 +494,64 @@ export class BalanceService {
       
       const customTokens = JSON.parse(stored);
       const tokens: TokenBalance[] = [];
+      const fixedTokens: any[] = [];
       
       for (const token of customTokens) {
         try {
-          // Load balance based on chain
-          let balance = '0';
-          if (token.chain === 'Ethereum' && token.address !== 'native' && token.address.startsWith('0x')) {
-            balance = await this.getERC20Balance(token.address, addresses.ethereum || addresses.eth || '', token.decimals);
-          } else if (token.chain === 'Tron' && token.address !== 'native' && token.address.startsWith('T')) {
-            balance = await this.getTRC20Balance(token.address, addresses.tron || '', token.decimals);
+          // Fix invalid addresses (CoinGecko IDs)
+          let fixedToken = { ...token };
+          
+          // If address is a CoinGecko ID, try to find proper mapping
+          if (token.address && !token.address.startsWith('0x') && !token.address.startsWith('T') && token.address !== 'native') {
+            console.log(`Fixing invalid address for ${token.symbol}: ${token.address}`);
+            const mapping = TokenMappingService.getTokenByCoinGeckoId(token.address);
+            if (mapping) {
+              fixedToken.address = mapping.contractAddress;
+              fixedToken.chain = mapping.chain;
+              fixedToken.decimals = mapping.decimals;
+              fixedToken.logo = mapping.logo;
+              console.log(`Fixed ${token.symbol} address to: ${mapping.contractAddress}`);
+            } else {
+              console.log(`No mapping found for ${token.symbol}, skipping`);
+              continue; // Skip tokens without proper mapping
+            }
           }
           
-          const price = await this.getTokenPrice(token.coingeckoId || token.symbol.toLowerCase());
+          // Load balance based on chain
+          let balance = '0';
+          if (fixedToken.chain === 'Ethereum' && fixedToken.address !== 'native' && fixedToken.address.startsWith('0x')) {
+            balance = await this.getERC20Balance(fixedToken.address, addresses.ethereum || addresses.eth || '', fixedToken.decimals);
+          } else if (fixedToken.chain === 'Tron' && fixedToken.address !== 'native' && fixedToken.address.startsWith('T')) {
+            balance = await this.getTRC20Balance(fixedToken.address, addresses.tron || '', fixedToken.decimals);
+          }
+          
+          const price = await this.getTokenPrice(fixedToken.coingeckoId || fixedToken.symbol.toLowerCase());
           const usdValue = (parseFloat(balance) * price).toFixed(2);
           
           tokens.push({
-            symbol: token.symbol,
-            name: token.name,
+            symbol: fixedToken.symbol,
+            name: fixedToken.name,
             balance: balance,
             usdValue: usdValue,
-            chain: token.chain,
-            address: token.address,
-            decimals: token.decimals,
-            isNative: token.isNative || false,
-            logo: token.logo || `https://assets.coingecko.com/coins/images/${this.getTokenImageId(token.symbol)}/large/${token.symbol.toLowerCase()}.png`,
-            change24h: await this.getTokenChange24h(token.coingeckoId || token.symbol.toLowerCase()),
+            chain: fixedToken.chain,
+            address: fixedToken.address,
+            decimals: fixedToken.decimals,
+            isNative: fixedToken.isNative || false,
+            logo: fixedToken.logo || `https://assets.coingecko.com/coins/images/${this.getTokenImageId(fixedToken.symbol)}/large/${fixedToken.symbol.toLowerCase()}.png`,
+            change24h: await this.getTokenChange24h(fixedToken.coingeckoId || fixedToken.symbol.toLowerCase()),
           });
+          
+          // Store fixed token for localStorage update
+          fixedTokens.push(fixedToken);
         } catch (error) {
           console.error(`Failed to load custom token ${token.symbol}:`, error);
         }
+      }
+      
+      // Update localStorage with fixed tokens
+      if (fixedTokens.length !== customTokens.length) {
+        console.log('Updating localStorage with fixed tokens');
+        localStorage.setItem('vordium-tokens', JSON.stringify(fixedTokens));
       }
       
       return tokens;
