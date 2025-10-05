@@ -2,13 +2,13 @@
 @tailwind components;
 @tailwind utilities;
 
-/* UNIFIED DARK THEME - Professional 3-Color Scheme */
+/* UNIFIED DARK THEME - Professional Design System */
 :root {
-  /* Core Colors - Only 3 shades of gray + black */
+  /* Core Colors - Clean dark theme */
   --color-black: #000000;           /* Pure black - deepest backgrounds */
-  --color-very-dark-gray: #1a1a1a;  /* Very dark gray - main backgrounds */
-  --color-dark-gray: #2a2a2a;       /* Dark gray - secondary backgrounds */
-  --color-gray: #3a3a3a;            /* Gray - tertiary backgrounds, borders */
+  --color-very-dark-gray: #111827;  /* Very dark gray - main backgrounds */
+  --color-dark-gray: #1f2937;       /* Dark gray - secondary backgrounds */
+  --color-gray: #374151;            /* Gray - tertiary backgrounds, borders */
   
   /* Text Colors */
   --color-white: #ffffff;           /* Primary text */
@@ -16,9 +16,14 @@
   --color-muted-gray: #9ca3af;     /* Muted text */
   
   /* Interactive States */
-  --color-hover: #404040;           /* Hover state - slightly lighter gray */
-  --color-border: #2a2a2a;         /* Borders */
-  --color-input: #1f1f1f;          /* Input backgrounds */
+  --color-hover: #4b5563;           /* Hover state - slightly lighter gray */
+  --color-border: #374151;         /* Borders */
+  --color-input: #1f2937;          /* Input backgrounds */
+  
+  /* Accent Colors - Minimal use */
+  --color-blue: #2563eb;            /* Primary accent */
+  --color-green: #10b981;           /* Success */
+  --color-red: #ef4444;             /* Error */
 }
 
 /* Global unified dark theme */
@@ -81,18 +86,18 @@ input:focus {
 .text-gray-900 { color: var(--color-white) !important; }
 .text-black { color: var(--color-white) !important; }
 
-/* Remove ALL colors - force grayscale */
-.text-blue-600, .text-blue-700, .text-blue-500 { color: var(--color-light-gray) !important; }
-.text-green-600, .text-green-400, .text-green-500 { color: var(--color-light-gray) !important; }
-.text-red-600, .text-red-400, .text-red-500 { color: var(--color-light-gray) !important; }
+/* Strategic color usage - Allow accent colors for important elements */
+.text-blue-600, .text-blue-700, .text-blue-500 { color: var(--color-blue) !important; }
+.text-green-600, .text-green-400, .text-green-500 { color: var(--color-green) !important; }
+.text-red-600, .text-red-400, .text-red-500 { color: var(--color-red) !important; }
 .text-purple-600, .text-purple-500 { color: var(--color-light-gray) !important; }
-.text-indigo-600, .text-indigo-500 { color: var(--color-light-gray) !important; }
+.text-indigo-600, .text-indigo-500 { color: var(--color-blue) !important; }
 
-.bg-blue-600, .bg-blue-700, .bg-blue-500, .bg-blue-50 { background-color: var(--color-gray) !important; }
-.bg-green-600, .bg-green-400, .bg-green-500, .bg-green-50 { background-color: var(--color-gray) !important; }
-.bg-red-600, .bg-red-400, .bg-red-500, .bg-red-50 { background-color: var(--color-gray) !important; }
+.bg-blue-600, .bg-blue-700, .bg-blue-500, .bg-blue-50 { background-color: var(--color-blue) !important; }
+.bg-green-600, .bg-green-400, .bg-green-500, .bg-green-50 { background-color: var(--color-green) !important; }
+.bg-red-600, .bg-red-400, .bg-red-500, .bg-red-50 { background-color: var(--color-red) !important; }
 .bg-purple-600, .bg-purple-500 { background-color: var(--color-gray) !important; }
-.bg-indigo-600, .bg-indigo-500 { background-color: var(--color-gray) !important; }
+.bg-indigo-600, .bg-indigo-500 { background-color: var(--color-blue) !important; }
 
 /* Borders */
 .border-gray-200 { border-color: var(--color-border) !important; }
@@ -130,28 +135,4 @@ button:hover,
   transition: all 0.2s ease-in-out;
 }
 
-:root {
-  --foreground-rgb: 0, 0, 0;
-  --background-start-rgb: 214, 219, 220;
-  --background-end-rgb: 255, 255, 255;
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --foreground-rgb: 255, 255, 255;
-    --background-start-rgb: 0, 0, 0;
-    --background-end-rgb: 0, 0, 0;
-  }
-}
-
-body {
-  color: rgb(var(--foreground-rgb));
-  background: linear-gradient(
-      to bottom,
-      transparent,
-      rgb(var(--background-end-rgb))
-    )
-    rgb(var(--background-start-rgb));
-  margin: 0;
-  padding: 0;
-}
+/* Clean, unified dark theme - no conflicting styles */
