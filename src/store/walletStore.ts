@@ -26,7 +26,7 @@ export interface Token {
   symbol: string;
   name: string;
   address: string;
-  chain: 'Ethereum' | 'Tron' | 'Solana' | 'Bitcoin';
+  chain: 'Ethereum' | 'Tron' | 'Solana' | 'Bitcoin' | 'BSC' | 'Polygon' | 'Arbitrum';
   decimals: number;
   balance: string;
   logo: string;

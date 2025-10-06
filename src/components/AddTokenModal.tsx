@@ -16,7 +16,7 @@ export function AddTokenModal({ isOpen, onClose }: { isOpen: boolean; onClose: (
   const [searching, setSearching] = useState(false);
   const [searchResults, setSearchResults] = useState<EnhancedTokenSearchResult[]>([]);
   const [customAddress, setCustomAddress] = useState('');
-  const [selectedChain, setSelectedChain] = useState<'Ethereum' | 'Tron' | 'Solana' | 'Bitcoin'>('Ethereum');
+  const [selectedChain, setSelectedChain] = useState<'Ethereum' | 'Tron' | 'Solana' | 'Bitcoin' | 'BSC' | 'Polygon' | 'Arbitrum'>('Ethereum');
   const [successMessage, setSuccessMessage] = useState('');
   
   const addToken = useWalletStore(state => state.addToken);
