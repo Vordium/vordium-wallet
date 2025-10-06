@@ -114,7 +114,35 @@ export class EnhancedTokenSearchService {
           const chainType = this.mapCoinGeckoToChain(coin.id);
           if (!chain || chainType === chain) {
             // Get high-quality logo (prefer large, then small, then thumb)
-            const logo = coin.large || coin.small || coin.thumb || coin.image || '';
+            let logo = coin.large || coin.small || coin.thumb || coin.image || '';
+            
+            // Ensure we have a valid HTTPS URL for logos
+            if (logo && !logo.startsWith('http')) {
+              logo = '';
+            }
+            
+            // Use CoinGecko's high-quality image API if available
+            if (!logo && coin.id) {
+              logo = `https://assets.coingecko.com/coins/images/${coin.id}/large/${coin.id}.png`;
+            }
+            
+            // Fallback to known good logos for popular tokens
+            const popularLogos: { [key: string]: string } = {
+              'bitcoin': 'https://assets.coingecko.com/coins/images/1/large/bitcoin.png',
+              'ethereum': 'https://assets.coingecko.com/coins/images/279/large/ethereum.png',
+              'binancecoin': 'https://assets.coingecko.com/coins/images/825/large/bnb-icon2_2x.png',
+              'usd-coin': 'https://assets.coingecko.com/coins/images/6319/large/USD_Coin_icon.png',
+              'tether': 'https://assets.coingecko.com/coins/images/325/large/Tether.png',
+              'matic-network': 'https://assets.coingecko.com/coins/images/4713/large/matic-token-icon.png',
+              'chainlink': 'https://assets.coingecko.com/coins/images/877/large/chainlink-new-logo.png',
+              'uniswap': 'https://assets.coingecko.com/coins/images/12504/large/uni.jpg',
+              'aave': 'https://assets.coingecko.com/coins/images/12645/large/AAVE.png',
+              'solana': 'https://assets.coingecko.com/coins/images/4128/large/solana.png',
+            };
+            
+            if (!logo && popularLogos[coin.id]) {
+              logo = popularLogos[coin.id];
+            }
             
             // Get price data
             const priceData = prices[coin.id];

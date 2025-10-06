@@ -345,13 +345,19 @@ export function AddTokenModal({ isOpen, onClose }: { isOpen: boolean; onClose: (
                       disabled={searching}
                       className="w-full flex items-center gap-3 p-4 bg-gray-800 border border-gray-700 rounded-xl hover:bg-gray-700 transition disabled:opacity-50"
                     >
-                      <Image 
-                        src={token.logo} 
+                      <img 
+                        src={token.logo || `https://via.placeholder.com/40/6B7280/FFFFFF?text=${token.symbol.charAt(0)}`} 
                         alt={token.symbol} 
                         width={40} 
                         height={40} 
-                        className="w-10 h-10 rounded-full bg-gray-600" 
-                        onError={(e) => e.currentTarget.src = `https://via.placeholder.com/40/6B7280/FFFFFF?text=${token.symbol.charAt(0)}`} 
+                        className="w-10 h-10 rounded-full bg-gray-600 object-cover" 
+                        onError={(e) => {
+                          e.currentTarget.src = `https://via.placeholder.com/40/6B7280/FFFFFF?text=${token.symbol.charAt(0)}`;
+                        }}
+                        onLoad={(e) => {
+                          // Remove placeholder styling when image loads successfully
+                          e.currentTarget.classList.remove('bg-gray-600');
+                        }}
                       />
                       <div className="flex-1 text-left">
                         <div className="flex items-center gap-2">
