@@ -102,6 +102,7 @@ export default function DashboardPage() {
       const customTokens = useWalletStore.getState().getTokens();
       console.log('Dashboard loaded custom tokens:', customTokens);
       console.log('Available accounts:', accounts);
+      console.log('Custom tokens count:', customTokens.length);
       
       // Combine blockchain tokens with custom tokens
       const allTokens = [...blockchainTokens];
@@ -110,10 +111,12 @@ export default function DashboardPage() {
       console.log('Processing custom tokens...');
       for (const customToken of customTokens) {
         console.log('Processing custom token:', customToken);
+        // Check if token already exists in blockchain tokens
+        // Only consider it a duplicate if it's the exact same token (same address and chain)
         const exists = blockchainTokens.some(t => 
           t.symbol === customToken.symbol && 
           t.chain === customToken.chain && 
-          (t.address === customToken.address || (t.isNative && customToken.isNative))
+          t.address === customToken.address
         );
         
         console.log('Token exists in blockchain tokens:', exists);
@@ -121,6 +124,22 @@ export default function DashboardPage() {
           // Try to get updated balance for custom token
           let updatedBalance = customToken.balance;
           let updatedUsdValue = customToken.usdValue;
+          
+          // Get token price for USD value calculation
+          let tokenPrice = 0;
+          try {
+            // Use the same price API as BalanceService
+            const priceResponse = await fetch(`/api/prices?ids=${customToken.symbol.toLowerCase()}`);
+            const priceData = await priceResponse.json();
+            tokenPrice = priceData[customToken.symbol.toLowerCase()]?.usd || 0;
+          } catch (error) {
+            console.warn(`Failed to get price for ${customToken.symbol}:`, error);
+          }
+          
+          // Calculate USD value
+          if (tokenPrice > 0) {
+            updatedUsdValue = (parseFloat(updatedBalance) * tokenPrice).toFixed(2);
+          }
           
           try {
             // Get user address for this chain
@@ -179,6 +198,8 @@ export default function DashboardPage() {
           };
           console.log('Adding custom token to dashboard:', tokenBalance);
           allTokens.push(tokenBalance);
+        } else {
+          console.log('Skipping custom token - already exists in blockchain tokens:', customToken.symbol);
         }
       }
       

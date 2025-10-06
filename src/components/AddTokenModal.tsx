@@ -141,6 +141,12 @@ export function AddTokenModal({ isOpen, onClose }: { isOpen: boolean; onClose: (
       });
 
       // Add to store - create token object with explicit chain type
+      // Calculate USD value if price is available
+      let usdValue = '0';
+      if (token.price && token.price > 0 && parseFloat(balance) > 0) {
+        usdValue = (parseFloat(balance) * token.price).toFixed(2);
+      }
+      
       const tokenToAdd = {
         symbol: token.symbol,
         name: token.name,
@@ -150,11 +156,16 @@ export function AddTokenModal({ isOpen, onClose }: { isOpen: boolean; onClose: (
         balance,
         logo: token.logo,
         isNative: false,
-        usdValue: '0'
+        usdValue
       } as WalletToken;
       console.log('AddTokenModal: Adding token to store:', tokenToAdd);
       (addToken as any)(tokenToAdd);
       console.log('AddTokenModal: Token added to store successfully');
+      
+      // Verify token was added by checking store
+      const tokensAfter = useWalletStore.getState().getTokens();
+      console.log('AddTokenModal: Tokens in store after addition:', tokensAfter);
+      console.log('AddTokenModal: Token found in store:', tokensAfter.some(t => t.symbol === token.symbol && t.chain === token.chain));
 
       setSuccessMessage(`${token.symbol} added successfully!`);
       setTimeout(() => {
