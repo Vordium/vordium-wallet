@@ -145,6 +145,7 @@ NEXT_PUBLIC_PRICE_CACHE_DURATION=60000
 2. ✅ Implement real-time token search
 3. ✅ Implement real-time price feeds
 4. ✅ Fix Solana and Bitcoin RPC connections
+5. ✅ Add BNB Smart Chain support
 
 ### Phase 3: UI Fixes
 1. ✅ Fix send/receive icons to be SVG gray

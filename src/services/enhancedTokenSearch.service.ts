@@ -5,7 +5,7 @@ export interface EnhancedTokenSearchResult {
   symbol: string;
   name: string;
   address: string;
-  chain: 'Ethereum' | 'Tron' | 'Solana' | 'Bitcoin';
+  chain: 'Ethereum' | 'Tron' | 'Solana' | 'Bitcoin' | 'BSC' | 'Polygon' | 'Arbitrum';
   decimals: number;
   logo: string;
   balance?: string;
@@ -20,7 +20,7 @@ export class EnhancedTokenSearchService {
   private static readonly CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
 
   // Search tokens with live API data
-  static async searchTokens(query: string, chain?: 'Ethereum' | 'Tron' | 'Solana' | 'Bitcoin'): Promise<EnhancedTokenSearchResult[]> {
+  static async searchTokens(query: string, chain?: 'Ethereum' | 'Tron' | 'Solana' | 'Bitcoin' | 'BSC' | 'Polygon' | 'Arbitrum'): Promise<EnhancedTokenSearchResult[]> {
     if (!query || query.length < 2) return [];
 
     const cacheKey = `${query}-${chain || 'all'}`;
@@ -87,27 +87,39 @@ export class EnhancedTokenSearchService {
       const data = await response.json();
       const results: EnhancedTokenSearchResult[] = [];
 
-      // Process coins
+      // Process coins - get more results and fetch prices
       if (data.coins) {
-        for (const coin of data.coins.slice(0, 10)) { // Limit to 10 results
+        const coinIds = data.coins.slice(0, 20).map((coin: any) => coin.id).join(',');
+        
+        // Fetch prices for all coins
+        let prices: any = {};
+        try {
+          const priceResponse = await fetch(
+            `${API_CONFIG.COINGECKO.API_URL}/simple/price?ids=${coinIds}&vs_currencies=usd&include_24hr_change=true`,
+            {
+              headers: {
+                'Accept': 'application/json',
+                ...(API_CONFIG.COINGECKO.API_KEY && { 'x-cg-demo-api-key': API_CONFIG.COINGECKO.API_KEY }),
+              },
+            }
+          );
+          if (priceResponse.ok) {
+            prices = await priceResponse.json();
+          }
+        } catch (error) {
+          console.warn('Failed to fetch prices:', error);
+        }
+
+        for (const coin of data.coins.slice(0, 20)) { // Increased to 20 results
           const chainType = this.mapCoinGeckoToChain(coin.id);
           if (!chain || chainType === chain) {
-            // Get the best available logo
+            // Get high-quality logo (prefer large, then small, then thumb)
             const logo = coin.large || coin.small || coin.thumb || coin.image || '';
             
-            // Debug logging
-            console.log('CoinGecko token:', {
-              symbol: coin.symbol,
-              name: coin.name,
-              logo: logo,
-              chain: chainType,
-              coinData: {
-                large: coin.large,
-                small: coin.small,
-                thumb: coin.thumb,
-                image: coin.image
-              }
-            });
+            // Get price data
+            const priceData = prices[coin.id];
+            const price = priceData?.usd || 0;
+            const change24h = priceData?.usd_24h_change || 0;
             
             results.push({
               symbol: coin.symbol?.toUpperCase() || '',
@@ -117,7 +129,8 @@ export class EnhancedTokenSearchService {
               decimals: 18, // Default for most tokens
               logo: logo,
               verified: true,
-              price: coin.market_cap_rank ? undefined : undefined, // Will be fetched separately
+              price: price,
+              change24h: change24h,
             });
           }
         }
@@ -219,17 +232,28 @@ export class EnhancedTokenSearchService {
   }
 
   // Map CoinGecko coin ID to chain type
-  private static mapCoinGeckoToChain(coinId: string): 'Ethereum' | 'Tron' | 'Solana' | 'Bitcoin' {
-    const chainMap: Record<string, 'Ethereum' | 'Tron' | 'Solana' | 'Bitcoin'> = {
+  private static mapCoinGeckoToChain(coinId: string): 'Ethereum' | 'Tron' | 'Solana' | 'Bitcoin' | 'BSC' | 'Polygon' | 'Arbitrum' {
+    const chainMap: Record<string, 'Ethereum' | 'Tron' | 'Solana' | 'Bitcoin' | 'BSC' | 'Polygon' | 'Arbitrum'> = {
       'bitcoin': 'Bitcoin',
       'ethereum': 'Ethereum',
       'tron': 'Tron',
       'solana': 'Solana',
+      'binancecoin': 'BSC',
+      'wbnb': 'BSC',
+      'pancakeswap-token': 'BSC',
       'usd-coin': 'Ethereum',
       'tether': 'Ethereum',
-      'binancecoin': 'Ethereum',
-      'matic-network': 'Ethereum',
-      'arbitrum': 'Ethereum',
+      'matic-network': 'Polygon',
+      'wmatic': 'Polygon',
+      'arbitrum': 'Arbitrum',
+      'chainlink': 'Ethereum',
+      'uniswap': 'Ethereum',
+      'aave': 'Ethereum',
+      'maker': 'Ethereum',
+      'curve-dao-token': 'Ethereum',
+      'synthetix-network-token': 'Ethereum',
+      'yearn-finance': 'Ethereum',
+      'compound-governance-token': 'Ethereum',
     };
 
     return chainMap[coinId] || 'Ethereum';

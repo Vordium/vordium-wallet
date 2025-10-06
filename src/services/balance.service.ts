@@ -10,7 +10,7 @@ export interface TokenBalance {
   name: string;
   balance: string;
   usdValue: string;
-  chain: 'Ethereum' | 'Tron' | 'Solana' | 'Bitcoin';
+  chain: 'Ethereum' | 'Tron' | 'Solana' | 'Bitcoin' | 'BSC' | 'Polygon' | 'Arbitrum';
   address?: string;
   decimals: number;
   isNative: boolean;
@@ -44,6 +44,9 @@ export class BalanceService {
   private static readonly TOKEN_LOGOS: { [key: string]: string } = {
     'ETH': 'https://assets.coingecko.com/coins/images/279/large/ethereum.png',
     'TRX': 'https://assets.coingecko.com/coins/images/1094/large/tron-logo.png',
+    'BNB': 'https://assets.coingecko.com/coins/images/825/large/bnb-icon2_2x.png',
+    'MATIC': 'https://assets.coingecko.com/coins/images/4713/large/matic-token-icon.png',
+    'ARB': 'https://assets.coingecko.com/coins/images/16547/large/photo_2023-03-29_21.47.00.jpeg',
     'USDT': 'https://assets.coingecko.com/coins/images/325/large/Tether.png',
     'USDC': 'https://assets.coingecko.com/coins/images/6319/large/USD_Coin_icon.png',
     'DAI': 'https://assets.coingecko.com/coins/images/9956/large/Badge_Dai.png',
