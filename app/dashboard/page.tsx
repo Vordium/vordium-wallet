@@ -11,6 +11,7 @@ import { BottomNavigation } from '@/components/BottomNavigation';
 import { WalletImportModal } from '@/components/WalletImportModal';
 import { BalanceService, type TokenBalance } from '@/services/balance.service';
 import { NotificationCenter, useNotifications } from '@/components/NotificationSystem';
+import { ethers } from 'ethers';
 import { PageSkeleton, BalanceCardSkeleton, TokenRowSkeleton } from '@/components/ui/Skeleton';
 import { getTrustWalletLogo, NATIVE_LOGOS } from '@/lib/tokenLogos';
 import { 
@@ -94,8 +95,89 @@ export default function DashboardPage() {
         solana: solanaAccount.address,
       };
       
-      const allTokens = await BalanceService.getAllTokensMultiChain(addresses);
-      console.log('Dashboard loaded tokens:', allTokens);
+      const blockchainTokens = await BalanceService.getAllTokensMultiChain(addresses);
+      console.log('Dashboard loaded blockchain tokens:', blockchainTokens);
+      
+      // Get custom tokens from store
+      const customTokens = useWalletStore.getState().getTokens();
+      console.log('Dashboard loaded custom tokens:', customTokens);
+      
+      // Combine blockchain tokens with custom tokens
+      const allTokens = [...blockchainTokens];
+      
+      // Add custom tokens that aren't already in blockchain tokens
+      for (const customToken of customTokens) {
+        const exists = blockchainTokens.some(t => 
+          t.symbol === customToken.symbol && 
+          t.chain === customToken.chain && 
+          (t.address === customToken.address || (t.isNative && customToken.isNative))
+        );
+        
+        if (!exists) {
+          // Try to get updated balance for custom token
+          let updatedBalance = customToken.balance;
+          let updatedUsdValue = customToken.usdValue;
+          
+          try {
+            // Get user address for this chain
+            const chainMap: Record<string, string> = {
+              'Ethereum': 'EVM',
+              'Tron': 'TRON',
+              'Solana': 'SOLANA',
+              'Bitcoin': 'BITCOIN',
+              'BSC': 'BSC',
+              'Polygon': 'POLYGON',
+              'Arbitrum': 'ARBITRUM'
+            };
+            
+            const userAddress = accounts.find(a => 
+              a.chain === chainMap[customToken.chain]
+            )?.address;
+            
+            if (userAddress && customToken.address !== 'native') {
+              // Try to fetch updated balance
+              if (customToken.chain === 'Ethereum' || customToken.chain === 'BSC' || customToken.chain === 'Polygon' || customToken.chain === 'Arbitrum') {
+                try {
+                  const provider = new ethers.JsonRpcProvider(
+                    customToken.chain === 'Ethereum' ? (process.env.NEXT_PUBLIC_ETHEREUM_RPC || 'https://eth.llamarpc.com') :
+                    customToken.chain === 'BSC' ? (process.env.NEXT_PUBLIC_BSC_RPC || 'https://bsc-dataseed.binance.org') :
+                    customToken.chain === 'Polygon' ? (process.env.NEXT_PUBLIC_POLYGON_RPC || 'https://polygon-rpc.com') :
+                    (process.env.NEXT_PUBLIC_ARBITRUM_RPC || 'https://arb1.arbitrum.io/rpc')
+                  );
+                  const contract = new ethers.Contract(
+                    customToken.address,
+                    ['function balanceOf(address) view returns (uint256)', 'function decimals() view returns (uint8)'],
+                    provider
+                  );
+                  const balance = await contract.balanceOf(userAddress);
+                  const decimals = await contract.decimals();
+                  updatedBalance = (Number(balance) / Math.pow(10, decimals)).toString();
+                } catch (error) {
+                  console.warn(`Failed to fetch balance for ${customToken.symbol}:`, error);
+                }
+              }
+            }
+          } catch (error) {
+            console.warn(`Failed to update balance for ${customToken.symbol}:`, error);
+          }
+          
+          // Convert store token to TokenBalance format
+          const tokenBalance: TokenBalance = {
+            symbol: customToken.symbol,
+            name: customToken.name,
+            balance: updatedBalance,
+            usdValue: updatedUsdValue,
+            chain: customToken.chain,
+            address: customToken.address,
+            decimals: customToken.decimals,
+            isNative: customToken.isNative,
+            logo: customToken.logo
+          };
+          allTokens.push(tokenBalance);
+        }
+      }
+      
+      console.log('Dashboard combined tokens:', allTokens);
       setTokens(allTokens);
       
       const total = await BalanceService.getTotalBalance(allTokens);
