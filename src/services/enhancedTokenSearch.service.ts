@@ -174,6 +174,12 @@ export class EnhancedTokenSearchService {
   // Search Moralis for EVM tokens
   private static async searchMoralis(query: string): Promise<EnhancedTokenSearchResult[]> {
     try {
+      // Skip Moralis search for very short queries or if no API key
+      if (query.length < 2 || !API_CONFIG.MORALIS.API_KEY) {
+        console.log('Skipping Moralis search: query too short or no API key');
+        return [];
+      }
+
       // Search for tokens by symbol or name
       const response = await fetch(
         `${API_CONFIG.MORALIS.API_URL}/erc20/metadata?chain=eth&symbols=${encodeURIComponent(query)}`,
@@ -186,7 +192,8 @@ export class EnhancedTokenSearchService {
       );
 
       if (!response.ok) {
-        throw new Error(`Moralis API error: ${response.status}`);
+        console.warn(`Moralis API error: ${response.status} - skipping Moralis search`);
+        return [];
       }
 
       const data = await response.json();
@@ -216,6 +223,12 @@ export class EnhancedTokenSearchService {
   // Search Helius for Solana tokens
   private static async searchHelius(query: string): Promise<EnhancedTokenSearchResult[]> {
     try {
+      // Skip Helius search if no API key or query too short
+      if (query.length < 2 || !API_CONFIG.HELIUS.API_KEY) {
+        console.log('Skipping Helius search: query too short or no API key');
+        return [];
+      }
+
       // Search for tokens by symbol or name
       const response = await fetch(
         `${API_CONFIG.HELIUS.API_URL}/token-metadata?api-key=${API_CONFIG.HELIUS.API_KEY}`,
@@ -232,7 +245,8 @@ export class EnhancedTokenSearchService {
       );
 
       if (!response.ok) {
-        throw new Error(`Helius API error: ${response.status}`);
+        console.warn(`Helius API error: ${response.status} - skipping Helius search`);
+        return [];
       }
 
       const data = await response.json();

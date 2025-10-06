@@ -51,7 +51,7 @@ export class SolanaService {
       const cached = this.getCachedData(cacheKey);
       if (cached) return cached.balance;
 
-      if (API_CONFIG.HELIUS.ENABLED) {
+      if (API_CONFIG.HELIUS.ENABLED && API_CONFIG.HELIUS.API_KEY) {
         const balance = await this.getHeliusBalance(address);
         if (balance !== null) {
           this.setCachedData(cacheKey, { balance });
@@ -66,7 +66,7 @@ export class SolanaService {
         return balance;
       }
 
-      console.warn('No Solana API configured, returning 0 balance');
+      console.warn('All Solana APIs failed, returning 0 balance');
       return '0';
     } catch (error) {
       console.error('Error getting Solana balance:', error);
@@ -220,7 +220,7 @@ export class SolanaService {
   // Get balance from direct RPC
   private static async getRPCBalance(address: string): Promise<string | null> {
     try {
-      const rpcUrl = API_CONFIG.HELIUS.API_URL || 'https://api.mainnet-beta.solana.com';
+      const rpcUrl = API_CONFIG.SOLANA.RPC_URL || 'https://api.mainnet-beta.solana.com';
       const response = await fetch(rpcUrl, {
         method: 'POST',
         headers: {
