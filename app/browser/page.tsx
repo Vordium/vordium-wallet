@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { BottomNavigation } from '@/components/BottomNavigation';
-import { SearchIcon, ArrowLeftIcon } from '@/components/icons/GrayIcons';
+import { SearchIcon, ArrowLeftIcon, RefreshIcon, HomeIcon } from '@/components/icons/GrayIcons';
 import { DAppCardSkeleton } from '@/components/ui/Skeleton';
 import Image from 'next/image';
 
@@ -148,6 +148,9 @@ export default function BrowserPage() {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('All');
   const [loading, setLoading] = useState(false);
+  const [browserMode, setBrowserMode] = useState(false);
+  const [currentUrl, setCurrentUrl] = useState('');
+  const [urlInput, setUrlInput] = useState('');
 
   const filteredDApps = TRENDING_DAPPS.filter(dapp => {
     const matchesSearch = dapp.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -157,6 +160,103 @@ export default function BrowserPage() {
   });
 
   const trendingDApps = filteredDApps.filter(dapp => dapp.trending);
+
+  // Browser functions
+  const navigateToUrl = (url: string) => {
+    let formattedUrl = url;
+    if (!url.startsWith('http://') && !url.startsWith('https://')) {
+      formattedUrl = `https://${url}`;
+    }
+    setCurrentUrl(formattedUrl);
+    setBrowserMode(true);
+  };
+
+  const handleUrlSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (urlInput.trim()) {
+      navigateToUrl(urlInput.trim());
+    }
+  };
+
+  const goBack = () => {
+    setBrowserMode(false);
+    setCurrentUrl('');
+    setUrlInput('');
+  };
+
+  const refreshPage = () => {
+    // In a real implementation, this would refresh the iframe
+    window.location.reload();
+  };
+
+  const goHome = () => {
+    setBrowserMode(false);
+    setCurrentUrl('');
+    setUrlInput('');
+  };
+
+  // Browser mode
+  if (browserMode) {
+    return (
+      <div className="min-h-screen bg-gray-900 text-white pb-20">
+        {/* Browser Header */}
+        <div className="sticky top-0 bg-gray-800 border-b border-gray-700 p-4 z-10">
+          <div className="flex items-center gap-3 mb-4">
+            <button onClick={goBack} className="p-2 hover:bg-gray-700 rounded-lg">
+              <ArrowLeftIcon className="w-5 h-5" />
+            </button>
+            <button onClick={goHome} className="p-2 hover:bg-gray-700 rounded-lg">
+              <HomeIcon className="w-5 h-5" />
+            </button>
+            <button onClick={refreshPage} className="p-2 hover:bg-gray-700 rounded-lg">
+              <RefreshIcon className="w-5 h-5" />
+            </button>
+          </div>
+          
+          {/* URL Bar */}
+          <form onSubmit={handleUrlSubmit} className="flex gap-2">
+            <input
+              type="url"
+              value={urlInput}
+              onChange={(e) => setUrlInput(e.target.value)}
+              placeholder="Enter URL or search..."
+              className="flex-1 px-4 py-3 bg-gray-700 border border-gray-600 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-gray-500"
+            />
+            <button 
+              type="submit"
+              className="px-6 py-3 bg-gray-600 text-white rounded-xl hover:bg-gray-500 transition"
+            >
+              Go
+            </button>
+          </form>
+          
+          <div className="mt-2 text-sm text-gray-400 truncate">
+            {currentUrl}
+          </div>
+        </div>
+
+        {/* Browser Content */}
+        <div className="h-screen">
+          {currentUrl ? (
+            <iframe
+              src={currentUrl}
+              className="w-full h-full border-0"
+              title="DApp Browser"
+              sandbox="allow-same-origin allow-scripts allow-forms allow-popups allow-popups-to-escape-sandbox"
+            />
+          ) : (
+            <div className="flex items-center justify-center h-full text-gray-400">
+              <div className="text-center">
+                <div className="text-6xl mb-4">🌐</div>
+                <p className="text-xl mb-2">Enter a URL to start browsing</p>
+                <p className="text-sm">Or select a DApp from the list below</p>
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gray-900 text-white pb-20">
@@ -206,7 +306,7 @@ export default function BrowserPage() {
             
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
               {trendingDApps.slice(0, 4).map(dapp => (
-                <DAppCard key={dapp.id} dapp={dapp} featured />
+                <DAppCard key={dapp.id} dapp={dapp} featured onNavigate={navigateToUrl} />
               ))}
             </div>
           </section>
@@ -230,7 +330,7 @@ export default function BrowserPage() {
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {filteredDApps.map(dapp => (
-                <DAppCard key={dapp.id} dapp={dapp} />
+                <DAppCard key={dapp.id} dapp={dapp} onNavigate={navigateToUrl} />
               ))}
             </div>
           )}
@@ -240,7 +340,10 @@ export default function BrowserPage() {
         <section className="mt-8">
           <h2 className="text-xl font-bold mb-4">Quick Actions</h2>
           <div className="grid grid-cols-2 gap-4">
-            <button className="p-4 bg-gray-800 rounded-xl border border-gray-700 hover:bg-gray-700 transition">
+            <button 
+              onClick={() => setBrowserMode(true)}
+              className="p-4 bg-gray-800 rounded-xl border border-gray-700 hover:bg-gray-700 transition"
+            >
               <div className="text-2xl mb-2">🌐</div>
               <div className="font-medium">Custom URL</div>
               <div className="text-sm text-gray-400">Enter any DApp URL</div>
@@ -259,10 +362,10 @@ export default function BrowserPage() {
   );
 }
 
-function DAppCard({ dapp, featured = false }: { dapp: DApp; featured?: boolean }) {
+function DAppCard({ dapp, featured = false, onNavigate }: { dapp: DApp; featured?: boolean; onNavigate: (url: string) => void }) {
   const handleOpen = () => {
-    // In a real implementation, this would open the DApp in an in-app browser
-    window.open(dapp.url, '_blank');
+    // Navigate to the DApp in the in-app browser
+    onNavigate(dapp.url);
   };
 
   return (
