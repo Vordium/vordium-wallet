@@ -40,6 +40,17 @@ export class TronService {
     }
   }
 
+  async getTRC20TokenBalances(address: string): Promise<any[]> {
+    try {
+      // This would typically use TronGrid API to get TRC-20 token balances
+      // For now, return empty array - this should be implemented with proper API calls
+      return [];
+    } catch (error) {
+      console.error('Failed to get TRC-20 token balances:', error);
+      return [];
+    }
+  }
+
   async sendTransaction(params: any): Promise<string> {
     // Implementation from previous artifact
     return '';

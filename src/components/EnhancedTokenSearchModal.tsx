@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { MultiChainTokenService, type MultiChainTokenInfo, type TokenSearchFilter } from '@/services/multiChainToken.service';
 import { useWalletStore, type Token as WalletToken } from '@/store/walletStore';
-import { SearchIcon, PlusIcon, XMarkIcon } from './icons/GrayIcons';
+import { SearchIcon, PlusIcon, XIcon } from './icons/GrayIcons';
 
 export function EnhancedTokenSearchModal({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) {
   const [searchQuery, setSearchQuery] = useState('');
@@ -117,7 +117,7 @@ export function EnhancedTokenSearchModal({ isOpen, onClose }: { isOpen: boolean;
               onClick={onClose}
               className="p-2 hover:bg-gray-700 rounded-lg transition"
             >
-              <XMarkIcon className="w-5 h-5 text-gray-400" />
+              <XIcon className="w-5 h-5 text-gray-400" />
             </button>
           </div>
 
@@ -180,7 +180,7 @@ export function EnhancedTokenSearchModal({ isOpen, onClose }: { isOpen: boolean;
             </div>
           ) : searchResults.length === 0 && searchQuery.length >= 2 ? (
             <div className="p-6 text-center text-gray-400">
-              No tokens found for "{searchQuery}"
+              No tokens found for &quot;{searchQuery}&quot;
               {selectedChains.length > 0 && (
                 <div className="text-sm mt-1">
                   on {selectedChains.join(', ')}

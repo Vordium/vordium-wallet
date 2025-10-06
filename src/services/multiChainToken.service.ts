@@ -133,15 +133,15 @@ export class MultiChainTokenService {
         tokens.push({
           symbol: token.symbol,
           name: token.name,
-          address: token.address,
+          address: token.mint,
           chain: 'Solana',
           decimals: token.decimals,
           logo: token.logo || this.getDefaultLogo(token.symbol),
           price: price,
           priceFormatted: `$${price.toFixed(4)}`,
-          balance: token.balance,
-          balanceFormatted: token.balance,
-          usdValue: (parseFloat(token.balance) * price).toFixed(2),
+          balance: '0', // SPL tokens don't have balance in metadata
+          balanceFormatted: '0',
+          usdValue: '0',
           verified: true,
           isNative: false,
         });
@@ -183,17 +183,17 @@ export class MultiChainTokenService {
       for (const token of trc20Tokens) {
         const price = await this.getTokenPrice(token.symbol.toLowerCase());
         tokens.push({
-          symbol: token.symbol,
-          name: token.name,
-          address: token.address,
+          symbol: token.symbol || 'UNKNOWN',
+          name: token.name || 'Unknown Token',
+          address: token.address || '',
           chain: 'Tron',
-          decimals: token.decimals,
-          logo: token.logo || this.getDefaultLogo(token.symbol),
+          decimals: token.decimals || 18,
+          logo: token.logo || this.getDefaultLogo(token.symbol || 'UNKNOWN'),
           price: price,
           priceFormatted: `$${price.toFixed(4)}`,
-          balance: token.balance,
-          balanceFormatted: token.balance,
-          usdValue: (parseFloat(token.balance) * price).toFixed(2),
+          balance: token.balance || '0',
+          balanceFormatted: token.balance || '0',
+          usdValue: (parseFloat(token.balance || '0') * price).toFixed(2),
           verified: true,
           isNative: false,
         });

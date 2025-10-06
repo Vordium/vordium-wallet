@@ -562,4 +562,44 @@ export class SolanaService {
       timestamp: Date.now(),
     });
   }
+
+  // Get SPL token balances for an address
+  static async getSPLTokenBalances(address: string): Promise<SolanaTokenMetadata[]> {
+    try {
+      const cacheKey = `spl-tokens-${address}`;
+      const cached = this.getCachedData(cacheKey);
+      if (cached) {
+        return cached;
+      }
+
+      if (!API_CONFIG.HELIUS.API_KEY) {
+        console.warn('Helius API key not configured for SPL token balances');
+        return [];
+      }
+
+      const response = await fetch(
+        `${API_CONFIG.HELIUS.API_URL}/v0/addresses/${address}/tokens?api-key=${API_CONFIG.HELIUS.API_KEY}`
+      );
+
+      if (!response.ok) {
+        throw new Error(`Helius API error: ${response.status}`);
+      }
+
+      const data = await response.json();
+      const tokens: SolanaTokenMetadata[] = data.map((token: any) => ({
+        mint: token.mint,
+        symbol: token.symbol || 'UNKNOWN',
+        name: token.name || 'Unknown Token',
+        decimals: token.decimals || 9,
+        logo: token.logo || undefined,
+        description: token.description || undefined,
+      }));
+
+      this.setCachedData(cacheKey, tokens);
+      return tokens;
+    } catch (error) {
+      console.error('Failed to get SPL token balances:', error);
+      return [];
+    }
+  }
 }
