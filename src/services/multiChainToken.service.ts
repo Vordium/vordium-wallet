@@ -159,7 +159,8 @@ export class MultiChainTokenService {
     
     try {
       // Get TRX balance
-      const trxBalance = await TronService.getBalance(address);
+      const tronService = new TronService();
+      const trxBalance = await tronService.getBalance(address);
       const trxPrice = await this.getTokenPrice('tron');
       
       tokens.push({
@@ -179,7 +180,7 @@ export class MultiChainTokenService {
       });
 
       // Get TRC-20 token balances
-      const trc20Tokens = await TronService.getTRC20TokenBalances(address);
+      const trc20Tokens = await tronService.getTRC20TokenBalances(address);
       for (const token of trc20Tokens) {
         const price = await this.getTokenPrice(token.symbol.toLowerCase());
         tokens.push({
