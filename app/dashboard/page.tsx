@@ -32,7 +32,6 @@ import {
   EyeIcon,
   GlobeIcon
 } from '@/components/icons/GrayIcons';
-import Image from 'next/image';
 
 export default function DashboardPage() {
   const router = useRouter();
@@ -547,7 +546,7 @@ function TokenRow({ token, logoUrl, onClick }: { token: TokenBalance; logoUrl: s
     >
       <div className="relative w-12 h-12 flex-shrink-0">
         {!logoError && logoUrl ? (
-          <Image
+          <img
             src={logoUrl}
             alt={token.symbol}
             width={48}
@@ -575,11 +574,29 @@ function TokenRow({ token, logoUrl, onClick }: { token: TokenBalance; logoUrl: s
       </div>
 
       <div className="flex-1 text-left min-w-0">
-        <div className="font-semibold text-white truncate">{token.symbol}</div>
+        <div className="flex items-center gap-2">
+          <span className="font-semibold text-white truncate">{token.symbol}</span>
+          {!token.isNative && (
+            <span className="px-2 py-0.5 bg-gray-600 text-gray-300 text-xs rounded-full">
+              {token.chain}
+            </span>
+          )}
+        </div>
         <div className="text-sm text-gray-400 truncate">{token.name}</div>
-        {!token.isNative && (
-          <div className="text-xs text-gray-500 mt-0.5">{token.chain}</div>
-        )}
+        {/* Show price and 24h change if available */}
+        <div className="text-xs flex items-center gap-2 mt-1">
+          <span className="text-gray-500">
+            {parseFloat(token.balance) > 0 
+              ? `$${(parseFloat(token.usdValue) / parseFloat(token.balance)).toFixed(6)}`
+              : 'Price N/A'
+            }
+          </span>
+          {token.change24h !== undefined && (
+            <span className={`${token.change24h >= 0 ? 'text-green-400' : 'text-red-400'}`}>
+              {token.change24h >= 0 ? '+' : ''}{token.change24h.toFixed(2)}%
+            </span>
+          )}
+        </div>
       </div>
 
       <div className="text-right">
