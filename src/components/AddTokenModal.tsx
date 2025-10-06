@@ -5,6 +5,7 @@ import { ethers } from 'ethers';
 import TronWeb from 'tronweb';
 import { useWalletStore } from '@/store/walletStore';
 import { TokenSearchService, type TokenSearchResult } from '@/services/tokenSearch.service';
+import { EnhancedTokenSearchService, type EnhancedTokenSearchResult } from '@/services/enhancedTokenSearch.service';
 import { TokenMappingService } from '@/services/tokenMapping.service';
 import { SearchIcon, PlusIcon, ArrowLeftIcon } from './icons/GrayIcons';
 import { ModalSkeleton, FormInputSkeleton } from './ui/Skeleton';
@@ -13,7 +14,7 @@ import Image from 'next/image';
 export function AddTokenModal({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) {
   const [searchQuery, setSearchQuery] = useState('');
   const [searching, setSearching] = useState(false);
-  const [searchResults, setSearchResults] = useState<TokenSearchResult[]>([]);
+  const [searchResults, setSearchResults] = useState<EnhancedTokenSearchResult[]>([]);
   const [customAddress, setCustomAddress] = useState('');
   const [selectedChain, setSelectedChain] = useState<'Ethereum' | 'Tron' | 'Solana' | 'Bitcoin'>('Ethereum');
   const [successMessage, setSuccessMessage] = useState('');
@@ -30,48 +31,55 @@ export function AddTokenModal({ isOpen, onClose }: { isOpen: boolean; onClose: (
       }
 
       setSearching(true);
-      // Use live search via our API route (avoids CORS issues)
-      console.log('AddTokenModal: Searching live tokens via API route');
+      console.log('AddTokenModal: Using enhanced token search service');
+      
       try {
-        const response = await fetch(`/api/search?query=${encodeURIComponent(searchQuery)}`);
-        const data = await response.json();
+        // Use enhanced search service directly for better results
+        const enhancedResults = await EnhancedTokenSearchService.searchTokens(searchQuery);
         
-        const liveResults: TokenSearchResult[] = data.coins?.slice(0, 10)
-          .map((coin: any) => {
-            // Try to find proper token mapping for selected chain
-            const mapping = TokenMappingService.getTokenByCoinGeckoId(coin.id);
-            if (mapping && mapping.chain === selectedChain) {
-              return {
-                symbol: mapping.symbol,
-                name: mapping.name,
-                address: mapping.contractAddress,
-                chain: mapping.chain,
-                decimals: mapping.decimals,
-                logo: mapping.logo,
-                verified: true,
-              };
-            }
-            return null;
-          })
-          .filter(Boolean) || [];
+        // Show all results from supported chains, not just selected chain
+        const supportedChains = ['Ethereum', 'BSC', 'Polygon', 'Arbitrum', 'Solana', 'Bitcoin', 'Tron'];
+        const filteredResults = enhancedResults.filter(token => 
+          supportedChains.includes(token.chain)
+        );
         
-        setSearchResults(liveResults);
-        console.log('AddTokenModal live search results:', liveResults.length);
+        setSearchResults(filteredResults);
+        console.log('AddTokenModal enhanced search results:', filteredResults.length, 'tokens found');
       } catch (error) {
-        console.error('AddTokenModal live search failed, using static search:', error);
-        // Fallback to static search
-        const staticResults = TokenSearchService.searchTokens(searchQuery, selectedChain);
-        setSearchResults(staticResults);
+        console.error('AddTokenModal enhanced search failed, using fallback:', error);
+        
+        // Fallback to API route
+        try {
+          const response = await fetch(`/api/search?query=${encodeURIComponent(searchQuery)}`);
+          const data = await response.json();
+          
+          const fallbackResults: EnhancedTokenSearchResult[] = data.coins?.slice(0, 20)
+            .map((coin: any) => ({
+              symbol: coin.symbol?.toUpperCase() || '',
+              name: coin.name || '',
+              address: coin.id || '',
+              chain: 'Ethereum' as const, // Default to Ethereum for fallback
+              decimals: 18,
+              logo: coin.large || coin.small || coin.thumb || '',
+              verified: true,
+              price: 0,
+            })) || [];
+          
+          setSearchResults(fallbackResults);
+        } catch (fallbackError) {
+          console.error('AddTokenModal fallback search also failed:', fallbackError);
+          setSearchResults([]);
+        }
       }
       
       setSearching(false);
     };
 
     searchTokens();
-  }, [searchQuery, selectedChain]);
+  }, [searchQuery]);
 
   // Add token from search
-  async function handleAddToken(token: TokenSearchResult) {
+  async function handleAddToken(token: EnhancedTokenSearchResult) {
     try {
       setSearching(true);
       
@@ -335,12 +343,34 @@ export function AddTokenModal({ isOpen, onClose }: { isOpen: boolean; onClose: (
                       key={index}
                       onClick={() => handleAddToken(token)}
                       disabled={searching}
-                      className="w-full flex items-center gap-3 p-4 bg-gray-50 dark:bg-gray-700 rounded-xl hover:bg-gray-200 dark:hover:bg-gray-600 transition disabled:opacity-50"
+                      className="w-full flex items-center gap-3 p-4 bg-gray-800 border border-gray-700 rounded-xl hover:bg-gray-700 transition disabled:opacity-50"
                     >
-                      <Image src={token.logo} alt={token.symbol} width={40} height={40} className="w-10 h-10 rounded-full" onError={(e) => e.currentTarget.src = 'https://via.placeholder.com/40'} />
+                      <Image 
+                        src={token.logo} 
+                        alt={token.symbol} 
+                        width={40} 
+                        height={40} 
+                        className="w-10 h-10 rounded-full bg-gray-600" 
+                        onError={(e) => e.currentTarget.src = `https://via.placeholder.com/40/6B7280/FFFFFF?text=${token.symbol.charAt(0)}`} 
+                      />
                       <div className="flex-1 text-left">
-                        <div className="font-bold text-gray-900 dark:text-white">{token.symbol}</div>
-                        <div className="text-sm text-gray-600 dark:text-gray-300">{token.name}</div>
+                        <div className="flex items-center gap-2">
+                          <span className="font-bold text-white">{token.symbol}</span>
+                          <span className="px-2 py-1 bg-gray-600 text-gray-300 text-xs rounded-full">
+                            {token.chain}
+                          </span>
+                        </div>
+                        <div className="text-sm text-gray-300">{token.name}</div>
+                        {token.price && token.price > 0 && (
+                          <div className="text-sm text-gray-400">
+                            ${token.price.toFixed(4)}
+                            {token.change24h && (
+                              <span className={`ml-2 ${token.change24h >= 0 ? 'text-green-400' : 'text-red-400'}`}>
+                                {token.change24h >= 0 ? '+' : ''}{token.change24h.toFixed(2)}%
+                              </span>
+                            )}
+                          </div>
+                        )}
                         {token.verified && (
                           <div className="text-xs text-green-600 dark:text-green-400">✓ Verified</div>
                         )}
