@@ -149,17 +149,34 @@ export class EnhancedTokenSearchService {
             const price = priceData?.usd || 0;
             const change24h = priceData?.usd_24h_change || 0;
             
-            results.push({
-              symbol: coin.symbol?.toUpperCase() || '',
-              name: coin.name || '',
-              address: coin.id || '',
-              chain: chainType,
-              decimals: 18, // Default for most tokens
-              logo: logo,
-              verified: true,
-              price: price,
-              change24h: change24h,
-            });
+                  // Use well-known contract addresses for popular tokens
+                  const knownContracts: { [key: string]: string } = {
+                    'pepe': '0x6982508145454Ce325dDbE47a25d4ec3d2311933',
+                    'shiba-inu': '0x95aD61b0a150d79219dCF64E1E6Cc01f0B64C4cE',
+                    'dogecoin': '0x4206931337dc273a630d328dA6441786BfaD668f',
+                    'chainlink': '0x514910771AF9Ca656af840dff83E8264EcF986CA',
+                    'uniswap': '0x1f9840a85d5aF5bf1D1762F925BDADdC4201F984',
+                    'aave': '0x7Fc66500c84A76Ad7e9c93437bFc5Ac33E2DDaE9',
+                    'maker': '0x9f8F72aA9304c8B593d555F12eF6589cC3A579A2',
+                    'curve-dao-token': '0xD533a949740bb3306d119CC777fa900bA034cd52',
+                    'synthetix-network-token': '0xC011a73ee8576Fb46F5E1c5751cA3B9Fe0af2a6F',
+                    'yearn-finance': '0x0bc529c00C6401aEF6D220BE8c6Ea1667F6Ad93e',
+                    'compound-governance-token': '0xc00e94Cb662C3520282E6f5717214004A7f26888',
+                  };
+                  
+                  const contractAddress = knownContracts[coin.id] || '';
+                  
+                  results.push({
+                    symbol: coin.symbol?.toUpperCase() || '',
+                    name: coin.name || '',
+                    address: contractAddress || coin.id || '',
+                    chain: chainType,
+                    decimals: 18, // Default for most tokens
+                    logo: logo,
+                    verified: true,
+                    price: price,
+                    change24h: change24h,
+                  });
           }
         }
       }
