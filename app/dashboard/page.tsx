@@ -10,6 +10,7 @@ import { WalletSwitcherModal } from '@/components/WalletSwitcherModal';
 import { BottomNavigation } from '@/components/BottomNavigation';
 import { WalletImportModal } from '@/components/WalletImportModal';
 import { BalanceService, type TokenBalance } from '@/services/balance.service';
+import { MoralisTokenService, type MoralisTokenInfo } from '@/services/moralisToken.service';
 import { NotificationCenter, useNotifications } from '@/components/NotificationSystem';
 import { ethers } from 'ethers';
 import { PageSkeleton, BalanceCardSkeleton, TokenRowSkeleton } from '@/components/ui/Skeleton';
@@ -87,15 +88,32 @@ export default function DashboardPage() {
     setRefreshing(true);
 
     try {
-      // Use multi-chain token service
-      const addresses = {
+      // Use Moralis for EVM chains (Ethereum, BSC, Polygon, Arbitrum)
+      const moralisAddresses = {
         ethereum: evmAccount.address,
-        tron: tronAccount.address,
-        bitcoin: bitcoinAccount.address,
-        solana: solanaAccount.address,
+        polygon: evmAccount.address, // Same address for Polygon
+        bsc: evmAccount.address,     // Same address for BSC
+        arbitrum: evmAccount.address, // Same address for Arbitrum
       };
       
-      const blockchainTokens = await BalanceService.getAllTokensMultiChain(addresses);
+      console.log('Loading tokens with Moralis for EVM chains...');
+      const moralisTokens = await MoralisTokenService.getAllTokensMultiChain(moralisAddresses);
+      console.log('Dashboard loaded Moralis tokens:', moralisTokens);
+      
+      // Convert MoralisTokenInfo to TokenBalance format
+      const blockchainTokens: TokenBalance[] = moralisTokens.map(token => ({
+        symbol: token.symbol,
+        name: token.name,
+        balance: token.balanceFormatted,
+        usdValue: token.usdValue,
+        chain: token.chain as 'Ethereum' | 'Tron' | 'Solana' | 'Bitcoin' | 'BSC' | 'Polygon' | 'Arbitrum',
+        address: token.address,
+        decimals: token.decimals,
+        isNative: token.address === 'native',
+        logo: token.logo,
+        change24h: token.change24h,
+      }));
+      
       console.log('Dashboard loaded blockchain tokens:', blockchainTokens);
       
       // Get custom tokens from store
@@ -125,15 +143,32 @@ export default function DashboardPage() {
           let updatedBalance = customToken.balance;
           let updatedUsdValue = customToken.usdValue;
           
-          // Get token price for USD value calculation
+          // Get token price and logo from Moralis if it's an EVM chain
           let tokenPrice = 0;
-          try {
-            // Use the same price API as BalanceService
-            const priceResponse = await fetch(`/api/prices?ids=${customToken.symbol.toLowerCase()}`);
-            const priceData = await priceResponse.json();
-            tokenPrice = priceData[customToken.symbol.toLowerCase()]?.usd || 0;
-          } catch (error) {
-            console.warn(`Failed to get price for ${customToken.symbol}:`, error);
+          let tokenLogo = customToken.logo;
+          
+          if (['Ethereum', 'BSC', 'Polygon', 'Arbitrum'].includes(customToken.chain) && customToken.address && customToken.address.startsWith('0x')) {
+            try {
+              const chainMap: { [key: string]: string } = {
+                'Ethereum': 'eth',
+                'BSC': 'bsc',
+                'Polygon': 'polygon',
+                'Arbitrum': 'arbitrum',
+              };
+              
+              const moralisChain = chainMap[customToken.chain];
+              if (moralisChain) {
+                // Get token metadata from Moralis
+                const tokenMetadata = await MoralisTokenService.getTokenMetadata(customToken.address, moralisChain);
+                if (tokenMetadata) {
+                  tokenPrice = tokenMetadata.price;
+                  tokenLogo = tokenMetadata.logo;
+                  console.log(`Got Moralis data for ${customToken.symbol}: price=${tokenPrice}, logo=${tokenLogo}`);
+                }
+              }
+            } catch (error) {
+              console.warn(`Failed to get Moralis data for ${customToken.symbol}:`, error);
+            }
           }
           
           // Calculate USD value
@@ -201,7 +236,7 @@ export default function DashboardPage() {
             address: customToken.address,
             decimals: customToken.decimals,
             isNative: customToken.isNative,
-            logo: customToken.logo
+            logo: tokenLogo // Use Moralis logo if available
           };
           console.log('Adding custom token to dashboard:', tokenBalance);
           allTokens.push(tokenBalance);

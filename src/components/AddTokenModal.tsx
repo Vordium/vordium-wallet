@@ -6,6 +6,7 @@ import TronWeb from 'tronweb';
 import { useWalletStore, type Token as WalletToken } from '@/store/walletStore';
 import { TokenSearchService, type TokenSearchResult } from '@/services/tokenSearch.service';
 import { EnhancedTokenSearchService, type EnhancedTokenSearchResult } from '@/services/enhancedTokenSearch.service';
+import { MoralisTokenService } from '@/services/moralisToken.service';
 import { TokenMappingService } from '@/services/tokenMapping.service';
 import { SearchIcon, PlusIcon, ArrowLeftIcon } from './icons/GrayIcons';
 import { ModalSkeleton, FormInputSkeleton } from './ui/Skeleton';
@@ -141,10 +142,38 @@ export function AddTokenModal({ isOpen, onClose }: { isOpen: boolean; onClose: (
       });
 
       // Add to store - create token object with explicit chain type
-      // Calculate USD value if price is available
+      // Get token information from Moralis if it's an EVM chain with contract address
       let usdValue = '0';
-      if (token.price && token.price > 0 && parseFloat(balance) > 0) {
-        usdValue = (parseFloat(balance) * token.price).toFixed(2);
+      let finalLogo = token.logo;
+      let finalPrice = token.price || 0;
+      
+      if (['Ethereum', 'BSC', 'Polygon', 'Arbitrum'].includes(token.chain) && token.address && token.address.startsWith('0x')) {
+        try {
+          const chainMap: { [key: string]: string } = {
+            'Ethereum': 'eth',
+            'BSC': 'bsc',
+            'Polygon': 'polygon',
+            'Arbitrum': 'arbitrum',
+          };
+          
+          const moralisChain = chainMap[token.chain];
+          if (moralisChain) {
+            // Get token metadata from Moralis
+            const tokenMetadata = await MoralisTokenService.getTokenMetadata(token.address, moralisChain);
+            if (tokenMetadata) {
+              finalPrice = tokenMetadata.price;
+              finalLogo = tokenMetadata.logo;
+              console.log(`AddTokenModal: Got Moralis data for ${token.symbol}: price=${finalPrice}, logo=${finalLogo}`);
+            }
+          }
+        } catch (error) {
+          console.warn(`AddTokenModal: Failed to get Moralis data for ${token.symbol}:`, error);
+        }
+      }
+      
+      // Calculate USD value if price is available
+      if (finalPrice > 0 && parseFloat(balance) > 0) {
+        usdValue = (parseFloat(balance) * finalPrice).toFixed(2);
       }
       
       const tokenToAdd = {
@@ -154,7 +183,7 @@ export function AddTokenModal({ isOpen, onClose }: { isOpen: boolean; onClose: (
         chain: token.chain as 'Ethereum' | 'Tron' | 'Solana' | 'Bitcoin' | 'BSC' | 'Polygon' | 'Arbitrum',
         decimals: token.decimals,
         balance,
-        logo: token.logo,
+        logo: finalLogo, // Use Moralis logo if available
         isNative: false,
         usdValue
       } as WalletToken;
