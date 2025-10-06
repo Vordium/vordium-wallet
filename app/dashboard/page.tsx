@@ -11,6 +11,7 @@ import { BottomNavigation } from '@/components/BottomNavigation';
 import { WalletImportModal } from '@/components/WalletImportModal';
 import { BalanceService, type TokenBalance } from '@/services/balance.service';
 import { MultiChainTokenService, type MultiChainTokenInfo } from '@/services/multiChainToken.service';
+import { MoralisTokenService } from '@/services/moralisToken.service';
 import { NotificationCenter, useNotifications } from '@/components/NotificationSystem';
 import { ethers } from 'ethers';
 import { PageSkeleton, BalanceCardSkeleton, TokenRowSkeleton } from '@/components/ui/Skeleton';
