@@ -5,12 +5,12 @@ import { useRouter } from 'next/navigation';
 import { useWalletStore } from '@/store/walletStore';
 import QRCode from 'react-qr-code';
 import Link from 'next/link';
-import { AddTokenModal } from '@/components/AddTokenModal';
+import { EnhancedTokenSearchModal } from '@/components/EnhancedTokenSearchModal';
 import { WalletSwitcherModal } from '@/components/WalletSwitcherModal';
 import { BottomNavigation } from '@/components/BottomNavigation';
 import { WalletImportModal } from '@/components/WalletImportModal';
 import { BalanceService, type TokenBalance } from '@/services/balance.service';
-import { MoralisTokenService, type MoralisTokenInfo } from '@/services/moralisToken.service';
+import { MultiChainTokenService, type MultiChainTokenInfo } from '@/services/multiChainToken.service';
 import { NotificationCenter, useNotifications } from '@/components/NotificationSystem';
 import { ethers } from 'ethers';
 import { PageSkeleton, BalanceCardSkeleton, TokenRowSkeleton } from '@/components/ui/Skeleton';
@@ -87,29 +87,33 @@ export default function DashboardPage() {
     setRefreshing(true);
 
     try {
-      // Use Moralis for EVM chains (Ethereum, BSC, Polygon, Arbitrum)
-      const moralisAddresses = {
+      // Use MultiChainTokenService for all chains
+      const addresses = {
         ethereum: evmAccount.address,
         polygon: evmAccount.address, // Same address for Polygon
         bsc: evmAccount.address,     // Same address for BSC
         arbitrum: evmAccount.address, // Same address for Arbitrum
+        tron: tronAccount.address,
+        solana: solanaAccount.address,
+        bitcoin: bitcoinAccount.address,
       };
       
-      console.log('Loading tokens with Moralis for EVM chains...');
-      const moralisTokens = await MoralisTokenService.getAllTokensMultiChain(moralisAddresses);
-      console.log('Dashboard loaded Moralis tokens:', moralisTokens);
+      console.log('Loading tokens with MultiChainTokenService for all chains...');
+      const multiChainTokens = await MultiChainTokenService.getAllTokensMultiChain(addresses);
+      console.log('Dashboard loaded multi-chain tokens:', multiChainTokens);
       
-      // Convert MoralisTokenInfo to TokenBalance format
-      const blockchainTokens: TokenBalance[] = moralisTokens.map(token => ({
+      // Convert MultiChainTokenInfo to TokenBalance format
+      const blockchainTokens: TokenBalance[] = multiChainTokens.map(token => ({
         symbol: token.symbol,
         name: token.name,
         balance: token.balanceFormatted,
         usdValue: token.usdValue,
-        chain: token.chain as 'Ethereum' | 'Tron' | 'Solana' | 'Bitcoin' | 'BSC' | 'Polygon' | 'Arbitrum',
+        chain: token.chain,
         address: token.address,
         decimals: token.decimals,
-        isNative: token.address === 'native',
+        isNative: token.isNative,
         logo: token.logo,
+        price: token.price,
         change24h: token.change24h,
       }));
       
@@ -523,7 +527,7 @@ export default function DashboardPage() {
       />
       
       {showAddToken && (
-        <AddTokenModal
+        <EnhancedTokenSearchModal
           isOpen={showAddToken}
           onClose={() => setShowAddToken(false)}
         />
@@ -586,9 +590,11 @@ function TokenRow({ token, logoUrl, onClick }: { token: TokenBalance; logoUrl: s
         {/* Show price and 24h change if available */}
         <div className="text-xs flex items-center gap-2 mt-1">
           <span className="text-gray-500">
-            {parseFloat(token.balance) > 0 
-              ? `$${(parseFloat(token.usdValue) / parseFloat(token.balance)).toFixed(6)}`
-              : 'Price N/A'
+            {token.price && token.price > 0 
+              ? `$${token.price.toFixed(6)}`
+              : parseFloat(token.balance) > 0 && parseFloat(token.usdValue) > 0
+                ? `$${(parseFloat(token.usdValue) / parseFloat(token.balance)).toFixed(6)}`
+                : 'Price N/A'
             }
           </span>
           {token.change24h !== undefined && (

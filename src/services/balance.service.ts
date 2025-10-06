@@ -15,6 +15,7 @@ export interface TokenBalance {
   decimals: number;
   isNative: boolean;
   logo: string;
+  price?: number; // Token price in USD
   change24h?: number; // Optional 24h price change percentage
 }
 
