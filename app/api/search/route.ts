@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { EnhancedTokenSearchService } from '@/src/services/enhancedTokenSearch.service';
+import { EnhancedTokenSearchService } from '@/services/enhancedTokenSearch.service';
 
 // Force dynamic rendering
 export const dynamic = 'force-dynamic';
