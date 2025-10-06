@@ -1,5 +1,5 @@
 // Solana Service - Live Solana blockchain integration
-import { API_CONFIG } from '@/config/api.config';
+import { API_CONFIG, CHAIN_CONFIG } from '@/config/api.config';
 
 export interface SolanaTransaction {
   signature: string;
@@ -220,7 +220,7 @@ export class SolanaService {
   // Get balance from direct RPC
   private static async getRPCBalance(address: string): Promise<string | null> {
     try {
-      const rpcUrl = API_CONFIG.SOLANA.RPC_URL || 'https://api.mainnet-beta.solana.com';
+      const rpcUrl = CHAIN_CONFIG.SOLANA.rpcUrl || 'https://api.mainnet-beta.solana.com';
       const response = await fetch(rpcUrl, {
         method: 'POST',
         headers: {
