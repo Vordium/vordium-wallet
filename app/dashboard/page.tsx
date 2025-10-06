@@ -101,18 +101,22 @@ export default function DashboardPage() {
       // Get custom tokens from store
       const customTokens = useWalletStore.getState().getTokens();
       console.log('Dashboard loaded custom tokens:', customTokens);
+      console.log('Available accounts:', accounts);
       
       // Combine blockchain tokens with custom tokens
       const allTokens = [...blockchainTokens];
       
       // Add custom tokens that aren't already in blockchain tokens
+      console.log('Processing custom tokens...');
       for (const customToken of customTokens) {
+        console.log('Processing custom token:', customToken);
         const exists = blockchainTokens.some(t => 
           t.symbol === customToken.symbol && 
           t.chain === customToken.chain && 
           (t.address === customToken.address || (t.isNative && customToken.isNative))
         );
         
+        console.log('Token exists in blockchain tokens:', exists);
         if (!exists) {
           // Try to get updated balance for custom token
           let updatedBalance = customToken.balance;
@@ -125,9 +129,9 @@ export default function DashboardPage() {
               'Tron': 'TRON',
               'Solana': 'SOLANA',
               'Bitcoin': 'BITCOIN',
-              'BSC': 'BSC',
-              'Polygon': 'POLYGON',
-              'Arbitrum': 'ARBITRUM'
+              'BSC': 'EVM',        // BSC uses same address as Ethereum
+              'Polygon': 'EVM',    // Polygon uses same address as Ethereum
+              'Arbitrum': 'EVM'    // Arbitrum uses same address as Ethereum
             };
             
             const userAddress = accounts.find(a => 
@@ -173,6 +177,7 @@ export default function DashboardPage() {
             isNative: customToken.isNative,
             logo: customToken.logo
           };
+          console.log('Adding custom token to dashboard:', tokenBalance);
           allTokens.push(tokenBalance);
         }
       }

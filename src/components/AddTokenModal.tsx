@@ -141,7 +141,7 @@ export function AddTokenModal({ isOpen, onClose }: { isOpen: boolean; onClose: (
       });
 
       // Add to store
-      addToken({
+      const tokenToAdd = {
         symbol: token.symbol,
         name: token.name,
         address: token.address,
@@ -151,7 +151,10 @@ export function AddTokenModal({ isOpen, onClose }: { isOpen: boolean; onClose: (
         logo: token.logo,
         isNative: false,
         usdValue: '0'
-      });
+      };
+      console.log('AddTokenModal: Adding token to store:', tokenToAdd);
+      addToken(tokenToAdd);
+      console.log('AddTokenModal: Token added to store successfully');
 
       setSuccessMessage(`${token.symbol} added successfully!`);
       setTimeout(() => {
