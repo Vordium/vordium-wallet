@@ -209,9 +209,9 @@ export default function TokenDetailPage({
     const isPositive = parseFloat(priceChange.percent) >= 0;
 
     const areaSeries = chart.addAreaSeries({
-      lineColor: isPositive ? '#10B981' : '#EF4444',
-      topColor: isPositive ? 'rgba(16, 185, 129, 0.4)' : 'rgba(239, 68, 68, 0.4)',
-      bottomColor: isPositive ? 'rgba(16, 185, 129, 0.0)' : 'rgba(239, 68, 68, 0.0)',
+      lineColor: isPositive ? '#6B7280' : '#9CA3AF',
+      topColor: isPositive ? 'rgba(107, 114, 128, 0.4)' : 'rgba(156, 163, 175, 0.4)',
+      bottomColor: isPositive ? 'rgba(107, 114, 128, 0.0)' : 'rgba(156, 163, 175, 0.0)',
       lineWidth: 3,
       priceLineVisible: false,
       lastValueVisible: false,
@@ -280,27 +280,41 @@ export default function TokenDetailPage({
         <div className="grid grid-cols-2 gap-3">
           <button
             onClick={() => router.push(`/send?token=${params.symbol}&chain=${params.chain}`)}
-            className="flex items-center justify-center gap-2 py-4 bg-blue-600 text-white rounded-2xl font-semibold hover:bg-blue-700"
+            className="flex items-center justify-center gap-2 py-4 bg-gray-700 text-white rounded-2xl font-semibold hover:bg-gray-800"
           >
-            <span className="text-xl">📤</span>
+            <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+              <path d="M10.894 2.553a1 1 0 00-1.788 0l-7 14a1 1 0 001.169 1.409l5-1.429A1 1 0 009 15.571V11a1 1 0 112 0v4.571a1 1 0 00.725.962l5 1.428a1 1 0 001.17-1.408l-7-14z" />
+            </svg>
             <span>Send</span>
           </button>
           <button
             onClick={() => router.push(`/receive?token=${params.symbol}&chain=${params.chain}`)}
-            className="flex items-center justify-center gap-2 py-4 bg-gray-100 text-gray-900 rounded-2xl font-semibold hover:bg-gray-200"
+            className="flex items-center justify-center gap-2 py-4 bg-gray-600 text-white rounded-2xl font-semibold hover:bg-gray-700"
           >
-            <span className="text-xl">📥</span>
+            <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+              <path fillRule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clipRule="evenodd" />
+            </svg>
             <span>Receive</span>
           </button>
         </div>
         <div className="grid grid-cols-2 gap-3 mt-3">
-          <button disabled className="flex items-center justify-center gap-2 py-4 bg-gray-100 text-gray-400 rounded-2xl font-semibold cursor-not-allowed">
-            <span className="text-xl">💳</span>
-            <span>Buy</span>
+          <button 
+            onClick={() => router.push('/portfolio')}
+            className="flex items-center justify-center gap-2 py-4 bg-gray-600 text-white rounded-2xl font-semibold hover:bg-gray-700"
+          >
+            <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+              <path fillRule="evenodd" d="M4 4a2 2 0 00-2 2v4a2 2 0 002 2V6h10a2 2 0 00-2-2H4zm2 6a2 2 0 012-2h8a2 2 0 012 2v4a2 2 0 01-2 2H8a2 2 0 01-2-2v-4zm6 4a2 2 0 100-4 2 2 0 000 4z" clipRule="evenodd" />
+            </svg>
+            <span>Portfolio</span>
           </button>
-          <button disabled className="flex items-center justify-center gap-2 py-4 bg-gray-100 text-gray-400 rounded-2xl font-semibold cursor-not-allowed">
-            <span className="text-xl">🔄</span>
-            <span>Swap</span>
+          <button 
+            onClick={() => router.push('/trending')}
+            className="flex items-center justify-center gap-2 py-4 bg-gray-600 text-white rounded-2xl font-semibold hover:bg-gray-700"
+          >
+            <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+              <path fillRule="evenodd" d="M3 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1z" clipRule="evenodd" />
+            </svg>
+            <span>Trending</span>
           </button>
         </div>
       </div>
