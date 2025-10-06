@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { ethers } from 'ethers';
 import TronWeb from 'tronweb';
-import { useWalletStore, type Token } from '@/store/walletStore';
+import { useWalletStore, type Token as WalletToken } from '@/store/walletStore';
 import { TokenSearchService, type TokenSearchResult } from '@/services/tokenSearch.service';
 import { EnhancedTokenSearchService, type EnhancedTokenSearchResult } from '@/services/enhancedTokenSearch.service';
 import { TokenMappingService } from '@/services/tokenMapping.service';
@@ -140,18 +140,18 @@ export function AddTokenModal({ isOpen, onClose }: { isOpen: boolean; onClose: (
         usdValue: '0'
       });
 
-      // Add to store
-      const tokenToAdd: Token = {
+      // Add to store - create token object with explicit chain type
+      const tokenToAdd = {
         symbol: token.symbol,
         name: token.name,
         address: token.address,
-        chain: token.chain as Token['chain'],
+        chain: token.chain as 'Ethereum' | 'Tron' | 'Solana' | 'Bitcoin' | 'BSC' | 'Polygon' | 'Arbitrum',
         decimals: token.decimals,
         balance,
         logo: token.logo,
         isNative: false,
         usdValue: '0'
-      };
+      } as WalletToken;
       console.log('AddTokenModal: Adding token to store:', tokenToAdd);
       (addToken as any)(tokenToAdd);
       console.log('AddTokenModal: Token added to store successfully');
