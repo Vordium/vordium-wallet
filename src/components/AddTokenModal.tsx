@@ -141,11 +141,11 @@ export function AddTokenModal({ isOpen, onClose }: { isOpen: boolean; onClose: (
       });
 
       // Add to store
-      const tokenToAdd = {
+      const tokenToAdd: Parameters<typeof addToken>[0] = {
         symbol: token.symbol,
         name: token.name,
         address: token.address,
-        chain: token.chain,
+        chain: token.chain as 'Ethereum' | 'Tron' | 'Solana' | 'Bitcoin' | 'BSC' | 'Polygon' | 'Arbitrum',
         decimals: token.decimals,
         balance,
         logo: token.logo,
