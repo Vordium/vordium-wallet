@@ -149,7 +149,7 @@ export class EnhancedTokenSearchService {
             const price = priceData?.usd || 0;
             const change24h = priceData?.usd_24h_change || 0;
             
-                  // Use well-known contract addresses for popular tokens
+                  // Use well-known contract addresses for popular tokens, fallback to CoinGecko ID
                   const knownContracts: { [key: string]: string } = {
                     'pepe': '0x6982508145454Ce325dDbE47a25d4ec3d2311933',
                     'shiba-inu': '0x95aD61b0a150d79219dCF64E1E6Cc01f0B64C4cE',

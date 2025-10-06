@@ -157,29 +157,36 @@ export default function DashboardPage() {
               a.chain === chainMap[customToken.chain]
             )?.address;
             
-            if (userAddress && customToken.address !== 'native') {
-              // Try to fetch updated balance
-              if (customToken.chain === 'Ethereum' || customToken.chain === 'BSC' || customToken.chain === 'Polygon' || customToken.chain === 'Arbitrum') {
-                try {
-                  const provider = new ethers.JsonRpcProvider(
-                    customToken.chain === 'Ethereum' ? (process.env.NEXT_PUBLIC_ETHEREUM_RPC || 'https://eth.llamarpc.com') :
-                    customToken.chain === 'BSC' ? (process.env.NEXT_PUBLIC_BSC_RPC || 'https://bsc-dataseed.binance.org') :
-                    customToken.chain === 'Polygon' ? (process.env.NEXT_PUBLIC_POLYGON_RPC || 'https://polygon-rpc.com') :
-                    (process.env.NEXT_PUBLIC_ARBITRUM_RPC || 'https://arb1.arbitrum.io/rpc')
-                  );
-                  const contract = new ethers.Contract(
-                    customToken.address,
-                    ['function balanceOf(address) view returns (uint256)', 'function decimals() view returns (uint8)'],
-                    provider
-                  );
-                  const balance = await contract.balanceOf(userAddress);
-                  const decimals = await contract.decimals();
-                  updatedBalance = (Number(balance) / Math.pow(10, decimals)).toString();
-                } catch (error) {
-                  console.warn(`Failed to fetch balance for ${customToken.symbol}:`, error);
-                }
-              }
-            }
+                  if (userAddress && customToken.address !== 'native') {
+                    // Try to fetch updated balance
+                    if (customToken.chain === 'Ethereum' || customToken.chain === 'BSC' || customToken.chain === 'Polygon' || customToken.chain === 'Arbitrum') {
+                      try {
+                        // If address is not a contract address (e.g., CoinGecko ID), try to get contract address
+                        let contractAddress = customToken.address;
+                        if (!contractAddress.startsWith('0x') || contractAddress.length !== 42) {
+                          console.log(`Token ${customToken.symbol} has non-contract address, skipping balance fetch`);
+                          // Skip balance fetching for tokens without valid contract addresses
+                        } else {
+                          const provider = new ethers.JsonRpcProvider(
+                            customToken.chain === 'Ethereum' ? (process.env.NEXT_PUBLIC_ETHEREUM_RPC || 'https://eth.llamarpc.com') :
+                            customToken.chain === 'BSC' ? (process.env.NEXT_PUBLIC_BSC_RPC || 'https://bsc-dataseed.binance.org') :
+                            customToken.chain === 'Polygon' ? (process.env.NEXT_PUBLIC_POLYGON_RPC || 'https://polygon-rpc.com') :
+                            (process.env.NEXT_PUBLIC_ARBITRUM_RPC || 'https://arb1.arbitrum.io/rpc')
+                          );
+                          const contract = new ethers.Contract(
+                            contractAddress,
+                            ['function balanceOf(address) view returns (uint256)', 'function decimals() view returns (uint8)'],
+                            provider
+                          );
+                          const balance = await contract.balanceOf(userAddress);
+                          const decimals = await contract.decimals();
+                          updatedBalance = (Number(balance) / Math.pow(10, decimals)).toString();
+                        }
+                      } catch (error) {
+                        console.warn(`Failed to fetch balance for ${customToken.symbol}:`, error);
+                      }
+                    }
+                  }
           } catch (error) {
             console.warn(`Failed to update balance for ${customToken.symbol}:`, error);
           }

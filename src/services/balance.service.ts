@@ -200,11 +200,29 @@ export class BalanceService {
           return true;
         }
         
-        // Validate contract addresses
-        if (token.chain === 'Ethereum' && token.address.startsWith('0x')) return true;
+        // Validate contract addresses - be more lenient for custom tokens
+        if (token.chain === 'Ethereum') {
+          // Accept valid Ethereum addresses or CoinGecko IDs (for tokens we'll look up later)
+          if (token.address.startsWith('0x') && token.address.length === 42) return true;
+          // Allow CoinGecko IDs for tokens that don't have contract addresses yet
+          if (token.address && !token.address.startsWith('0x')) {
+            console.log(`Keeping token with CoinGecko ID for later contract lookup: ${token.symbol}`);
+            return true;
+          }
+        }
         if (token.chain === 'Tron' && token.address.startsWith('T')) return true;
         if (token.chain === 'Solana' && token.address.length >= 32 && token.address.length <= 44) return true;
         if (token.chain === 'Bitcoin' && (token.address.startsWith('1') || token.address.startsWith('3') || token.address.startsWith('bc1'))) return true;
+        
+        // For other chains (BSC, Polygon, Arbitrum), be lenient with addresses
+        if (['BSC', 'Polygon', 'Arbitrum'].includes(token.chain)) {
+          if (token.address.startsWith('0x') && token.address.length === 42) return true;
+          // Allow non-contract addresses for these chains too
+          if (token.address && token.address !== 'native') {
+            console.log(`Keeping token for ${token.chain}: ${token.symbol}`);
+            return true;
+          }
+        }
         
         console.log(`Removing invalid token: ${token.symbol} with address: ${token.address} on chain: ${token.chain}`);
         return false;
