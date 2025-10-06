@@ -159,20 +159,28 @@ export function AddTokenModal({ isOpen, onClose }: { isOpen: boolean; onClose: (
         usdValue
       } as WalletToken;
       console.log('AddTokenModal: Adding token to store:', tokenToAdd);
-      (addToken as any)(tokenToAdd);
-      console.log('AddTokenModal: Token added to store successfully');
       
+      try {
+        (addToken as any)(tokenToAdd);
+        console.log('AddTokenModal: Token added to store successfully');
+        
       // Verify token was added by checking store
       const tokensAfter = useWalletStore.getState().getTokens();
       console.log('AddTokenModal: Tokens in store after addition:', tokensAfter);
       console.log('AddTokenModal: Token found in store:', tokensAfter.some(t => t.symbol === token.symbol && t.chain === token.chain));
+      
+      // Force a page reload to ensure the dashboard picks up the new token
+      console.log('AddTokenModal: Dispatching tokenAdded event');
+      window.dispatchEvent(new CustomEvent('tokenAdded', { detail: { token: tokenToAdd } }));
+      } catch (error) {
+        console.error('AddTokenModal: Failed to add token to store:', error);
+        throw error;
+      }
 
       setSuccessMessage(`${token.symbol} added successfully!`);
       setTimeout(() => {
         setSuccessMessage('');
         onClose();
-        // Trigger a custom event to refresh dashboard
-        window.dispatchEvent(new CustomEvent('tokenAdded'));
       }, 1500);
       
     } catch (error) {

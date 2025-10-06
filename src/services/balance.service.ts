@@ -444,18 +444,18 @@ export class BalanceService {
     return tokens;
   }
 
-  // Load Solana tokens using direct RPC calls
+  // Load Solana tokens using Solana service
   private static async loadSolanaTokens(address: string): Promise<TokenBalance[]> {
     const tokens: TokenBalance[] = [];
     
     try {
-      // Use free Solana RPC
-      const rpcUrl = 'https://api.mainnet-beta.solana.com';
+      console.log('Loading Solana tokens for address:', address);
       
-      // Get SOL balance
-      const solBalance = await this.getSolBalance(address, rpcUrl);
+      // Use Solana service for better error handling
+      const { SolanaService } = await import('./solana.service');
+      const solBalance = await SolanaService.getBalance(address);
       const solPrice = await this.getTokenPrice('solana');
-      const solUsdValue = (parseFloat(solBalance) * solPrice).toFixed(2);
+      const solUsdValue = (parseFloat(solBalance || '0') * solPrice).toFixed(2);
       
       tokens.push({
         symbol: 'SOL',

@@ -204,7 +204,13 @@ export default function DashboardPage() {
       }
       
       console.log('Dashboard combined tokens:', allTokens);
+      console.log('Dashboard setting tokens, count:', allTokens.length);
       setTokens(allTokens);
+      
+      // Debug: Check if tokens are actually set
+      setTimeout(() => {
+        console.log('Dashboard tokens after setState:', tokens);
+      }, 100);
       
       const total = await BalanceService.getTotalBalance(allTokens);
       setTotalBalance(total);
