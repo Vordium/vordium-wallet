@@ -124,8 +124,14 @@ input:focus {
   box-shadow: 0 4px 12px rgba(64, 64, 64, 0.3) !important;
 }
 .hover\\:bg-gray-700:hover { 
-  background-color: var(--color-hover) !important; 
+  --tw-bg-opacity: 1;
+  background-color: rgb(26 26 26 / var(--tw-bg-opacity, 1)) !important; 
   box-shadow: 0 4px 12px rgba(64, 64, 64, 0.3) !important;
+}
+
+.bg-gray-700 {
+  --tw-bg-opacity: 1;
+  background-color: rgb(26 26 26 / var(--tw-bg-opacity, 1)) !important;
 }
 
 /* Enhanced glowing hover effects for interactive elements */
