@@ -17,7 +17,7 @@
   /* Text Colors */
   --color-white: #ffffff;           /* Primary text */
   --color-light-gray: #d1d5db;     /* Secondary text */
-  --color-muted-gray: #9ca3af;     /* Muted text */
+  --color-muted-gray: #d1d5db;     /* Muted text - now lighter (was #9ca3af) */
   
   /* Interactive States */
   --color-hover: #3a3a3a;           /* Hover state - slightly lighter gray */
@@ -79,9 +79,9 @@ input:focus {
 .text-gray-100 { color: var(--color-white) !important; }
 .text-gray-200 { color: var(--color-light-gray) !important; }
 .text-gray-300 { color: var(--color-light-gray) !important; }
-.text-gray-400 { color: var(--color-muted-gray) !important; }
-.text-gray-500 { color: var(--color-muted-gray) !important; }
-.text-gray-600 { color: var(--color-light-gray) !important; }
+.text-gray-400 { color: var(--color-light-gray) !important; } /* Lighter gray */
+.text-gray-500 { color: var(--color-light-gray) !important; } /* Lighter gray */
+.text-gray-600 { color: var(--color-light-gray) !important; } /* Lighter gray */
 .text-gray-700 { color: var(--color-light-gray) !important; }
 .text-gray-800 { color: var(--color-white) !important; }
 .text-gray-900 { color: var(--color-white) !important; }

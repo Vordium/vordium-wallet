@@ -590,7 +590,7 @@ function TokenRow({ token, logoUrl, onClick }: { token: TokenBalance; logoUrl: s
         <div className="text-sm text-gray-400 truncate">{token.name}</div>
         {/* Show price and 24h change if available */}
         <div className="text-xs flex items-center gap-2 mt-1">
-          <span className="text-gray-500">
+          <span className="text-gray-400">
             {token.price && token.price > 0 
               ? `$${token.price.toFixed(6)}`
               : parseFloat(token.balance) > 0 && parseFloat(token.usdValue) > 0
