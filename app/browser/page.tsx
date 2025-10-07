@@ -25,7 +25,7 @@ const TRENDING_DAPPS: DApp[] = [
     name: 'Aster DEX',
     description: 'Next-generation decentralized exchange with advanced trading features',
     category: 'DEX',
-    url: 'https://aster.exchange',
+    url: 'https://asterdex.com',
     logo: 'https://assets.coingecko.com/coins/images/32964/large/aster.png',
     trending: true,
     verified: true,
@@ -236,7 +236,7 @@ export default function BrowserPage() {
         </div>
 
         {/* Browser Content */}
-        <div className="h-screen">
+        <div className="h-[calc(100vh-80px)]">
           {currentUrl ? (
             <iframe
               src={currentUrl}

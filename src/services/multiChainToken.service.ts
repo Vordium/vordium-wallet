@@ -378,7 +378,8 @@ export class MultiChainTokenService {
   private static async getTokenPrice(coinId: string): Promise<number> {
     const cacheKey = `price_${coinId}`;
     const cached = this.getCached(cacheKey);
-    if (cached) {
+    if (cached !== null && cached !== undefined) {
+      console.log(`Price for ${coinId} from cache: $${cached}`);
       return cached;
     }
 
@@ -387,6 +388,7 @@ export class MultiChainTokenService {
       const data = await response.json();
       const price = data[coinId]?.usd || 0;
       
+      console.log(`Price for ${coinId} from API: $${price}`);
       this.setCached(cacheKey, price);
       return price;
     } catch (error) {
@@ -397,7 +399,7 @@ export class MultiChainTokenService {
 
   // Helper methods
   private static convertMoralisToMultiChain(token: MoralisTokenInfo): MultiChainTokenInfo {
-    return {
+    const multiChainToken = {
       symbol: token.symbol,
       name: token.name,
       address: token.address,
@@ -413,6 +415,8 @@ export class MultiChainTokenService {
       verified: token.verified,
       isNative: token.address === 'native',
     };
+    console.log(`Converting token ${token.symbol} with price: $${token.price}`);
+    return multiChainToken;
   }
 
   private static mapCoinGeckoToChain(coinId: string): 'Ethereum' | 'Tron' | 'Solana' | 'Bitcoin' | 'BSC' | 'Polygon' | 'Arbitrum' {
