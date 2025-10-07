@@ -10,7 +10,7 @@
   /* Core Colors - Dark grays and blacks only */
   --color-black: #000000;           /* Pure black - deepest backgrounds */
   --color-very-dark-gray: #111111;  /* Very dark gray - main backgrounds */
-  --color-dark-gray: #1a1a1a;       /* Dark gray - secondary backgrounds */
+  --color-dark-gray: #0a0a0a;       /* Dark gray - secondary backgrounds (darker) */
   --color-gray: #2a2a2a;            /* Gray - tertiary backgrounds, borders */
   --color-light-gray-border: #3a3a3a; /* Light gray - borders and accents */
   
