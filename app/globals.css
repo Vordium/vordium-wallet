@@ -2,6 +2,9 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Import futuristic animations and effects */
+@import './futuristic-animations.css';
+
 /* UNIFIED DARK GRAY THEME - Professional Design System */
 :root {
   /* Core Colors - Dark grays and blacks only */

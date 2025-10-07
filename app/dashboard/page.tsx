@@ -296,9 +296,9 @@ export default function DashboardPage() {
   const isPositive = parseFloat(change24h.percent) >= 0;
 
   return (
-    <div className="min-h-screen bg-gray-900 text-white pb-20">
+    <div className="min-h-screen bg-gray-900 text-white pb-20 modern-scrollbar">
       {/* Top Bar */}
-      <div className="flex items-center justify-between p-4 border-b border-gray-700">
+      <div className="flex items-center justify-between p-4 border-b border-gray-700 glass-effect sticky top-0 z-40">
         <button
           onClick={() => setShowWalletModal(true)}
           className="flex items-center gap-2 px-4 py-2 bg-gray-800 rounded-full hover:bg-gray-700 transition"
