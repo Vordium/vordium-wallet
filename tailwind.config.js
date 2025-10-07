@@ -8,6 +8,13 @@ module.exports = {
   darkMode: 'class',
   theme: {
     extend: {
+      colors: {
+        gray: {
+          700: '#2a2a2a', // Dark gray instead of Tailwind default #374151
+          800: '#1a1a1a',
+          900: '#111111',
+        }
+      },
       animation: {
         'slide-up': 'slideUp 0.3s ease-out',
         'shake': 'shake 0.5s ease-in-out',
