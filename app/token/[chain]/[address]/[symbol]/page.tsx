@@ -4,6 +4,7 @@ import { useEffect, useState, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { createChart, ColorType } from 'lightweight-charts';
 import { getTrustWalletLogo, NATIVE_LOGOS } from '@/lib/tokenLogos';
+import { InAppBrowser } from '@/components/InAppBrowser';
 
 interface Transaction {
   hash: string;
@@ -32,6 +33,8 @@ export default function TokenDetailPage({
   const [timeframe, setTimeframe] = useState<'1H' | '1D' | '1W' | '1M' | '1Y' | 'All'>('1D');
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [loading, setLoading] = useState(true);
+  const [showBrowser, setShowBrowser] = useState(false);
+  const [browserUrl, setBrowserUrl] = useState('');
 
   const chainNameMap: Record<string, string> = {
     'ethereum': 'Ethereum',
@@ -45,7 +48,7 @@ export default function TokenDetailPage({
   const chainName = chainNameMap[params.chain] || params.chain;
   const isNative = params.address === 'native';
 
-  // Open blockchain scanner
+  // Open blockchain scanner in in-app browser
   const openBlockchainScanner = () => {
     const scannerUrls: Record<string, string> = {
       'ethereum': params.address === 'native' 
@@ -70,7 +73,8 @@ export default function TokenDetailPage({
     };
 
     const url = scannerUrls[params.chain.toLowerCase()] || scannerUrls['ethereum'];
-    window.open(url, '_blank', 'width=1200,height=800,toolbar=no,location=no,status=no,menubar=no');
+    setBrowserUrl(url);
+    setShowBrowser(true);
   };
 
   // Add token to portfolio
@@ -467,6 +471,14 @@ export default function TokenDetailPage({
           </div>
         )}
       </div>
+
+      {/* In-App Browser for Blockchain Scanner */}
+      <InAppBrowser
+        url={browserUrl}
+        isOpen={showBrowser}
+        onClose={() => setShowBrowser(false)}
+        title={`${chainName} Explorer`}
+      />
     </div>
   );
 }

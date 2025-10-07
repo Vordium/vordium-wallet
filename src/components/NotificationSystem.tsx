@@ -158,7 +158,7 @@ export function NotificationToast({ notification }: { notification: Notification
   };
 
   return (
-    <div className={`fixed top-4 right-4 z-50 max-w-sm w-full ${getBgColor()} border rounded-xl p-4 shadow-lg animate-in slide-in-from-right-5 duration-300`}>
+    <div className={`fixed top-20 left-1/2 transform -translate-x-1/2 z-[9999] max-w-sm w-full mx-4 ${getBgColor()} border rounded-xl p-4 shadow-lg animate-slide-in`}>
       <div className="flex items-start gap-3">
         <div className="flex-shrink-0">
           {getIcon()}
