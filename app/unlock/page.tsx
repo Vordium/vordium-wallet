@@ -7,6 +7,7 @@ import { CryptoService } from '@/services/crypto.service';
 import { useWalletStore } from '@/store/walletStore';
 import { BiometricAuth } from '@/components/BiometricAuth';
 import { biometricService } from '@/services/biometric.service';
+import { SecurityService } from '@/services/security.service';
 
 export default function UnlockPage() {
   const router = useRouter();
@@ -72,6 +73,16 @@ export default function UnlockPage() {
     setError('');
 
     try {
+      // Check rate limiting
+      const identifier = 'wallet-unlock'; // Could use device ID or wallet address
+      const rateLimitCheck = await SecurityService.checkRateLimit(identifier, 'failed_login');
+      
+      if (!rateLimitCheck.allowed) {
+        setError(rateLimitCheck.message || 'Too many attempts');
+        setLoading(false);
+        return;
+      }
+
       const vaultJson = localStorage.getItem('vordium_vault');
       if (!vaultJson) {
         throw new Error('No wallet found');
@@ -84,11 +95,18 @@ export default function UnlockPage() {
       const seed = await CryptoService.mnemonicToSeed(mnemonic);
       const evm = await CryptoService.deriveAccount(seed, 'EVM', 0);
       const tron = await CryptoService.deriveAccount(seed, 'TRON', 0);
+      const solana = await CryptoService.deriveAccount(seed, 'SOLANA', 0);
+      const bitcoin = await CryptoService.deriveAccount(seed, 'BITCOIN', 0);
 
       // Store in Zustand
       addAccount({ id: 'evm-0', name: 'Ethereum Account 1', address: evm.address, chain: 'EVM' });
       addAccount({ id: 'tron-0', name: 'TRON Account 1', address: tron.address, chain: 'TRON' });
+      addAccount({ id: 'solana-0', name: 'Solana Account 1', address: solana.address, chain: 'SOLANA' });
+      addAccount({ id: 'bitcoin-0', name: 'Bitcoin Account 1', address: bitcoin.address, chain: 'BITCOIN' });
       selectAccount('evm-0');
+
+      // Clear failed attempts on success
+      SecurityService.clearFailedAttempts(identifier);
 
       // Mark as unlocked
       localStorage.setItem('vordium_unlocked', 'true');
@@ -96,7 +114,12 @@ export default function UnlockPage() {
       // Navigate to dashboard
       router.replace('/dashboard');
     } catch (e) {
-      setError('Incorrect password');
+      // Record failed attempt
+      const identifier = 'wallet-unlock';
+      SecurityService.recordFailedAttempt(identifier, 'failed_login');
+      
+      const remainingAttempts = SecurityService.getRemainingAttempts(identifier);
+      setError(`Incorrect password. ${remainingAttempts} attempts remaining before lockout.`);
       setLoading(false);
     }
   }
