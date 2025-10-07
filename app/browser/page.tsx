@@ -238,12 +238,29 @@ export default function BrowserPage() {
         {/* Browser Content */}
         <div className="h-[calc(100vh-80px)]">
           {currentUrl ? (
-            <iframe
-              src={currentUrl}
-              className="w-full h-full border-0"
-              title="DApp Browser"
-              sandbox="allow-same-origin allow-scripts allow-forms allow-popups allow-popups-to-escape-sandbox"
-            />
+            <div className="relative h-full">
+              <iframe
+                src={currentUrl}
+                className="w-full h-full border-0"
+                title="DApp Browser"
+                sandbox="allow-same-origin allow-scripts allow-forms allow-popups allow-popups-to-escape-sandbox"
+                onError={() => {
+                  console.error('Failed to load:', currentUrl);
+                }}
+              />
+              {/* Fallback message for blocked iframes */}
+              <div className="absolute bottom-0 left-0 right-0 bg-gray-800 border-t border-gray-700 p-3">
+                <div className="text-xs text-gray-400 text-center">
+                  If the site doesn&apos;t load, it may block embedding.
+                  <button
+                    onClick={() => window.open(currentUrl, '_blank')}
+                    className="ml-2 text-blue-400 hover:text-blue-300 underline"
+                  >
+                    Open in new tab
+                  </button>
+                </div>
+              </div>
+            </div>
           ) : (
             <div className="flex items-center justify-center h-full text-gray-400">
               <div className="text-center">
