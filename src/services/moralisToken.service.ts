@@ -52,7 +52,7 @@ export class MoralisTokenService {
       }
 
       const response = await fetch(
-        `${API_CONFIG.MORALIS.API_URL}/${address}/erc20?chain=${chain}`,
+        `${API_CONFIG.MORALIS.API_URL}/${address}/erc20?chain=${chain}&exclude_spam=true&include=percent_change`,
         {
           headers: {
             'X-API-Key': API_CONFIG.MORALIS.API_KEY,
@@ -105,21 +105,29 @@ export class MoralisTokenService {
       }
 
       const data = await response.json();
+      
+      // Get the native token price separately
+      const nativeSymbol = this.getNativeTokenSymbol(chain);
+      const tokenPrice = await this.getNativeTokenPrice(chain);
+      const balance = parseFloat(data.balance || '0') / Math.pow(10, 18);
+      const usdValue = balance * tokenPrice;
+      
       const result = {
         token_address: 'native',
         name: this.getNativeTokenName(chain),
-        symbol: this.getNativeTokenSymbol(chain),
+        symbol: nativeSymbol,
         logo: this.getNativeTokenLogo(chain),
         decimals: 18,
         balance: data.balance || '0',
-        balance_formatted: data.formatted || '0',
+        balance_formatted: balance.toFixed(6),
         possible_spam: false,
         verified: true,
-        usd_price: data.usd_price || 0,
-        usd_price_24hr_change: data.usd_price_24hr_change || 0,
-        usd_value: data.usd_value || 0,
+        usd_price: tokenPrice,
+        usd_price_24hr_change: 0, // We'll fetch this separately if needed
+        usd_value: usdValue,
       };
 
+      console.log(`Moralis: Fetched ${nativeSymbol} balance=${balance.toFixed(6)}, price=$${tokenPrice}, value=$${usdValue.toFixed(2)}`);
       this.setCached(cacheKey, result);
       return result;
     } catch (error) {
@@ -331,6 +339,29 @@ export class MoralisTokenService {
 
   private static getDefaultLogo(symbol: string): string {
     return `https://via.placeholder.com/64/6B7280/FFFFFF?text=${symbol.charAt(0)}`;
+  }
+
+  // Get native token price from CoinGecko
+  private static async getNativeTokenPrice(chain: string): Promise<number> {
+    const coinIds: { [key: string]: string } = {
+      'eth': 'ethereum',
+      'polygon': 'matic-network',
+      'bsc': 'binancecoin',
+      'arbitrum': 'ethereum', // Arbitrum uses ETH
+    };
+    
+    const coinId = coinIds[chain] || chain;
+    
+    try {
+      const response = await fetch(`/api/prices?ids=${coinId}`);
+      const data = await response.json();
+      const price = data[coinId]?.usd || 0;
+      console.log(`Moralis: Fetched price for ${coinId}: $${price}`);
+      return price;
+    } catch (error) {
+      console.error(`Failed to get price for ${coinId}:`, error);
+      return 0;
+    }
   }
 
   // Cache management
