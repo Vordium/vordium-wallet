@@ -159,7 +159,7 @@ function ConnectionsPageContent() {
                         className="w-8 h-8 rounded-full"
                         onError={(e) => {
                           const target = e.target as HTMLImageElement;
-                          target.src = 'https://via.placeholder.com/32/374151/9CA3AF?text=D';
+                          target.src = 'https://via.placeholder.com/32/2a2a2a/d1d5db?text=D';
                         }}
                       />
                     ) : (

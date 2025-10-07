@@ -208,7 +208,7 @@ function AlertsPageContent() {
                       className="w-12 h-12 rounded-full"
                       onError={(e) => {
                         const target = e.target as HTMLImageElement;
-                        target.src = `https://via.placeholder.com/48/374151/9CA3AF?text=${alert.token.symbol.charAt(0)}`;
+                        target.src = `https://via.placeholder.com/48/2a2a2a/d1d5db?text=${alert.token.symbol.charAt(0)}`;
                       }}
                     />
                     
@@ -475,7 +475,7 @@ function EditAlertModal({
             className="w-12 h-12 rounded-full"
             onError={(e) => {
               const target = e.target as HTMLImageElement;
-              target.src = `https://via.placeholder.com/48/374151/9CA3AF?text=${alert.token.symbol.charAt(0)}`;
+              target.src = `https://via.placeholder.com/48/2a2a2a/d1d5db?text=${alert.token.symbol.charAt(0)}`;
             }}
           />
           <div>

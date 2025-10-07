@@ -222,7 +222,7 @@ function NFTsPageContent() {
                       className="w-full h-full object-cover"
                       onError={(e) => {
                         const target = e.target as HTMLImageElement;
-                        target.src = 'https://via.placeholder.com/300x300/374151/9CA3AF?text=NFT';
+                        target.src = 'https://via.placeholder.com/300x300/2a2a2a/d1d5db?text=NFT';
                       }}
                     />
                     <div className="absolute top-2 right-2">
@@ -251,7 +251,7 @@ function NFTsPageContent() {
                       className="w-full h-full object-cover"
                       onError={(e) => {
                         const target = e.target as HTMLImageElement;
-                        target.src = 'https://via.placeholder.com/80x80/374151/9CA3AF?text=NFT';
+                        target.src = 'https://via.placeholder.com/80x80/2a2a2a/d1d5db?text=NFT';
                       }}
                     />
                   </div>
@@ -296,7 +296,7 @@ function NFTsPageContent() {
                   className="w-full h-full object-cover"
                   onError={(e) => {
                     const target = e.target as HTMLImageElement;
-                    target.src = 'https://via.placeholder.com/400x400/374151/9CA3AF?text=NFT';
+                    target.src = 'https://via.placeholder.com/400x400/2a2a2a/d1d5db?text=NFT';
                   }}
                 />
               </div>

@@ -190,7 +190,7 @@ export function TokenSelector({
                           className="w-10 h-10 rounded-full"
                           onError={(e) => {
                             const target = e.target as HTMLImageElement;
-                            target.src = `https://via.placeholder.com/40/374151/9CA3AF?text=${token.symbol.charAt(0)}`;
+                            target.src = `https://via.placeholder.com/40/2a2a2a/d1d5db?text=${token.symbol.charAt(0)}`;
                           }}
                         />
                         
@@ -238,7 +238,7 @@ export function TokenSelector({
                           className="w-10 h-10 rounded-full"
                           onError={(e) => {
                             const target = e.target as HTMLImageElement;
-                            target.src = `https://via.placeholder.com/40/374151/9CA3AF?text=${searchResult.symbol.charAt(0)}`;
+                            target.src = `https://via.placeholder.com/40/2a2a2a/d1d5db?text=${searchResult.symbol.charAt(0)}`;
                           }}
                         />
                         
