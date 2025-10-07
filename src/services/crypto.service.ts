@@ -6,6 +6,9 @@ import TronWeb from 'tronweb';
 import { PublicKey } from '@solana/web3.js';
 // Using WebCrypto PBKDF2 instead of argon2-browser to avoid WASM in Next.js build
 
+// PBKDF2 iterations (OWASP recommends 600,000+ for PBKDF2-SHA256)
+const PBKDF2_ITERATIONS = 600000; // Increased from 100,000 for enhanced security
+
 // Derivation paths
 const EVM_PATH = "m/44'/60'/0'/0"; // EIP-44 standard
 const TRON_PATH = "m/44'/195'/0'/0"; // TRON standard
@@ -281,7 +284,7 @@ export class CryptoService {
       ['deriveKey']
     );
 
-    const iterations = 150000;
+    const iterations = PBKDF2_ITERATIONS; // Using constant for consistency
     const aesKey = await crypto.subtle.deriveKey(
       {
         name: 'PBKDF2',
