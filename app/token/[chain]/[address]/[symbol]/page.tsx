@@ -37,10 +37,84 @@ export default function TokenDetailPage({
     'ethereum': 'Ethereum',
     'tron': 'Tron',
     'solana': 'Solana',
-    'bitcoin': 'Bitcoin'
+    'bitcoin': 'Bitcoin',
+    'bsc': 'BSC',
+    'polygon': 'Polygon',
+    'arbitrum': 'Arbitrum'
   };
   const chainName = chainNameMap[params.chain] || params.chain;
   const isNative = params.address === 'native';
+
+  // Open blockchain scanner
+  const openBlockchainScanner = () => {
+    const scannerUrls: Record<string, string> = {
+      'ethereum': params.address === 'native' 
+        ? `https://etherscan.io`
+        : `https://etherscan.io/token/${params.address}`,
+      'bsc': params.address === 'native'
+        ? `https://bscscan.com`
+        : `https://bscscan.com/token/${params.address}`,
+      'polygon': params.address === 'native'
+        ? `https://polygonscan.com`
+        : `https://polygonscan.com/token/${params.address}`,
+      'arbitrum': params.address === 'native'
+        ? `https://arbiscan.io`
+        : `https://arbiscan.io/token/${params.address}`,
+      'solana': params.address === 'native'
+        ? `https://solscan.io`
+        : `https://solscan.io/token/${params.address}`,
+      'tron': params.address === 'native'
+        ? `https://tronscan.org`
+        : `https://tronscan.org/#/token20/${params.address}`,
+      'bitcoin': `https://blockchair.com/bitcoin/address/${params.address}`
+    };
+
+    const url = scannerUrls[params.chain.toLowerCase()] || scannerUrls['ethereum'];
+    window.open(url, '_blank', 'width=1200,height=800,toolbar=no,location=no,status=no,menubar=no');
+  };
+
+  // Add token to portfolio
+  const handleAddToPortfolio = async () => {
+    try {
+      const { useWalletStore } = await import('@/store/walletStore');
+      const { addToken } = useWalletStore.getState();
+      
+      // Check if token is already in portfolio
+      const existingTokens = useWalletStore.getState().getTokens();
+      const exists = existingTokens.some(t => 
+        t.symbol === params.symbol.toUpperCase() && 
+        t.chain === chainName as any &&
+        t.address === params.address
+      );
+      
+      if (exists) {
+        alert('Token already in your portfolio!');
+        return;
+      }
+
+      // Add token to portfolio
+      addToken({
+        symbol: params.symbol.toUpperCase(),
+        name: params.symbol.toUpperCase(),
+        address: params.address,
+        chain: chainName as any,
+        decimals: 18,
+        balance: balance,
+        logo: NATIVE_LOGOS[params.symbol.toUpperCase()] || getTrustWalletLogo(params.address, chainName),
+        isNative: isNative,
+        usdValue: usdValue
+      });
+
+      // Dispatch event to refresh dashboard
+      window.dispatchEvent(new CustomEvent('tokenAdded'));
+      
+      alert('Token added to portfolio!');
+      router.push('/dashboard');
+    } catch (error) {
+      console.error('Failed to add token:', error);
+      alert('Failed to add token to portfolio');
+    }
+  };
 
   useEffect(() => {
     loadTokenData();
@@ -299,22 +373,23 @@ export default function TokenDetailPage({
         </div>
         <div className="grid grid-cols-2 gap-3 mt-3">
           <button 
-            onClick={() => router.push('/portfolio')}
-            className="flex items-center justify-center gap-2 py-4 bg-gray-600 text-white rounded-2xl font-semibold hover:bg-gray-700"
+            onClick={handleAddToPortfolio}
+            className="flex items-center justify-center gap-2 py-4 bg-gray-600 text-white rounded-2xl font-semibold hover:bg-gray-700 transition-all"
           >
             <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-              <path fillRule="evenodd" d="M4 4a2 2 0 00-2 2v4a2 2 0 002 2V6h10a2 2 0 00-2-2H4zm2 6a2 2 0 012-2h8a2 2 0 012 2v4a2 2 0 01-2 2H8a2 2 0 01-2-2v-4zm6 4a2 2 0 100-4 2 2 0 000 4z" clipRule="evenodd" />
+              <path fillRule="evenodd" d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z" clipRule="evenodd" />
             </svg>
-            <span>Portfolio</span>
+            <span>Add to Portfolio</span>
           </button>
           <button 
-            onClick={() => router.push('/trending')}
-            className="flex items-center justify-center gap-2 py-4 bg-gray-600 text-white rounded-2xl font-semibold hover:bg-gray-700"
+            onClick={openBlockchainScanner}
+            className="flex items-center justify-center gap-2 py-4 bg-gray-600 text-white rounded-2xl font-semibold hover:bg-gray-700 transition-all"
           >
             <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-              <path fillRule="evenodd" d="M3 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1z" clipRule="evenodd" />
+              <path d="M11 3a1 1 0 100 2h2.586l-6.293 6.293a1 1 0 101.414 1.414L15 6.414V9a1 1 0 102 0V4a1 1 0 00-1-1h-5z" />
+              <path d="M5 5a2 2 0 00-2 2v8a2 2 0 002 2h8a2 2 0 002-2v-3a1 1 0 10-2 0v3H5V7h3a1 1 0 000-2H5z" />
             </svg>
-            <span>Trending</span>
+            <span>Check on Chain</span>
           </button>
         </div>
       </div>

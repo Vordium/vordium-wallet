@@ -4,7 +4,6 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { ArrowLeftIcon, TrendingIcon, TrendingUpIcon, TrendingDownIcon, RefreshIcon } from '@/components/icons/GrayIcons';
 import { PageSkeleton } from '@/components/ui/Skeleton';
-import Image from 'next/image';
 
 interface TrendingToken {
   id: string;
@@ -207,12 +206,12 @@ export default function TrendingPage() {
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
                 <div className="relative">
-                  <Image
+                  <img
                     src={token.image}
                     alt={token.name}
                     width={48}
                     height={48}
-                    className="rounded-full"
+                    className="w-12 h-12 rounded-full object-cover bg-gray-700"
                     onError={(e) => {
                       (e.target as HTMLImageElement).src = `https://via.placeholder.com/48/6B7280/FFFFFF?text=${token.symbol.charAt(0)}`;
                     }}
