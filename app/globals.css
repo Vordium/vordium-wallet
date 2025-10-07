@@ -20,7 +20,7 @@
   --color-muted-gray: #d1d5db;     /* Muted text - now lighter (was #9ca3af) */
   
   /* Interactive States */
-  --color-hover: #3a3a3a;           /* Hover state - slightly lighter gray */
+  --color-hover: #1f2937;           /* Hover state - darker gray (gray-800) */
   --color-border: #2a2a2a;         /* Borders */
   --color-input: #1a1a1a;          /* Input backgrounds */
   
