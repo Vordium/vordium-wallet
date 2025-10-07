@@ -195,8 +195,19 @@ export const useWalletStore = create<WalletState>()(
       },
       removeToken: (tokenAddress, chain) => {
         const tokens = get().getTokens();
+        
+        // Protect native tokens from being deleted
+        const protectedNativeTokens = ['ETH', 'BTC', 'TRX', 'SOL', 'BNB', 'MATIC'];
+        const tokenToRemove = tokens.find(t => t.address === tokenAddress && t.chain === chain);
+        
+        if (tokenToRemove?.isNative || protectedNativeTokens.includes(tokenToRemove?.symbol || '')) {
+          console.warn(`Cannot remove native token: ${tokenToRemove?.symbol}`);
+          return;
+        }
+        
         const newTokens = tokens.filter(t => !(t.address === tokenAddress && t.chain === chain));
         localStorage.setItem('vordium-tokens', JSON.stringify(newTokens));
+        console.log(`Token removed: ${tokenAddress} on ${chain}`);
       },
       getTokens: () => {
         try {
