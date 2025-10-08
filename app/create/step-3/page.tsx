@@ -129,13 +129,24 @@ export default function CreateStep3() {
       const bitcoin = await CryptoService.deriveAccount(seed, 'BITCOIN', 0);
       const solana = await CryptoService.deriveAccount(seed, 'SOLANA', 0);
       
-      // Store in Zustand
+      // Create wallet object for multi-wallet system
+      const wallet = {
+        id: `wallet-${Date.now()}`,
+        name: walletName || 'My Wallet',
+        accounts: [
+          { id: 'evm-0', name: 'Ethereum Account 1', address: evm.address, chain: 'EVM' as const },
+          { id: 'tron-0', name: 'TRON Account 1', address: tron.address, chain: 'TRON' as const },
+          { id: 'bitcoin-0', name: 'Bitcoin Account 1', address: bitcoin.address, chain: 'BITCOIN' as const },
+          { id: 'solana-0', name: 'Solana Account 1', address: solana.address, chain: 'SOLANA' as const }
+        ],
+        createdAt: Date.now()
+      };
+      
+      // Store in Zustand using addWallet (this is the correct method!)
       const store = useWalletStore.getState();
-      store.addAccount({ id: 'evm-0', name: 'Ethereum Account 1', address: evm.address, chain: 'EVM' });
-      store.addAccount({ id: 'tron-0', name: 'TRON Account 1', address: tron.address, chain: 'TRON' });
-      store.addAccount({ id: 'bitcoin-0', name: 'Bitcoin Account 1', address: bitcoin.address, chain: 'BITCOIN' });
-      store.addAccount({ id: 'solana-0', name: 'Solana Account 1', address: solana.address, chain: 'SOLANA' });
-      store.selectAccount('evm-0');
+      store.addWallet(wallet);
+      
+      console.log('Wallet created and saved:', wallet);
       
       // Mark as unlocked
       localStorage.setItem('vordium_unlocked', 'true');

@@ -98,12 +98,33 @@ export default function UnlockPage() {
       const solana = await CryptoService.deriveAccount(seed, 'SOLANA', 0);
       const bitcoin = await CryptoService.deriveAccount(seed, 'BITCOIN', 0);
 
-      // Store in Zustand
-      addAccount({ id: 'evm-0', name: 'Ethereum Account 1', address: evm.address, chain: 'EVM' });
-      addAccount({ id: 'tron-0', name: 'TRON Account 1', address: tron.address, chain: 'TRON' });
-      addAccount({ id: 'solana-0', name: 'Solana Account 1', address: solana.address, chain: 'SOLANA' });
-      addAccount({ id: 'bitcoin-0', name: 'Bitcoin Account 1', address: bitcoin.address, chain: 'BITCOIN' });
-      selectAccount('evm-0');
+      // Check if wallet already exists in store
+      const { wallets, addWallet, setCurrentWallet } = useWalletStore.getState();
+      
+      let walletId = wallets[0]?.id;
+      
+      if (wallets.length === 0) {
+        // Create new wallet in store if it doesn't exist
+        const walletName = localStorage.getItem('vordium_wallet_name') || 'My Wallet';
+        const wallet = {
+          id: `wallet-${Date.now()}`,
+          name: walletName,
+          accounts: [
+            { id: 'evm-0', name: 'Ethereum Account 1', address: evm.address, chain: 'EVM' as const },
+            { id: 'tron-0', name: 'TRON Account 1', address: tron.address, chain: 'TRON' as const },
+            { id: 'solana-0', name: 'Solana Account 1', address: solana.address, chain: 'SOLANA' as const },
+            { id: 'bitcoin-0', name: 'Bitcoin Account 1', address: bitcoin.address, chain: 'BITCOIN' as const }
+          ],
+          createdAt: Date.now()
+        };
+        addWallet(wallet);
+        walletId = wallet.id;
+        console.log('Wallet created on unlock:', wallet);
+      } else {
+        // Wallet exists, just set it as current
+        setCurrentWallet(walletId);
+        console.log('Wallet loaded from store:', wallets[0]);
+      }
 
       // Clear failed attempts on success
       SecurityService.clearFailedAttempts(identifier);
