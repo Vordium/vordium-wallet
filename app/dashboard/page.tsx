@@ -456,7 +456,7 @@ export default function DashboardPage() {
             {/* Add Token */}
             <button
               onClick={() => setShowAddToken(true)}
-              className="w-full mt-4 py-4 border-2 border-dashed border-gray-600 rounded-2xl text-gray-400 font-semibold hover:bg-gray-700 hover:text-gray-300 transition flex items-center justify-center gap-2"
+              className="w-full mt-4 mb-6 py-4 border-2 border-dashed border-gray-600 rounded-2xl text-gray-400 font-semibold hover:bg-gray-700 hover:text-gray-300 transition flex items-center justify-center gap-2"
             >
               <PlusIcon className="w-5 h-5" />
               Add Token

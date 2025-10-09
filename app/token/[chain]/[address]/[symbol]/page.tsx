@@ -48,28 +48,37 @@ export default function TokenDetailPage({
   const chainName = chainNameMap[params.chain] || params.chain;
   const isNative = params.address === 'native';
 
-  // Open blockchain scanner in in-app browser
-  const openBlockchainScanner = () => {
+  // Open blockchain scanner in in-app browser - shows wallet address, not token
+  const openBlockchainScanner = async () => {
+    const { useWalletStore } = await import('@/store/walletStore');
+    const accounts = useWalletStore.getState().accounts;
+    
+    // Get wallet address for this chain
+    let walletAddress = '';
+    const chainLower = params.chain.toLowerCase();
+    
+    if (['ethereum', 'bsc', 'polygon', 'arbitrum'].includes(chainLower)) {
+      const evmAccount = accounts.find(a => a.chain === 'EVM');
+      walletAddress = evmAccount?.address || '';
+    } else if (chainLower === 'tron') {
+      const tronAccount = accounts.find(a => a.chain === 'TRON');
+      walletAddress = tronAccount?.address || '';
+    } else if (chainLower === 'solana') {
+      const solanaAccount = accounts.find(a => a.chain === 'SOLANA');
+      walletAddress = solanaAccount?.address || '';
+    } else if (chainLower === 'bitcoin') {
+      const bitcoinAccount = accounts.find(a => a.chain === 'BITCOIN');
+      walletAddress = bitcoinAccount?.address || '';
+    }
+    
     const scannerUrls: Record<string, string> = {
-      'ethereum': params.address === 'native' 
-        ? `https://etherscan.io`
-        : `https://etherscan.io/token/${params.address}`,
-      'bsc': params.address === 'native'
-        ? `https://bscscan.com`
-        : `https://bscscan.com/token/${params.address}`,
-      'polygon': params.address === 'native'
-        ? `https://polygonscan.com`
-        : `https://polygonscan.com/token/${params.address}`,
-      'arbitrum': params.address === 'native'
-        ? `https://arbiscan.io`
-        : `https://arbiscan.io/token/${params.address}`,
-      'solana': params.address === 'native'
-        ? `https://solscan.io`
-        : `https://solscan.io/token/${params.address}`,
-      'tron': params.address === 'native'
-        ? `https://tronscan.org`
-        : `https://tronscan.org/#/token20/${params.address}`,
-      'bitcoin': `https://blockchair.com/bitcoin/address/${params.address}`
+      'ethereum': `https://etherscan.io/address/${walletAddress}`,
+      'bsc': `https://bscscan.com/address/${walletAddress}`,
+      'polygon': `https://polygonscan.com/address/${walletAddress}`,
+      'arbitrum': `https://arbiscan.io/address/${walletAddress}`,
+      'solana': `https://solscan.io/account/${walletAddress}`,
+      'tron': `https://tronscan.org/#/address/${walletAddress}`,
+      'bitcoin': `https://blockchair.com/bitcoin/address/${walletAddress}`
     };
 
     const url = scannerUrls[params.chain.toLowerCase()] || scannerUrls['ethereum'];
